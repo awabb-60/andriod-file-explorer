@@ -20,7 +20,7 @@ class SdCardPresenter(
     private val storagePath: String
 ) : StoragePresenterContract {
 
-    val copyLocation = "storage/3316-331/paste"
+    val copyLocation = ""
 
     override var filesListPresenter: FilesListPresenterContract? = null
 

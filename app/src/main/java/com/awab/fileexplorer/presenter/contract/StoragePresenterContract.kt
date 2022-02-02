@@ -17,11 +17,17 @@ import java.text.SimpleDateFormat
 
 interface StoragePresenterContract {
 
+    // the name of your sd card
     val sdCardName: String
-        get() = "3361-3530"
+        get() = ""
 
+    // the path of your sd card
     val sdCardPath: String
-        get() = "/storage/3361-3530"
+        get() = ""
+
+    // the path of your sd card
+    val internalStoragePath: String
+        get() = ""
 
     var filesListPresenter: FilesListPresenterContract?
 
@@ -196,6 +202,9 @@ interface StoragePresenterContract {
             return
         view.startMoveScreen()
     }
+
+    // to copy or move to the sd card or the internal storage, you have to have a folder
+    // named (Paste) in location you try to copy to.
     fun copy(to:String) {
         val selectedItem = filesListPresenter?.getSelectedItems()
         if (selectedItem == null || selectedItem.isEmpty())
@@ -208,13 +217,15 @@ interface StoragePresenterContract {
             "I" -> {
                 Intent(COPY_BROADCAST_ACTION).apply {
                     putExtra(COPY_PATHS_EXTRA, arrayOf(*listPath.toTypedArray()))
-                    putExtra(PASTE_LOCATION, "/storage/emulated/0/Paste")
+                    //  the copy location
+                    putExtra(PASTE_LOCATION, internalStoragePath + File.separator +"Paste")
                 }
             }
             "S" ->{
                 Intent(COPY_BROADCAST_ACTION).apply {
                     putExtra(COPY_PATHS_EXTRA, arrayOf(*listPath.toTypedArray()))
-                    putExtra(PASTE_LOCATION, "/storage/3361-3530/Paste")
+                    //  the copy location
+                    putExtra(PASTE_LOCATION, sdCardPath + File.separator + "Paste")
                     putExtra(TREE_URI_FOR_COPY_EXTRA, getTreeUri(view.context(), sdCardName).toString())
                     putExtra(EXTERNAL_STORAGE_PATH_EXTRA, sdCardPath)
                 }
@@ -240,7 +251,8 @@ interface StoragePresenterContract {
             "I" -> {
                 Intent(COPY_BROADCAST_ACTION).apply {
                     putExtra(COPY_PATHS_EXTRA, arrayOf(*listPath.toTypedArray()))
-                    putExtra(PASTE_LOCATION, "/storage/emulated/0/Paste")
+                    //  the copy location
+                    putExtra(PASTE_LOCATION, internalStoragePath + File.separator +"Paste")
                     putExtra(TREE_URI_FOR_COPY_EXTRA, getTreeUri(view.context(), sdCardName).toString())
                     putExtra(EXTERNAL_STORAGE_PATH_EXTRA, sdCardPath)
                 }
@@ -248,7 +260,7 @@ interface StoragePresenterContract {
             "S" ->{
                 Intent(COPY_BROADCAST_ACTION).apply {
                     putExtra(COPY_PATHS_EXTRA, arrayOf(*listPath.toTypedArray()))
-                    putExtra(PASTE_LOCATION, "/storage/3361-3530/Paste")
+                    putExtra(PASTE_LOCATION, sdCardPath + File.separator + "Paste")
                     putExtra(TREE_URI_FOR_COPY_EXTRA, getTreeUri(view.context(), sdCardName).toString())
                     putExtra(EXTERNAL_STORAGE_PATH_EXTRA, sdCardPath)
                 }
