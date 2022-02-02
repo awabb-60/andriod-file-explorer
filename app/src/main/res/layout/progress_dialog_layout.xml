@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:padding="10dp"
+        android:id="@+id/tvItemsCount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        tools:text="1/30"/>
+
+    <TextView
+        android:padding="10dp"
+        android:id="@+id/tvCopyName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="file 123"
+        android:ellipsize="middle"
+        android:textSize="17sp"
+        android:singleLine="true" />
+
+    <ProgressBar
+        android:id="@+id/copyProgressBar"
+        android:padding="5dp"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/progressPercentage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        tools:text="37%"
+        />
+
+    <TextView
+        android:id="@+id/tvCancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:background="?attr/selectableItemBackground"
+        android:text="Cancel"
+        android:textColor="@color/colorOnPrimary"
+        android:padding="10dp"
+        android:alpha="0.8"
+        android:layout_margin="10dp"
+        android:textSize="15sp" />
+</LinearLayout>

@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">File Explorer</string>
+
+    <string name="miDelete">Delete</string>
+    <string name="miMove">Move</string>
+    <string name="miCopy">Copy</string>
+    <string name="miRename">Rename</string>
+    <string name="miDetails">Details</string>
+    <string name="miSelectAll">Select All</string>
+    <string name="mi_open_with">Open With</string>
+
+    <string name="title_activity_media">MediaActivity</string>
+
+    <string name="open_with_chooser_title">open with</string>
+</resources>

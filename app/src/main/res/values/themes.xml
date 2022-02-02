@@ -1,0 +1,52 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.FileExplorer" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryVariant">@color/colorPrimaryVariant</item>
+        <item name="colorOnPrimary">@color/colorOnPrimary</item>
+
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/colorOnPrimary</item>
+        <item name="colorSecondaryVariant">@color/colorOnPrimary</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+
+        <!--        to make the action mode appear over the toolbar-->
+        <item name="windowActionModeOverlay">true</item>
+        <item name="actionModeCloseDrawable">@drawable/ic_chevron_left</item>
+        <item name="android:actionModeBackground">@color/colorPrimary</item>
+    </style>
+
+
+    <style name="FileExplorerToolBar" parent="Theme.MaterialComponents.Light">
+        <item name="actionMenuTextColor">@color/colorOnPrimary</item>
+        <item name="android:background">@color/colorPrimary</item>
+    </style>
+
+    <style name="DetailsItem">
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Title</item>
+    </style>
+
+    <style name="FileExplorerFileIcon">
+        <item name="android:background">@color/white</item>
+    </style>
+
+    <style name="MediaItemStyle">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:background">@drawable/media_button_background</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_margin">10dp</item>
+    </style>
+
+    <style name="Theme.FileExplorer.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.FileExplorer.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.FileExplorer.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+</resources>

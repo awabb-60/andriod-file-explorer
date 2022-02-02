@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/miDelete"
+        android:title="@string/miDelete"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/miMove"
+        android:title="@string/miMove"
+        app:showAsAction="never">
+    </item>
+
+    <item
+        android:id="@+id/miCopy"
+        android:title="@string/miCopy"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/miRename"
+        android:title="@string/miRename"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/miDetails"
+        android:title="@string/miDetails"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/miSelectAll"
+        android:title="@string/miSelectAll"
+        app:showAsAction="never"/>
+</menu>

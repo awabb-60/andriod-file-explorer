@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:clickable="true"
+    android:background="?attr/selectableItemBackground"
+    android:layout_width="match_parent"
+    android:padding="10dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:focusable="true">
+
+    <RelativeLayout
+        android:clickable="false"
+        android:id="@+id/rlProgressBarLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tvProgressPercentage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            tools:text="67%" />
+
+        <ProgressBar
+            android:id="@+id/pbSizeProgressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/circular_shape"
+            android:max="100"
+            android:progress="90"
+            android:progressDrawable="@drawable/circular_progress" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/tvStorageName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/rlProgressBarLayout"
+        android:layout_alignBottom="@id/rlProgressBarLayout"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_toEndOf="@id/rlProgressBarLayout"
+        android:layout_toRightOf="@id/rlProgressBarLayout"
+        android:clickable="false"
+        android:gravity="center_vertical"
+        android:textSize="20sp"
+        tools:text="Phone" />
+
+    <TextView
+        android:clickable="false"
+        android:id="@+id/tvStorageSize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/rlProgressBarLayout"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="5dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+        android:textSize="11sp"
+        tools:text="1.35GB free of 14.83GB" />
+
+</RelativeLayout>
