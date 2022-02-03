@@ -5,26 +5,27 @@ import android.content.Context
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.awab.fileexplorer.model.data_models.FileModel
 import com.awab.fileexplorer.R
 import com.awab.fileexplorer.databinding.FileItemBinding
+import com.awab.fileexplorer.model.data_models.FileModel
 import com.awab.fileexplorer.model.types.FileType
 import com.awab.fileexplorer.model.types.MimeType
 import com.awab.fileexplorer.model.utils.getApkIcon
-import com.awab.fileexplorer.model.utils.listeners.FragmentListener
+import com.awab.fileexplorer.presenter.contract.SearchPresenterContract
 import com.bumptech.glide.Glide
 
 
 class SearchAdapter : RecyclerView.Adapter<SearchAdapter.ViewHolder>() {
-    lateinit var list: List<FileModel>
-    lateinit var mFragmentListener: FragmentListener
-    lateinit var mContext: Context
+
+    private lateinit var list: List<FileModel>
+    private lateinit var mSearchPresenter: SearchPresenterContract
+    private lateinit var mContext: Context
+
     var searchText = ""
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -45,24 +46,22 @@ class SearchAdapter : RecyclerView.Adapter<SearchAdapter.ViewHolder>() {
         notifyDataSetChanged()
     }
 
-    fun setContextAndListener(context: Context) {
+    fun setContext(context: Context) {
         mContext = context
-        if (context is FragmentListener)
-            mFragmentListener = context
     }
 
+    fun setPresenter(presenter: SearchPresenterContract) {
+        mSearchPresenter = presenter
+    }
 
     inner class ViewHolder(private val binding: FileItemBinding) : RecyclerView.ViewHolder(binding.root) {
         init {
             binding.root.setOnClickListener {
                 if (adapterPosition != RecyclerView.NO_POSITION)
-//                    mFragmentListener.onFileClickFromSerach(list[adapterPosition])
-                    Log.d("TAG","" )
+                    mSearchPresenter.onItemClicked(list[adapterPosition])
             }
             binding.root.setOnLongClickListener {
-//                if (adapterPosition != RecyclerView.NO_POSITION)
-//                    mFragmentListener.onFileLongClick();true
-                    true
+                true
             }
         }
 
@@ -124,5 +123,6 @@ class SearchAdapter : RecyclerView.Adapter<SearchAdapter.ViewHolder>() {
         ss.setSpan(foregroundColor, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         return ss
     }
+
 
 }

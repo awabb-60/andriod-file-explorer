@@ -5,6 +5,8 @@ import com.awab.fileexplorer.view.contract.IFileFragmentView
 
 interface FilesListPresenterContract {
 
+    val mainStoragePresenter:StoragePresenterContract
+
     val actionModeOn:Boolean
 
     val view: IFileFragmentView

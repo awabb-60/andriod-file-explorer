@@ -36,7 +36,7 @@ class FilesFragment() : Fragment(), IFileFragmentView {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context is StorageView){
-            mMainPresenter = context.presenter()
+            mMainPresenter = context.presenter
         }
 
         val filePath = arguments?.getString(FILE_PATH_ARGS)!!

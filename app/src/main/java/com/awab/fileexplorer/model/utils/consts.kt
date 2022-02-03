@@ -76,10 +76,10 @@ const val COPY_TYPE_EXTRA = "COPY_TYPE_EXTRA"
 const val COPY = "COPY"
 const val MOVE = "MOVE"
 
-const val MEDIA_CONTENT_URI = "MEDIA_CONTENT_URI"
-const val MEDIA_CONTENT_DOCS = "MEDIA_CONTENT_DOCS"
-
-const val OPEN_WITH_TITLE = "Open With"
+/**
+ * this the category of media to be shown in the media activity
+ */
+const val MEDIA_CATEGORY_EXTRA = "MEDIA_CATEGORY_EXTRA"
 
 val PROJECTION = arrayOf(
     MediaStore.MediaColumns.DATA,

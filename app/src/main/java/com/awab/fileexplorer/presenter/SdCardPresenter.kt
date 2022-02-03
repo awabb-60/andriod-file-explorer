@@ -12,6 +12,7 @@ import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 import com.awab.fileexplorer.model.utils.PICKER_REQUEST_CODE
 import com.awab.fileexplorer.model.utils.SD_CARD_TREE_URI_SP
 import com.awab.fileexplorer.model.utils.TREE_URI_
+import com.awab.fileexplorer.presenter.contract.SearchPresenterContract
 import com.awab.fileexplorer.view.contract.StorageView
 
 class SdCardPresenter(
@@ -22,7 +23,9 @@ class SdCardPresenter(
 
     val copyLocation = ""
 
-    override var filesListPresenter: FilesListPresenterContract? = null
+    override lateinit var filesListPresenter: FilesListPresenterContract
+
+    override lateinit var searchPresenter: SearchPresenterContract
 
     override var actionModeOn: Boolean = false
 

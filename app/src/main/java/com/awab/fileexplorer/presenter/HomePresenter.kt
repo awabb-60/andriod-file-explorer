@@ -1,9 +1,9 @@
 package com.awab.fileexplorer.presenter
 
 import android.content.Intent
-import android.provider.MediaStore
 import com.awab.fileexplorer.R
 import com.awab.fileexplorer.model.data_models.StorageModel
+import com.awab.fileexplorer.model.types.MediaCategory
 import com.awab.fileexplorer.model.types.StorageType
 import com.awab.fileexplorer.presenter.contract.HomePresenterContract
 import com.awab.fileexplorer.model.utils.*
@@ -37,27 +37,27 @@ class HomePresenter(private val homeView: HomeView): HomePresenterContract {
 
     override fun mediaItemClicked(id: Int) {
         val mediaIntent = Intent(view.context(), MediaActivity::class.java)
-        when(id){
+
+        // the ype o media that will be presented
+        val type = when(id){
             R.id.btnMediaImages->{
-                val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-                mediaIntent.putExtra(MEDIA_CONTENT_URI  ,uri)
-                view.openActivity(mediaIntent)
+                MediaCategory.IMAGES
             }
             R.id.btnMediaVideo->{
-                val uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-                mediaIntent.putExtra(MEDIA_CONTENT_URI  ,uri)
-                view.openActivity(mediaIntent)
+                MediaCategory.VIDEOS
             }
             R.id.btnMediaAudio->{
-                val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-                mediaIntent.putExtra(MEDIA_CONTENT_URI  ,uri)
-                view.openActivity(mediaIntent)
+                MediaCategory.AUDIO
             }
             R.id.btnMediaDocs->{
-                mediaIntent.putExtra(MEDIA_CONTENT_DOCS  ,true)
-                view.openActivity(mediaIntent)
+                MediaCategory.DOCUMENTS
             }
+            else -> return
         }
+
+        // open the media activity
+        mediaIntent.putExtra(MEDIA_CATEGORY_EXTRA, type)
+        view.openActivity(mediaIntent)
     }
 
     fun makeStoragesModels(storages: List<File?>): List<StorageModel> {

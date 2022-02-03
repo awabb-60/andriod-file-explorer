@@ -60,7 +60,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
             when (it.itemId) {
                 R.id.miCreateFolder -> createNewFolder()
                 R.id.miView -> pickViewType()
-                R.id.miSearch -> openSearchFragment()
+                R.id.miSearch -> {openSearchFragment()}
             }
             Log.d(TAG, "menu item clicked: toolBar listener")
             true
@@ -134,6 +134,14 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         breadcrumbsAdapter.add(BreadcrumbsModel(name, path))
 //        to scroll the adapter to the last breadcrumbs item
         binding.rvBreadcrumbs.smoothScrollToPosition(breadcrumbsAdapter.list.count() - 1)
+    }
+
+    override fun openMenu() {
+        openOptionsMenu()
+    }
+
+    override fun closeMenu() {
+        closeOptionsMenu()
     }
 
     override fun onFileClickFromSerach(file: FileModel) {
@@ -219,13 +227,13 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
     override fun showItemDetails(name: String, lastModified: String, size: String, path: String) {
         val dialogBinding = ItemDetailsLayoutBinding.inflate(layoutInflater)
         dialogBinding.tvDetailsName.text = name
-        dialogBinding.tvDetailslastModified.text = lastModified
+        dialogBinding.tvDetailsLastModified.text = lastModified
         dialogBinding.tvDetailsSize.text = size
         dialogBinding.tvDetailsPath.text = path
 
-        val dialog = AlertDialog.Builder(this).setView(dialogBinding.root).create()
-        dialog.show()
-        dialogBinding.tvOk.setOnClickListener { dialog.cancel() }
+        val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
+        dialog?.show()
+        dialogBinding.tvOk.setOnClickListener { dialog?.cancel() }
     }
 
     override fun showItemsDetails(contains: String, totalSize: String) {
@@ -233,9 +241,9 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         dialogBinding.tvDetailsContains.text = contains
         dialogBinding.tvDetailsTotalSize.text = totalSize
 
-        val dialog = AlertDialog.Builder(this).setView(dialogBinding.root).create()
-        dialog.show()
-        dialogBinding.tvOk.setOnClickListener { dialog.cancel() }
+        val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
+        dialog?.show()
+        dialogBinding.tvOk.setOnClickListener { dialog?.cancel() }
     }
 
     override fun startCopyScreen() {
@@ -407,7 +415,6 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
-
     override fun onResume() {
         super.onResume()
         // to update the screen with progress
@@ -455,7 +462,6 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         supportFragmentManager.popBackStack()
         navigateToFolder(name, path)
     }
-
 
     private fun createNewFolder() {
 //        checking the authorization for the sdCard

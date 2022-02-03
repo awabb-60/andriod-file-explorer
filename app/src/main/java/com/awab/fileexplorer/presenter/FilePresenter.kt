@@ -14,13 +14,17 @@ class FilePresenter(
     private val mStoragePresenter: StoragePresenterContract
 ): FilesListPresenterContract {
 
+
+    override val mainStoragePresenter: StoragePresenterContract
+        get() = mStoragePresenter
+
     lateinit var list:List<FileModel>
 
     override val filesList: List<FileModel>
         get() = list
 
     override val actionModeOn: Boolean
-        get() = mStoragePresenter.actionModeOn
+        get() = mainStoragePresenter.actionModeOn
 
 
     override fun loadFiles() {
@@ -33,15 +37,15 @@ class FilePresenter(
     }
 
     override fun removeBreadcrumb() {
-        mStoragePresenter.removeBreadcrumb()
+        mainStoragePresenter.removeBreadcrumb()
     }
 
     override fun onFileClick(file: FileModel) {
-        mStoragePresenter.onFileClicked(file)
+        mainStoragePresenter.onFileClicked(file)
     }
 
     override fun onFileLongClick(file: FileModel) {
-        mStoragePresenter.onFileLongClicked(file)
+        mainStoragePresenter.onFileLongClicked(file)
     }
 
     override fun selectOrUnClickedItem(file: FileModel) {

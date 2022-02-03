@@ -8,6 +8,7 @@ import androidx.core.net.toUri
 import com.awab.fileexplorer.R
 import com.awab.fileexplorer.model.RecentFiles
 import com.awab.fileexplorer.model.data_models.MediaItemModel
+import com.awab.fileexplorer.model.types.MediaCategory
 import com.awab.fileexplorer.model.types.MimeType
 import com.awab.fileexplorer.model.utils.*
 import com.awab.fileexplorer.presenter.contract.MediaPresenterContract
@@ -20,16 +21,40 @@ import java.util.*
 
 class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
     private val TAG = "MediaPresenter"
+
+    private val mediaLoaderCallback = object:LoadMediaCallback{
+        override fun onSuccess(list: List<MediaItemModel>) {
+            view.mediaAdapter.setList(list)
+        }
+
+        override fun onFailure(message: String) {
+            view.mediaAdapter.setList(listOf())
+            view.showToast(message)
+        }
+    }
+
     override var actionModeOn: Boolean = false
 
     override fun loadMedia(intent: Intent) {
-        val contentUri = intent.getParcelableExtra<Uri>(MEDIA_CONTENT_URI)
-
-        when {
-            contentUri != null -> {
+        val category = intent.getSerializableExtra(MEDIA_CATEGORY_EXTRA)
+        if (category !is MediaCategory){
+            view.mediaAdapter.setList(listOf())
+            return
+        }
+        when(category) {
+            MediaCategory.IMAGES->{
+                val contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
                 getMediaFiles(contentUri, PROJECTION, null, null)
             }
-            intent.getBooleanExtra(MEDIA_CONTENT_DOCS, false) -> {
+            MediaCategory.VIDEOS->{
+                val contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+                getMediaFiles(contentUri, PROJECTION, null, null)
+            }
+            MediaCategory.AUDIO->{
+                val contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+                getMediaFiles(contentUri, PROJECTION, null, null)
+            }
+            MediaCategory.DOCUMENTS -> {
                 val docsContentUri = MediaStore.Files.getContentUri("external")
                 val selection = "_data LIKE ? OR _data LIKE ? OR _data LIKE ? OR _data LIKE ? "
                 val selectionArgs = arrayOf("%.pdf%", "%.txt%", "%.html%", "%.xml%")
@@ -186,16 +211,7 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
 
         // the worker thread that will handle the work and then notify the ui with the work results
         // with the callback
-        MediaLoaderWorkerThread(work, object:LoadMediaCallback{
-            override fun onSuccess(list: List<MediaItemModel>) {
-                view.mediaAdapter.setList(list)
-            }
-
-            override fun onFailure(message: String) {
-                view.mediaAdapter.setList(listOf())
-                view.showToast(message)
-            }
-        }).execute()
+        MediaLoaderWorkerThread(work, mediaLoaderCallback).execute()
     }
 
 }

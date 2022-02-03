@@ -7,16 +7,12 @@ import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 
 interface StorageView {
 
-    val presenter:StoragePresenterContract
-
-    fun context(): Context
-
     /**
      * get the presenter that control this view
      */
-    fun presenter(): StoragePresenterContract {
-        return presenter
-    }
+    val presenter:StoragePresenterContract
+
+    fun context(): Context
 
     /**
      * this opens the media file that in the intent
@@ -27,6 +23,16 @@ interface StorageView {
      * this open the folder with the given path
      */
     fun navigateToFolder(name:String, path:String)
+
+    /**
+     * to open the menu
+     */
+    fun openMenu()
+
+    /**
+     * to close the menu
+     */
+    fun closeMenu()
 
     fun onFileClickFromSerach(file: FileModel)
 

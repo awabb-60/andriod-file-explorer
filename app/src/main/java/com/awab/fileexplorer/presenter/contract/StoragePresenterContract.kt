@@ -13,6 +13,7 @@ import com.awab.fileexplorer.model.types.MimeType
 import com.awab.fileexplorer.view.contract.StorageView
 import java.io.File
 import com.awab.fileexplorer.model.utils.*
+import com.awab.fileexplorer.presenter.SearchFragmentPresenter
 import java.text.SimpleDateFormat
 
 interface StoragePresenterContract {
@@ -29,7 +30,9 @@ interface StoragePresenterContract {
     val internalStoragePath: String
         get() = ""
 
-    var filesListPresenter: FilesListPresenterContract?
+    var filesListPresenter: FilesListPresenterContract
+
+    var searchPresenter: SearchPresenterContract
 
     var actionModeOn:Boolean
 
@@ -163,6 +166,10 @@ interface StoragePresenterContract {
     } else // navigating to folder
         view.navigateToFolder(file.name, file.path)
 }
+
+    fun onFileClickedFromSearch(file: FileModel){
+        view.openMenu()
+    }
 
     fun onFileLongClicked(file: FileModel){
 //        starting the action mode

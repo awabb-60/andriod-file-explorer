@@ -3,20 +3,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginTop="5dp"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
-        android:layout_marginTop="0dp"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
         android:orientation="vertical"
-        android:padding="10dp"
-        >
+        android:padding="10dp">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clickable="false"
             android:text="Name" />
 
         <TextView
@@ -24,19 +26,23 @@
             style="@style/DetailsItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clickable="false"
             tools:text="Folder 1" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="0dp"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
         android:orientation="vertical"
         android:padding="10dp">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clickable="false"
             android:text="Size" />
 
         <TextView
@@ -44,39 +50,47 @@
             style="@style/DetailsItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clickable="false"
             tools:text="300MB" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="0dp"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
         android:orientation="vertical"
         android:padding="10dp">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clickable="false"
             android:text="Last Modified" />
 
         <TextView
-            android:id="@+id/tv_detailslast_modified"
+            android:id="@+id/tv_details_last_modified"
             style="@style/DetailsItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clickable="false"
             tools:text="1 may 2021 1:20:PM" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="0dp"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
         android:orientation="vertical"
         android:padding="10dp">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clickable="false"
             android:text="Path" />
 
         <TextView
@@ -84,6 +98,7 @@
             style="@style/DetailsItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clickable="false"
             tools:text="MyDevice/Storage" />
     </LinearLayout>
 
@@ -92,11 +107,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
+        android:alpha="0.8"
         android:background="?attr/selectableItemBackground"
+        android:padding="15dp"
         android:text="Ok"
         android:textColor="@color/colorOnPrimary"
-        android:padding="10dp"
-        android:alpha="0.8"
-        android:layout_margin="10dp"
         android:textSize="15sp" />
+
 </LinearLayout>

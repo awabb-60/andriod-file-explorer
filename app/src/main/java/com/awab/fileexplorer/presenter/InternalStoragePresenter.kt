@@ -7,6 +7,7 @@ import com.awab.fileexplorer.model.types.FileType
 import com.awab.fileexplorer.presenter.contract.FilesListPresenterContract
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 import com.awab.fileexplorer.model.utils.*
+import com.awab.fileexplorer.presenter.contract.SearchPresenterContract
 import com.awab.fileexplorer.view.contract.StorageView
 import java.io.File
 
@@ -18,7 +19,9 @@ class InternalStoragePresenter(
 
     val copyLocation = ""
 
-    override var filesListPresenter: FilesListPresenterContract? = null
+    override lateinit var filesListPresenter: FilesListPresenterContract
+
+    override lateinit var searchPresenter: SearchPresenterContract
 
     override var actionModeOn: Boolean = false
 

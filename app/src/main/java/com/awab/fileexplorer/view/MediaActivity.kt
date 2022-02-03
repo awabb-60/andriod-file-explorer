@@ -1,23 +1,23 @@
 package com.awab.fileexplorer.view
 
-import android.app.ProgressDialog
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.view.ActionMode
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.awab.fileexplorer.R
 import com.awab.fileexplorer.adapters.MediaAdapter
 import com.awab.fileexplorer.databinding.ActivityMediaBinding
 import com.awab.fileexplorer.databinding.ItemDetailsLayoutBinding
 import com.awab.fileexplorer.databinding.ItemsDetailsLayoutBinding
-import com.awab.fileexplorer.databinding.LoadingLayoutBinding
 import com.awab.fileexplorer.model.utils.*
 import com.awab.fileexplorer.presenter.MediaPresenter
 import com.awab.fileexplorer.presenter.contract.MediaPresenterContract
@@ -78,19 +78,19 @@ class MediaActivity : AppCompatActivity(), MediaView {
         dialogBinding.apply {
             tvDetailsName.text = name
             tvDetailsPath.text = path
+            tvDetailsName.movementMethod = ScrollingMovementMethod()
+            tvDetailsPath.movementMethod = ScrollingMovementMethod()
+
             tvDetailsSize.text = size
-            tvDetailslastModified.text = dateStr
+            tvDetailsLastModified.text = dateStr
         }
 
-        val dialog = AlertDialog.Builder(this)
-            .setTitle("Details")
-            .setView(dialogBinding.root)
-            .create()
+        val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
 
-        dialog.show()
+        dialog?.show()
 
         dialogBinding.tvOk.setOnClickListener {
-            dialog.cancel()
+            dialog?.cancel()
         }
     }
 
