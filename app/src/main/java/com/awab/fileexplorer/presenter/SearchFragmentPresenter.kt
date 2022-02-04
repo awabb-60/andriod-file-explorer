@@ -1,8 +1,9 @@
 package com.awab.fileexplorer.presenter
 
+import android.content.ContentResolver
 import android.os.AsyncTask
+import android.provider.MediaStore
 import com.awab.fileexplorer.model.data_models.FileModel
-import com.awab.fileexplorer.model.utils.getInnerFiles
 import com.awab.fileexplorer.model.utils.getSearchResults
 import com.awab.fileexplorer.model.utils.makeFileModels
 import com.awab.fileexplorer.presenter.contract.SearchPresenterContract
@@ -10,10 +11,11 @@ import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 import com.awab.fileexplorer.view.contract.ISearchFragmentView
 import java.io.File
 
-class SearchFragmentPresenter(private val view: ISearchFragmentView,
-                              private val folderName: String,
-                              private val mStoragePresenter:StoragePresenterContract)
-    :SearchPresenterContract{
+class SearchFragmentPresenter(
+    private val view: ISearchFragmentView,
+    private val folderPath: String,
+    private val mStoragePresenter: StoragePresenterContract
+) : SearchPresenterContract {
 
     override val mainStoragePresenter: StoragePresenterContract
         get() = mStoragePresenter
@@ -23,7 +25,7 @@ class SearchFragmentPresenter(private val view: ISearchFragmentView,
 
     override fun loadFiles() {
         if (searchList.isNullOrEmpty())
-            SearchListAsync(this, folderName).execute()
+            SearchListAsync(this, folderPath, view.context().contentResolver).execute()
         else
             isReady(searchList)
     }
@@ -37,7 +39,7 @@ class SearchFragmentPresenter(private val view: ISearchFragmentView,
         }
     }
 
-    private fun updateViewList(list: List<FileModel>, text:String) {
+    private fun updateViewList(list: List<FileModel>, text: String) {
         if (list.isEmpty())
             view.searchResultEmpty()
         else
@@ -54,19 +56,38 @@ class SearchFragmentPresenter(private val view: ISearchFragmentView,
         mainStoragePresenter.onFileClickedFromSearch(file)
     }
 
-    class SearchListAsync(private val controller: SearchFragmentPresenter, private val folderName: String) :
+    class SearchListAsync(
+        private val presenter: SearchFragmentPresenter,
+        private val folderPath: String,
+        private val contentResolver: ContentResolver
+    ) :
         AsyncTask<Unit, Unit, List<FileModel>>() {
 
         override fun doInBackground(vararg params: Unit?): List<FileModel> {
-            val folder = File(folderName)
-            val allFiles = getInnerFiles(folder, false)
+//            val folder = File(folderPath)
+//            val allFiles = getInnerFiles(folder, false)
+
+            val query = contentResolver.query(
+                MediaStore.Files.getContentUri("external"),
+                null, "_data Like ?",
+                arrayOf("%$folderPath%"), null
+            )
+
+            val allFiles = mutableListOf<File>()
+            query?.let { cursor ->
+                cursor.use {
+                    val pathId = it.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA)
+                    while (it.moveToNext()) {
+                        val path = it.getString(pathId)
+                        allFiles.add(File(path))
+                    }
+                }
+            }
             return makeFileModels(allFiles)
         }
 
-        override fun onPostExecute(result: List<FileModel>?) {
-            if (result != null) {
-                controller.isReady(result)
-            }
+        override fun onPostExecute(result: List<FileModel>) {
+            presenter.isReady(result)
             super.onPostExecute(result)
         }
     }

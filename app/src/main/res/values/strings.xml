@@ -12,4 +12,7 @@
     <string name="title_activity_media">MediaActivity</string>
 
     <string name="open_with_chooser_title">open with</string>
+
+    <string name="loading">loading…</string>
+    <string name="search_hint">Enter search text</string>
 </resources>

@@ -60,7 +60,7 @@ interface StoragePresenterContract {
 
     fun getMIRenameVisibility():Boolean{
 //        true to show rename
-        val count = filesListPresenter?.filesList?.count { it.selected }?:return false
+        val count = filesListPresenter.filesList.count { it.selected }?:return false
         return count ==1
     }
     fun removeBreadcrumb(){
@@ -68,7 +68,7 @@ interface StoragePresenterContract {
     }
 
     fun getSelectedTitle():String{
-        val count = filesListPresenter?.filesList?.count { it.selected }?:return ""
+        val count = filesListPresenter.filesList.count { it.selected }?:return ""
 
         return if (count <= 1)
             "$count item Selected"
@@ -77,25 +77,25 @@ interface StoragePresenterContract {
     }
 
     fun selectAll(){
-        filesListPresenter?.selectAll()
+        filesListPresenter.selectAll()
         view.updateActionMode()
     }
 
     fun shouldStopActionMode():Boolean{
-        val count = filesListPresenter?.filesList?.count { it.selected }?:return true
+        val count = filesListPresenter.filesList.count { it.selected }?:return true
         return count <= 0
     }
 
     fun stopActionMode(){
         actionModeOn = false
         view.stopActionMode()
-        filesListPresenter?.stopActionMode()
+        filesListPresenter.stopActionMode()
     }
 
     fun showDetails(){
-        val selectedList = filesListPresenter?.getSelectedItems()
+        val selectedList = filesListPresenter.getSelectedItems()
 
-        if (selectedList?.size == 1){
+        if (selectedList.size == 1){
             val item = selectedList[0]
             val date = SimpleDateFormat(DATE_FORMAT_PATTERN).format(item.date)
             if (item.type == FileType.FILE){
@@ -139,8 +139,7 @@ interface StoragePresenterContract {
     }
 
     fun confirmRename(){
-        val item = filesListPresenter?.getSelectedItems()?.get(0)
-        if (item != null)
+        val item = filesListPresenter.getSelectedItems().get(0)
             view.showRenameDialog(item.path, item.name)
     }
 
@@ -149,7 +148,7 @@ interface StoragePresenterContract {
     fun onFileClicked(file: FileModel){
 //        selecting unselecting the item
         if (actionModeOn){
-            filesListPresenter?.selectOrUnClickedItem(file)
+            filesListPresenter.selectOrUnClickedItem(file)
             view.updateActionMode()
             return
         }
@@ -168,17 +167,17 @@ interface StoragePresenterContract {
 }
 
     fun onFileClickedFromSearch(file: FileModel){
-        view.openMenu()
+        onFileClicked(file)
     }
 
     fun onFileLongClicked(file: FileModel){
 //        starting the action mode
        if (!actionModeOn){
            actionModeOn = true
-           filesListPresenter?.selectOrUnClickedItem(file)
+           filesListPresenter.selectOrUnClickedItem(file)
            view.startActionMode()
        }else{ // selecting unselecting the item
-           filesListPresenter?.selectOrUnClickedItem(file)
+           filesListPresenter.selectOrUnClickedItem(file)
            view.updateActionMode()
        }
 }
@@ -197,15 +196,15 @@ interface StoragePresenterContract {
     }
 
     fun startCopyScreen() {
-        val selectedItem = filesListPresenter?.getSelectedItems()
-        if (selectedItem == null || selectedItem.isEmpty())
+        val selectedItem = filesListPresenter.getSelectedItems()
+        if (selectedItem.isEmpty())
             return
         view.startCopyScreen()
     }
 
     fun startMoveScreen() {
-        val selectedItem = filesListPresenter?.getSelectedItems()
-        if (selectedItem == null || selectedItem.isEmpty())
+        val selectedItem = filesListPresenter.getSelectedItems()
+        if (selectedItem.isEmpty())
             return
         view.startMoveScreen()
     }
@@ -213,8 +212,8 @@ interface StoragePresenterContract {
     // to copy or move to the sd card or the internal storage, you have to have a folder
     // named (Paste) in location you try to copy to.
     fun copy(to:String) {
-        val selectedItem = filesListPresenter?.getSelectedItems()
-        if (selectedItem == null || selectedItem.isEmpty())
+        val selectedItem = filesListPresenter.getSelectedItems()
+        if (selectedItem.isEmpty())
             return
 
         val listPath = selectedItem.map { it.path }
@@ -247,8 +246,8 @@ interface StoragePresenterContract {
     }
 
     fun move(to:String){
-        val selectedItem = filesListPresenter?.getSelectedItems()
-        if (selectedItem == null || selectedItem.isEmpty())
+        val selectedItem = filesListPresenter.getSelectedItems()
+        if (selectedItem.isEmpty())
             return
 
         val listPath = selectedItem.map { it.path }
@@ -297,7 +296,7 @@ interface StoragePresenterContract {
         CopyServices.cancelCopy()
         view.stopCloseCopyScreen()
         stopActionMode()
-        filesListPresenter?.loadFiles()
+        filesListPresenter.loadFiles()
         Toast.makeText(view.context(), "copy done", Toast.LENGTH_SHORT).show()
     }
 

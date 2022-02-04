@@ -17,6 +17,7 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_FADE
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.awab.fileexplorer.*
@@ -46,6 +47,9 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
 
     private var progressDialogBinding: ProgressDialogLayoutBinding? = null
     private var progressDialog: AlertDialog? = null
+
+    lateinit var storageName:String
+    lateinit var storagePath:String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         createController()
@@ -89,8 +93,8 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
 
         // opening the storage folder
         if (savedInstanceState == null) {
-            val storageName = intent.getStringExtra(STORAGE_DISPLAY_NAME_EXTRA)!!
-            val storagePath = intent.getStringExtra(STORAGE_PATH_EXTRA)!!
+            storageName = intent.getStringExtra(STORAGE_DISPLAY_NAME_EXTRA)!!
+            storagePath = intent.getStringExtra(STORAGE_PATH_EXTRA)!!
             navigateToFolder(storageName, storagePath)
         }
 
@@ -175,12 +179,10 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         }
 
         val dialogBinding = ConfirmDeleteLayoutBinding.inflate(layoutInflater)
-        val dialog = AlertDialog.Builder(this)
-            .setTitle("Confirm Delete")
-            .setMessage("do you want to delete?")
-            .setView(dialogBinding.root)
-            .create()
+        val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
 
+        dialog.setTitle("Confirm Delete")
+        dialog.setMessage("do you want to delete?")
         dialog.show()
 
         dialogBinding.tvDelete.setOnClickListener {
@@ -199,24 +201,24 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
             return
         }
 
-        val binding = NamingFileLayoutBinding.inflate(layoutInflater, null, false)
-        binding.etNameFile.setText(currentName)
+        val dialogBinding = NamingFileLayoutBinding.inflate(layoutInflater, null, false)
+        dialogBinding.etNameFile.setText(currentName)
 
-        val dialog = AlertDialog.Builder(this).setTitle("Rename File")
-            .setView(binding.root)
-            .create()
+        val dialog = CustomDialog.makeDialog(this,dialogBinding.root)
 
+
+        dialog.setTitle("Rename File")
         dialog.show()
 
 //        focusing on the edit text
-        binding.etNameFile.requestFocus()
+        dialogBinding.etNameFile.requestFocus()
         val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.showSoftInput(binding.etNameFile, InputMethodManager.SHOW_IMPLICIT)
+        imm.showSoftInput(dialogBinding.etNameFile, InputMethodManager.SHOW_IMPLICIT)
 
-        binding.tvSave.setOnClickListener {
+        dialogBinding.tvSave.setOnClickListener {
 
-            if (binding.etNameFile.text.isNotBlank()) {
-                val name = binding.etNameFile.text.toString().trim()
+            if (dialogBinding.etNameFile.text.isNotBlank()) {
+                val name = dialogBinding.etNameFile.text.toString().trim()
                 mStoragePresenter.rename(path, name)
             } else
                 Toast.makeText(this, "invalid name", Toast.LENGTH_SHORT).show()
@@ -232,8 +234,8 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         dialogBinding.tvDetailsPath.text = path
 
         val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
-        dialog?.show()
-        dialogBinding.tvOk.setOnClickListener { dialog?.cancel() }
+        dialog.show()
+        dialogBinding.tvOk.setOnClickListener { dialog.cancel() }
     }
 
     override fun showItemsDetails(contains: String, totalSize: String) {
@@ -242,8 +244,8 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         dialogBinding.tvDetailsTotalSize.text = totalSize
 
         val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
-        dialog?.show()
-        dialogBinding.tvOk.setOnClickListener { dialog?.cancel() }
+        dialog.show()
+        dialogBinding.tvOk.setOnClickListener { dialog.cancel() }
     }
 
     override fun startCopyScreen() {
@@ -253,10 +255,9 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         }
 
         val dialogBinding = ChoseLocationBinding.inflate(layoutInflater)
-        val dialog = AlertDialog.Builder(this)
-            .setTitle("Choose Copy Location")
-            .setView(dialogBinding.root).create()
+        val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
 
+        dialog.setTitle("Choose Copy Location")
         dialog.show()
 
         dialogBinding.tvCancel.setOnClickListener {
@@ -269,9 +270,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
                 R.id.rbSdCard -> mStoragePresenter.copy("S")
             }
             dialog.cancel()
-
         }
-
     }
 
     override fun startMoveScreen() {
@@ -280,10 +279,9 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
             return
         }
         val dialogBinding = ChoseLocationBinding.inflate(layoutInflater)
-        val dialog = AlertDialog.Builder(this)
-            .setTitle("Choose Move Location")
-            .setView(dialogBinding.root).create()
+        val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
 
+        dialog.setTitle("Choose Move Location")
         dialog.show()
 
         dialogBinding.tvCancel.setOnClickListener {
@@ -301,9 +299,8 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
 
     override fun openCopyProgress(action:String) {
         val dialogBinding = ProgressDialogLayoutBinding.inflate(layoutInflater)
-        val dialog = AlertDialog.Builder(this)
-            .setView(dialogBinding.root)
-            .create()
+        val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
+
 
         dialogBinding.tvCancel.setOnClickListener {
             dialog.cancel()
@@ -449,10 +446,11 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
     }
 
     private fun openSearchFragment() {
-        val path = breadcrumbsAdapter.list.last().path
-        val searchFragment = SearchFragment.newInstance(path)
+        val currentFolderPath = breadcrumbsAdapter.list.last().path
+        val searchFragment = SearchFragment.newInstance(currentFolderPath, storageName, storagePath)
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragmentContainer, searchFragment)
+            .setTransition(TRANSIT_FRAGMENT_FADE)
             .addToBackStack(SEARCH_FRAGMENT_TAG)
             .commit()
     }
@@ -471,18 +469,17 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         }
 
         val dirPath = breadcrumbsAdapter.list.last().path
-        val binding = NamingFileLayoutBinding.inflate(layoutInflater, null, false)
-        val dialog = AlertDialog.Builder(this).setTitle("Create Folder")
-            .setView(binding.root)
-            .create()
+
+        val dialogBinding = NamingFileLayoutBinding.inflate(layoutInflater, null, false)
+        val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
         dialog.show()
 
-        binding.etNameFile.requestFocus()
+        dialogBinding.etNameFile.requestFocus()
         val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.showSoftInput(binding.etNameFile, 0)
+        imm.showSoftInput(dialogBinding.etNameFile, 0)
 
-        binding.tvSave.setOnClickListener {
-            val etCreateFolderName = binding.etNameFile
+        dialogBinding.tvSave.setOnClickListener {
+            val etCreateFolderName = dialogBinding.etNameFile
             if (etCreateFolderName.text.isNotBlank()) {
                 val name = etCreateFolderName.text.toString()
                 mStoragePresenter.createFolder("$dirPath/$name")
@@ -493,11 +490,11 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
 
     private fun pickViewType() {
         val viewingData = loadViewingData()
-        val binding = PickViewTypeLayoutBinding.inflate(layoutInflater, null, false)
+        val dialogBinding = PickViewTypeLayoutBinding.inflate(layoutInflater, null, false)
 //        val pickViewTypeView = layoutInflater.inflate(R.layout.pick_view_type_layout, null)
 
-        val rgSortingType: RadioGroup = binding.rgViewType
-        val rgSortingOrder: RadioGroup = binding.rgViewOrder
+        val rgSortingType: RadioGroup = dialogBinding.rgViewType
+        val rgSortingOrder: RadioGroup = dialogBinding.rgViewOrder
         when (viewingData[0]) {
             SORTING_TYPE_NAME -> rgSortingType.check(R.id.rbName)
             SORTING_TYPE_SIZE -> rgSortingType.check(R.id.rbSize)
@@ -508,9 +505,9 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
             SORTING_ORDER_DEC -> rgSortingOrder.check(R.id.rbDescending)
         }
 
-        val dialog = AlertDialog.Builder(this).setView(binding.root).create()
+        val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
         dialog.show()
-        binding.tvSave.setOnClickListener {
+        dialogBinding.tvSave.setOnClickListener {
             val type = when (rgSortingType.checkedRadioButtonId) {
                 R.id.rbName -> {
                     SORTING_TYPE_NAME

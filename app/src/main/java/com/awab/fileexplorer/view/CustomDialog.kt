@@ -1,14 +1,14 @@
 package com.awab.fileexplorer.view
 
-import android.app.AlertDialog
 import android.content.Context
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
 import com.awab.fileexplorer.R
 
 class CustomDialog{
     companion object {
-        fun makeDialog(context: Context, view: View): AlertDialog? {
+        fun makeDialog(context: Context, view: View): AlertDialog {
             val dialog = AlertDialog.Builder(context)
                 .setView(view)
                 .create()
