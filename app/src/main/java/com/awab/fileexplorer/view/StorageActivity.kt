@@ -17,7 +17,6 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_FADE
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.awab.fileexplorer.*
@@ -148,7 +147,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         closeOptionsMenu()
     }
 
-    override fun onFileClickFromSerach(file: FileModel) {
+    override fun onFileClickFromSearch(file: FileModel) {
     }
 
     override fun removeBreadcrumb() {

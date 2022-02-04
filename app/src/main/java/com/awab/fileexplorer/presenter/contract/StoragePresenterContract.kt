@@ -13,7 +13,6 @@ import com.awab.fileexplorer.model.types.MimeType
 import com.awab.fileexplorer.view.contract.StorageView
 import java.io.File
 import com.awab.fileexplorer.model.utils.*
-import com.awab.fileexplorer.presenter.SearchFragmentPresenter
 import java.text.SimpleDateFormat
 
 interface StoragePresenterContract {
@@ -60,7 +59,7 @@ interface StoragePresenterContract {
 
     fun getMIRenameVisibility():Boolean{
 //        true to show rename
-        val count = filesListPresenter.filesList.count { it.selected }?:return false
+        val count = filesListPresenter.filesList.count { it.selected }
         return count ==1
     }
     fun removeBreadcrumb(){
@@ -68,7 +67,7 @@ interface StoragePresenterContract {
     }
 
     fun getSelectedTitle():String{
-        val count = filesListPresenter.filesList.count { it.selected }?:return ""
+        val count = filesListPresenter.filesList.count { it.selected }
 
         return if (count <= 1)
             "$count item Selected"
@@ -82,7 +81,7 @@ interface StoragePresenterContract {
     }
 
     fun shouldStopActionMode():Boolean{
-        val count = filesListPresenter.filesList.count { it.selected }?:return true
+        val count = filesListPresenter.filesList.count { it.selected }
         return count <= 0
     }
 

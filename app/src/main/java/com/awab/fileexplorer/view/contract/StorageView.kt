@@ -34,7 +34,7 @@ interface StorageView {
      */
     fun closeMenu()
 
-    fun onFileClickFromSerach(file: FileModel)
+    fun onFileClickFromSearch(file: FileModel)
 
     /**
      * removes the breadcrumb item when the navigating out from the file

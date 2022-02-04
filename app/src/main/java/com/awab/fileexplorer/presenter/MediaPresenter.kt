@@ -25,6 +25,7 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
     private val mediaLoaderCallback = object:LoadMediaCallback{
         override fun onSuccess(list: List<MediaItemModel>) {
             view.mediaAdapter.setList(list)
+
         }
 
         override fun onFailure(message: String) {
