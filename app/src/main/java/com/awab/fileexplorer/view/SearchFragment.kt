@@ -102,7 +102,7 @@ class SearchFragment : Fragment(), ISearchFragmentView {
         binding.searchView.queryHint = getString(R.string.search_hint)
 
         // bind this search presenter to tha main presenter
-        mMainPresenter.searchPresenter = mSearchFragmentPresenter
+        mMainPresenter.supPresenter = mSearchFragmentPresenter
 
 
         //  showing a progress bar until the Presenter is ready

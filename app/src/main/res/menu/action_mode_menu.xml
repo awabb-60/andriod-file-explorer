@@ -10,12 +10,13 @@
     <item
         android:id="@+id/miMove"
         android:title="@string/miMove"
-        app:showAsAction="never">
-    </item>
+        android:visible="false"
+        app:showAsAction="never"/>
 
     <item
         android:id="@+id/miCopy"
         android:title="@string/miCopy"
+        android:visible="false"
         app:showAsAction="never" />
     <item
         android:id="@+id/miRename"
@@ -30,5 +31,5 @@
     <item
         android:id="@+id/miSelectAll"
         android:title="@string/miSelectAll"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
 </menu>

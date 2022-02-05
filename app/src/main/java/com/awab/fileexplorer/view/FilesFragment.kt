@@ -67,7 +67,7 @@ class FilesFragment() : Fragment(), IFileFragmentView {
         binding.rvFilesList.setHasFixedSize(true)
 
 //        bind this view to the main presenter
-        mMainPresenter.filesListPresenter = mFileFragmentPresenter
+        mMainPresenter.supPresenter = mFileFragmentPresenter
         mFileFragmentPresenter.loadFiles()
     }
 

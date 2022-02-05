@@ -7,12 +7,11 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.documentfile.provider.DocumentFile
-import com.awab.fileexplorer.presenter.contract.FilesListPresenterContract
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 import com.awab.fileexplorer.model.utils.PICKER_REQUEST_CODE
 import com.awab.fileexplorer.model.utils.SD_CARD_TREE_URI_SP
 import com.awab.fileexplorer.model.utils.TREE_URI_
-import com.awab.fileexplorer.presenter.contract.SearchPresenterContract
+import com.awab.fileexplorer.presenter.contract.SupPresenter
 import com.awab.fileexplorer.view.contract.StorageView
 
 class SdCardPresenter(
@@ -23,9 +22,7 @@ class SdCardPresenter(
 
     val copyLocation = ""
 
-    override lateinit var filesListPresenter: FilesListPresenterContract
-
-    override lateinit var searchPresenter: SearchPresenterContract
+    override lateinit var supPresenter: SupPresenter
 
     override var actionModeOn: Boolean = false
 
@@ -59,7 +56,7 @@ class SdCardPresenter(
             }
 
             view.stopActionMode()
-            filesListPresenter?.loadFiles()
+            supPresenter.loadFiles()
         } catch (e: Exception) {
             Toast.makeText(view.context(), "IO error occurred", Toast.LENGTH_SHORT).show()
         }
@@ -80,7 +77,7 @@ class SdCardPresenter(
             if (file != null) {
                 val success = file.createDirectory(newFolderName)
                 if (success != null)
-                    filesListPresenter?.loadFiles()
+                    supPresenter.loadFiles()
                 else
                     Toast.makeText(view.context(), "unable to create this file", Toast.LENGTH_SHORT).show()
             }
@@ -91,9 +88,9 @@ class SdCardPresenter(
 
     override fun delete() {
         try {
-            val selectedItems = filesListPresenter?.getSelectedItems()
+            val selectedItems = supPresenter.getSelectedItems()
             val parentDir = getTreeUriFile()
-            if (selectedItems == null || selectedItems.isEmpty())
+            if (selectedItems.isEmpty())
                 return
             val file = navigateToParentTreeFile(parentDir, selectedItems[0].path)
             selectedItems.forEach {
@@ -107,7 +104,7 @@ class SdCardPresenter(
                     Toast.makeText(view.context(), "error deleting ${it.name}", Toast.LENGTH_SHORT).show()
             }
             view.stopActionMode()
-            filesListPresenter?.loadFiles()
+            supPresenter.loadFiles()
         } catch (e: Exception) {
             Toast.makeText(view.context(), "error deleting files", Toast.LENGTH_SHORT).show()
         }

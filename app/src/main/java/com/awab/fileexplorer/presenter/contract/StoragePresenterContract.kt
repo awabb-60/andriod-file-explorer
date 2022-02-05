@@ -29,9 +29,7 @@ interface StoragePresenterContract {
     val internalStoragePath: String
         get() = ""
 
-    var filesListPresenter: FilesListPresenterContract
-
-    var searchPresenter: SearchPresenterContract
+    var supPresenter: SupPresenter
 
     var actionModeOn:Boolean
 
@@ -59,7 +57,7 @@ interface StoragePresenterContract {
 
     fun getMIRenameVisibility():Boolean{
 //        true to show rename
-        val count = filesListPresenter.filesList.count { it.selected }
+        val count = supPresenter.getSelectedItemCount()
         return count ==1
     }
     fun removeBreadcrumb(){
@@ -67,7 +65,7 @@ interface StoragePresenterContract {
     }
 
     fun getSelectedTitle():String{
-        val count = filesListPresenter.filesList.count { it.selected }
+        val count = supPresenter.getSelectedItemCount()
 
         return if (count <= 1)
             "$count item Selected"
@@ -76,23 +74,23 @@ interface StoragePresenterContract {
     }
 
     fun selectAll(){
-        filesListPresenter.selectAll()
+        supPresenter.selectAll()
         view.updateActionMode()
     }
 
     fun shouldStopActionMode():Boolean{
-        val count = filesListPresenter.filesList.count { it.selected }
+        val count = supPresenter.getSelectedItemCount()
         return count <= 0
     }
 
     fun stopActionMode(){
         actionModeOn = false
         view.stopActionMode()
-        filesListPresenter.stopActionMode()
+        supPresenter.stopActionMode()
     }
 
     fun showDetails(){
-        val selectedList = filesListPresenter.getSelectedItems()
+        val selectedList = supPresenter.getSelectedItems()
 
         if (selectedList.size == 1){
             val item = selectedList[0]
@@ -138,7 +136,7 @@ interface StoragePresenterContract {
     }
 
     fun confirmRename(){
-        val item = filesListPresenter.getSelectedItems().get(0)
+        val item = supPresenter.getSelectedItems().get(0)
             view.showRenameDialog(item.path, item.name)
     }
 
@@ -147,7 +145,7 @@ interface StoragePresenterContract {
     fun onFileClicked(file: FileModel){
 //        selecting unselecting the item
         if (actionModeOn){
-            filesListPresenter.selectOrUnClickedItem(file)
+            supPresenter.selectOrUnClickedItem(file)
             view.updateActionMode()
             return
         }
@@ -173,10 +171,10 @@ interface StoragePresenterContract {
 //        starting the action mode
        if (!actionModeOn){
            actionModeOn = true
-           filesListPresenter.selectOrUnClickedItem(file)
+           supPresenter.selectOrUnClickedItem(file)
            view.startActionMode()
        }else{ // selecting unselecting the item
-           filesListPresenter.selectOrUnClickedItem(file)
+           supPresenter.selectOrUnClickedItem(file)
            view.updateActionMode()
        }
 }
@@ -195,14 +193,14 @@ interface StoragePresenterContract {
     }
 
     fun startCopyScreen() {
-        val selectedItem = filesListPresenter.getSelectedItems()
+        val selectedItem = supPresenter.getSelectedItems()
         if (selectedItem.isEmpty())
             return
         view.startCopyScreen()
     }
 
     fun startMoveScreen() {
-        val selectedItem = filesListPresenter.getSelectedItems()
+        val selectedItem = supPresenter.getSelectedItems()
         if (selectedItem.isEmpty())
             return
         view.startMoveScreen()
@@ -211,7 +209,7 @@ interface StoragePresenterContract {
     // to copy or move to the sd card or the internal storage, you have to have a folder
     // named (Paste) in location you try to copy to.
     fun copy(to:String) {
-        val selectedItem = filesListPresenter.getSelectedItems()
+        val selectedItem = supPresenter.getSelectedItems()
         if (selectedItem.isEmpty())
             return
 
@@ -245,7 +243,7 @@ interface StoragePresenterContract {
     }
 
     fun move(to:String){
-        val selectedItem = filesListPresenter.getSelectedItems()
+        val selectedItem = supPresenter.getSelectedItems()
         if (selectedItem.isEmpty())
             return
 
@@ -295,7 +293,7 @@ interface StoragePresenterContract {
         CopyServices.cancelCopy()
         view.stopCloseCopyScreen()
         stopActionMode()
-        filesListPresenter.loadFiles()
+        supPresenter.loadFiles()
         Toast.makeText(view.context(), "copy done", Toast.LENGTH_SHORT).show()
     }
 

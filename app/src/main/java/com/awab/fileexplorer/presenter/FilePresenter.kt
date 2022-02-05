@@ -14,30 +14,19 @@ class FilePresenter(
     private val mStoragePresenter: StoragePresenterContract
 ): FilesListPresenterContract {
 
-
     override val mainStoragePresenter: StoragePresenterContract
         get() = mStoragePresenter
 
-    lateinit var list:List<FileModel>
-
-    override val filesList: List<FileModel>
-        get() = list
-
-    override val actionModeOn: Boolean
-        get() = mainStoragePresenter.actionModeOn
-
+    override fun removeBreadcrumb() {
+        mainStoragePresenter.removeBreadcrumb()
+    }
 
     override fun loadFiles() {
         val sp = view.context().getSharedPreferences(VIEW_TYPE_SHARED_PREFERENCES, Context.MODE_PRIVATE)
         val type = sp.getString(SHARED_PREFERENCES_SORTING_TYPE, SORTING_TYPE_NAME)!!
         val order = sp.getString(SHARED_PREFERENCES_SORTING_ORDER, SORTING_ORDER_DEC)!!
         val list = makeFilesList(folder, sortingType = type, sortingOrder = order)
-        this.list = list
         view.updateList(list)
-    }
-
-    override fun removeBreadcrumb() {
-        mainStoragePresenter.removeBreadcrumb()
     }
 
     override fun onFileClick(file: FileModel) {
@@ -60,7 +49,12 @@ class FilePresenter(
         return view.getSelectedItems()
     }
 
+    override fun getSelectedItemCount(): Int {
+        return view.getSelectedItems().count()
+    }
+
     override fun stopActionMode() {
         view.stopActionMode()
     }
+
 }

@@ -8,6 +8,7 @@ import com.awab.fileexplorer.presenter.contract.FilesListPresenterContract
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 import com.awab.fileexplorer.model.utils.*
 import com.awab.fileexplorer.presenter.contract.SearchPresenterContract
+import com.awab.fileexplorer.presenter.contract.SupPresenter
 import com.awab.fileexplorer.view.contract.StorageView
 import java.io.File
 
@@ -19,9 +20,7 @@ class InternalStoragePresenter(
 
     val copyLocation = ""
 
-    override lateinit var filesListPresenter: FilesListPresenterContract
-
-    override lateinit var searchPresenter: SearchPresenterContract
+    override lateinit var supPresenter: SupPresenter
 
     override var actionModeOn: Boolean = false
 
@@ -45,22 +44,22 @@ class InternalStoragePresenter(
             Toast.makeText(view.context(), "file renamed successfully", Toast.LENGTH_SHORT).show()
 
             view.stopActionMode()
-            filesListPresenter?.loadFiles()
+            supPresenter.loadFiles()
         } else
             Toast.makeText(view.context(), "cant rename this file", Toast.LENGTH_SHORT).show()
     }
 
     override fun createFolder(path: String) {
         if (createFolderIO(File(path.trim())))
-            filesListPresenter?.loadFiles()
+            supPresenter.loadFiles()
         else
             Toast.makeText(view.context(), "folder was not crated", Toast.LENGTH_SHORT).show()
     }
 
     override fun delete() {
         try {
-            val selectedItems = filesListPresenter?.getSelectedItems()
-            selectedItems?.forEach {
+            val selectedItems = supPresenter.getSelectedItems()
+            selectedItems.forEach {
                 if (it.type == FileType.DIRECTORY)
                     deleteFolderIO(it.path)
                 else
@@ -68,7 +67,7 @@ class InternalStoragePresenter(
             }
 
             view.stopActionMode()
-            filesListPresenter?.loadFiles()
+            supPresenter.loadFiles()
         } catch (e: Exception) {
             Toast.makeText(view.context(), "error deleting files", Toast.LENGTH_SHORT).show()
         }

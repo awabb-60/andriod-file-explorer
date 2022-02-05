@@ -58,9 +58,13 @@ class SearchAdapter : RecyclerView.Adapter<SearchAdapter.ViewHolder>() {
         init {
             binding.root.setOnClickListener {
                 if (adapterPosition != RecyclerView.NO_POSITION)
-                    mSearchPresenter.onItemClicked(list[adapterPosition])
+                    mSearchPresenter.onFileClick(list[adapterPosition])
             }
             binding.root.setOnLongClickListener {
+                if (adapterPosition != RecyclerView.NO_POSITION)
+                    mSearchPresenter.onFileLongClick(list[adapterPosition])
+
+                //  so the cilk event doesn't go to anther view in the tree
                 true
             }
         }
