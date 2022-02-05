@@ -5,20 +5,15 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
-import android.view.WindowManager
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.view.ActionMode
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.awab.fileexplorer.R
 import com.awab.fileexplorer.adapters.MediaAdapter
 import com.awab.fileexplorer.databinding.ActivityMediaBinding
 import com.awab.fileexplorer.databinding.ItemDetailsLayoutBinding
 import com.awab.fileexplorer.databinding.ItemsDetailsLayoutBinding
-import com.awab.fileexplorer.model.utils.*
 import com.awab.fileexplorer.presenter.MediaPresenter
 import com.awab.fileexplorer.presenter.contract.MediaPresenterContract
 import com.awab.fileexplorer.view.action_mode_callbacks.MediaActionModeCallback
@@ -45,20 +40,16 @@ class MediaActivity : AppCompatActivity(), MediaView {
         setSupportActionBar(binding.toolBar)
 
         title = ""
+        presenter = MediaPresenter(this)
 
-        adapter = MediaAdapter().apply {
-            setContext(this@MediaActivity)
-        }
+        adapter = MediaAdapter(this, presenter)
 
         binding.rvMedia.adapter = adapter
         binding.rvMedia.layoutManager = LinearLayoutManager(this)
         binding.rvMedia.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         binding.rvMedia.setHasFixedSize(true)
 
-        presenter = MediaPresenter(this)
         presenter.loadMedia(intent)
-
-        adapter.setPresenter(presenter)
     }
 
     override val mediaAdapter: MediaAdapter
@@ -87,10 +78,10 @@ class MediaActivity : AppCompatActivity(), MediaView {
 
         val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
 
-        dialog?.show()
+        dialog.show()
 
         dialogBinding.tvOk.setOnClickListener {
-            dialog?.cancel()
+            dialog.cancel()
         }
     }
 
@@ -102,13 +93,11 @@ class MediaActivity : AppCompatActivity(), MediaView {
             tvDetailsTotalSize.text = totalSize
         }
 
-        val dialog = AlertDialog.Builder(this)
-            .setTitle("Details")
-            .setView(dialogBinding.root)
-            .create()
+        val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
+
+        dialog.setTitle("Details")
 
         dialog.show()
-
         dialogBinding.tvOk.setOnClickListener {
             dialog.cancel()
         }

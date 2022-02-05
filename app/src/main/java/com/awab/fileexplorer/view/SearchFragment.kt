@@ -69,11 +69,7 @@ class SearchFragment : Fragment(), ISearchFragmentView {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        _adapter = SearchAdapter().apply {
-            setContext(requireContext())
-            setPresenter(mSearchFragmentPresenter)
-            setItemsList(listOf())
-        }
+        _adapter = SearchAdapter(requireContext(), mSearchFragmentPresenter)
 
         binding.rvSearchResults.adapter = adapter
         binding.rvSearchResults.layoutManager = LinearLayoutManager(requireContext())

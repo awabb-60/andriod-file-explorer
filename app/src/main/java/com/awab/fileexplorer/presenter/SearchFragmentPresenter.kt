@@ -52,11 +52,9 @@ class SearchFragmentPresenter(
     }
 
     override fun onFileLongClick(file: FileModel) {
-
     }
 
     override fun selectOrUnClickedItem(file: FileModel) {
-
     }
 
     override fun selectAll() {
@@ -72,5 +70,4 @@ class SearchFragmentPresenter(
 
     override fun stopActionMode() {
     }
-
 }

@@ -56,10 +56,7 @@ class FilesFragment() : Fragment(), IFileFragmentView {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        _adapter = FilesAdapter().apply {
-            setContext(requireContext())
-            setPresenter(mFileFragmentPresenter)
-        }
+        _adapter = FilesAdapter(requireContext(), mFileFragmentPresenter)
 
         binding.rvFilesList.adapter = adapter
         binding.rvFilesList.layoutManager = LinearLayoutManager(context)
