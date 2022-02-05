@@ -37,7 +37,7 @@ class FilePresenter(
         mainStoragePresenter.onFileLongClicked(file)
     }
 
-    override fun selectOrUnClickedItem(file: FileModel) {
+    override fun selectOrUnSelectItem(file: FileModel) {
         view.selectOrUnSelectItem(file)
     }
 

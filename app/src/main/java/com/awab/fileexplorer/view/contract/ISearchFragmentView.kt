@@ -16,4 +16,12 @@ interface ISearchFragmentView {
     fun searchTextEmpty()
 
     fun removeInputMethod()
+
+    fun selectOrUnSelect(file: FileModel)
+
+    fun selectAll()
+
+    fun getSelectedItems(): List<FileModel>
+
+    fun stopActionMode()
 }

@@ -163,7 +163,7 @@ interface StoragePresenterContract {
     fun onFileClicked(file: FileModel){
 //        selecting unselecting the item
         if (actionModeOn){
-            supPresenter.selectOrUnClickedItem(file)
+            supPresenter.selectOrUnSelectItem(file)
             view.updateActionMode()
             return
         }
@@ -194,10 +194,10 @@ interface StoragePresenterContract {
 //        starting the action mode
        if (!actionModeOn){
            actionModeOn = true
-           supPresenter.selectOrUnClickedItem(file)
+           supPresenter.selectOrUnSelectItem(file)
            view.startActionMode()
        }else{ // selecting unselecting the item
-           supPresenter.selectOrUnClickedItem(file)
+           supPresenter.selectOrUnSelectItem(file)
            view.updateActionMode()
        }
 }

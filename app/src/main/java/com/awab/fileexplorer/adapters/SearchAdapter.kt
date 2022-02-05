@@ -32,6 +32,37 @@ class SearchAdapter(val context: Context, val presenter: SupPresenter) : Recycle
 
     override fun getItemCount() = currentList.size
 
+
+    fun selectOrUnSelect(file: FileModel) {
+        for (i in currentList) {
+            if (i == file) {
+                i.selected = !i.selected
+                notifyItemChanged(currentList.indexOf(i))
+                break
+            }
+        }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun selectAll() {
+        currentList.forEach {
+            it.selected = true
+        }
+        notifyDataSetChanged()
+    }
+
+    fun getSelectedItems(): List<FileModel> {
+        return currentList.filter { it.selected }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun stopActionMode() {
+        currentList.forEach {
+            it.selected = false
+        }
+        notifyDataSetChanged()
+    }
+
     @SuppressLint("NotifyDataSetChanged")
     fun setItemsList(list: List<FileModel>, searchText: String = "") {
         this.currentList = list

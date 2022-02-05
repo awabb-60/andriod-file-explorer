@@ -151,12 +151,31 @@ class SearchFragment : Fragment(), ISearchFragmentView {
         imm.hideSoftInputFromWindow(binding.root.windowToken, 0)
     }
 
+    override fun selectOrUnSelect(file: FileModel) {
+        adapter.selectOrUnSelect(file)
+    }
+
+    override fun selectAll() {
+        adapter.selectAll()
+    }
+
+    override fun getSelectedItems(): List<FileModel> {
+        return adapter.getSelectedItems()
+    }
+
+    override fun stopActionMode() {
+        adapter.stopActionMode()
+    }
+
+
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
         // reloading the list after config change
         val text = binding.searchView.query
         mSearchFragmentPresenter.onTextChanged(text.toString())
     }
+
+
 
     companion object {
         fun newInstance(currentFolderPath: String, storageName: String, storagePath: String): SearchFragment {

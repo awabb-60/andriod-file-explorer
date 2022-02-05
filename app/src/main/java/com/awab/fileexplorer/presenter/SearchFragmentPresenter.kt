@@ -52,22 +52,26 @@ class SearchFragmentPresenter(
     }
 
     override fun onFileLongClick(file: FileModel) {
+        mainStoragePresenter.onFileLongClicked(file)
     }
 
-    override fun selectOrUnClickedItem(file: FileModel) {
+    override fun selectOrUnSelectItem(file: FileModel) {
+        view.selectOrUnSelect(file)
     }
 
     override fun selectAll() {
+        view.selectAll()
     }
 
     override fun getSelectedItems(): List<FileModel> {
-        return listOf()
+        return view.getSelectedItems()
     }
 
     override fun getSelectedItemCount(): Int {
-        return 0
+        return getSelectedItems().count()
     }
 
     override fun stopActionMode() {
+        view.stopActionMode()
     }
 }

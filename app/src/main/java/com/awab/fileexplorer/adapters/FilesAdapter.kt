@@ -32,14 +32,6 @@ class FilesAdapter(val mContext: Context, val presenter: SupPresenter) : ListAda
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun stopActionMode() {
-        currentList.forEach {
-            it.selected = false
-        }
-        notifyDataSetChanged()
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
     fun selectAll() {
         currentList.forEach {
             it.selected = true
@@ -49,6 +41,14 @@ class FilesAdapter(val mContext: Context, val presenter: SupPresenter) : ListAda
 
     fun getSelectedItems(): List<FileModel> {
         return currentList.filter { it.selected }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun stopActionMode() {
+        currentList.forEach {
+            it.selected = false
+        }
+        notifyDataSetChanged()
     }
 
     inner class ViewHolder(private val binding: FileItemBinding) : RecyclerView.ViewHolder(binding.root) {

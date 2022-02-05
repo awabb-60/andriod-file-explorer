@@ -44,7 +44,7 @@ interface SupPresenter {
      * to select the item if the item is unselected or
      * to unselect the item if the item is selected
      */
-    fun selectOrUnClickedItem(file: FileModel)
+    fun selectOrUnSelectItem(file: FileModel)
 
     /**
      * select all the items in the supPresenter view
