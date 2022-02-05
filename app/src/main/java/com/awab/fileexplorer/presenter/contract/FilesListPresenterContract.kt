@@ -6,5 +6,8 @@ interface FilesListPresenterContract:SupPresenter {
 
     val view: IFileFragmentView
 
+    override val mainMenuState: Boolean
+        get() = true
+
     fun removeBreadcrumb()
 }

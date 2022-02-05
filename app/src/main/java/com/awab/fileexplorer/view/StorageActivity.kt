@@ -33,6 +33,7 @@ import com.awab.fileexplorer.view.action_mode_callbacks.FilesActionModeCallBack
 import com.awab.fileexplorer.view.contract.StorageView
 import java.io.File
 
+
 class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
     private val TAG = "StorageActivity"
     private lateinit var binding: ActivityStorageBinding
@@ -50,6 +51,8 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
     lateinit var storageName:String
     lateinit var storagePath:String
 
+    override var showMenu = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         createController()
         super.onCreate(savedInstanceState)
@@ -65,7 +68,6 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
                 R.id.miView -> pickViewType()
                 R.id.miSearch -> {openSearchFragment()}
             }
-            Log.d(TAG, "menu item clicked: toolBar listener")
             true
         }
 
@@ -96,7 +98,6 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
             storagePath = intent.getStringExtra(STORAGE_PATH_EXTRA)!!
             navigateToFolder(storageName, storagePath)
         }
-
     }
 
     private fun createController() {
@@ -115,6 +116,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
             }
         }
     }
+
 
     override val presenter: StoragePresenterContract
         get() = mStoragePresenter
@@ -139,12 +141,8 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         binding.rvBreadcrumbs.smoothScrollToPosition(breadcrumbsAdapter.list.count() - 1)
     }
 
-    override fun openMenu() {
-        openOptionsMenu()
-    }
-
-    override fun closeMenu() {
-        closeOptionsMenu()
+    override fun updateMenu() {
+        invalidateOptionsMenu()
     }
 
     override fun onFileClickFromSearch(file: FileModel) {
@@ -335,7 +333,8 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.main_menu, menu)
+        if(showMenu)
+            menuInflater.inflate(R.menu.main_menu, menu)
         return true
     }
 

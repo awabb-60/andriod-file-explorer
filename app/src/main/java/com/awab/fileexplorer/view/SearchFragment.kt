@@ -98,14 +98,14 @@ class SearchFragment : Fragment(), ISearchFragmentView {
         binding.searchView.queryHint = getString(R.string.search_hint)
 
         // bind this search presenter to tha main presenter
-        mMainPresenter.supPresenter = mSearchFragmentPresenter
-
+        mMainPresenter.bindSupPresenter(mSearchFragmentPresenter)
 
         //  showing a progress bar until the Presenter is ready
         binding.searchProgressBar.visibility = View.VISIBLE
 
         // querying the files for search
         mSearchFragmentPresenter.loadFiles()
+
     }
 
     override fun onDestroyView() {

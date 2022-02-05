@@ -36,6 +36,24 @@ interface StoragePresenterContract {
     val view: StorageView
 
     /**
+     * this method bind thr supPresenter to the main presenter
+     */
+    fun bindSupPresenter(supPresenter: SupPresenter) {
+        this.supPresenter = supPresenter
+        // only updating when the state is different
+        if (supPresenter.mainMenuState != view.showMenu)
+            updateMaineMenu(supPresenter.mainMenuState)
+    }
+
+    /**
+     * show or hide the main menu based on visibility
+     * @param visible the menu visibility state
+     */
+    fun updateMaineMenu(visible:Boolean){
+        view.showMenu = visible
+        view.updateMenu()
+    }
+    /**
      * to check is the storage is authorized
      * mainly for sd card
      */
@@ -164,6 +182,11 @@ interface StoragePresenterContract {
 }
 
     fun onFileClickedFromSearch(file: FileModel){
+        if(file.type == FileType.DIRECTORY){
+            view.showMenu = false
+            view.updateMenu()
+        }
+
         onFileClicked(file)
     }
 

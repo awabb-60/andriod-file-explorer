@@ -7,10 +7,13 @@ import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 
 interface StorageView {
 
+
     /**
      * get the presenter that control this view
      */
     val presenter:StoragePresenterContract
+
+    var showMenu:Boolean
 
     fun context(): Context
 
@@ -25,14 +28,9 @@ interface StorageView {
     fun navigateToFolder(name:String, path:String)
 
     /**
-     * to open the menu
+     * to update the menu
      */
-    fun openMenu()
-
-    /**
-     * to close the menu
-     */
-    fun closeMenu()
+    fun updateMenu()
 
     fun onFileClickFromSearch(file: FileModel)
 

@@ -7,10 +7,16 @@ import com.awab.fileexplorer.model.data_models.FileModel
  */
 interface SupPresenter {
 
+
     /**
      * the main Storage presenter
      */
     val mainStoragePresenter:StoragePresenterContract
+
+    /**
+     * this indicates wither the main menu should be hidden or not
+     */
+    val mainMenuState:Boolean
 
     /**
      * the action mode state: true==active, false== inactive

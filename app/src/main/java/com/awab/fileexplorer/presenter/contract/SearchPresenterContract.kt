@@ -15,6 +15,9 @@ interface SearchPresenterContract:SupPresenter {
      */
     var searchList:List<FileModel>
 
+    override val mainMenuState: Boolean
+        get() = false
+
     /**
      * this filter the search list by the given text
      * and then update the view
