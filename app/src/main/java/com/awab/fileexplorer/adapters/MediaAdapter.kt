@@ -6,12 +6,16 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.awab.fileexplorer.R
 import com.awab.fileexplorer.adapters.utils.bindFileItem
+import com.awab.fileexplorer.adapters.utils.getSpannableColoredString
 import com.awab.fileexplorer.databinding.FileItemBinding
 import com.awab.fileexplorer.model.data_models.MediaItemModel
 import com.awab.fileexplorer.presenter.contract.MediaPresenterContract
 
 class MediaAdapter(val context: Context, val mediaPresenter: MediaPresenterContract) : RecyclerView.Adapter<MediaAdapter.ViewHolder>() {
+
+    var searchText = ""
 
     var currentList = listOf<MediaItemModel>()
 
@@ -79,6 +83,10 @@ class MediaAdapter(val context: Context, val mediaPresenter: MediaPresenterContr
 
         fun bind(item: MediaItemModel) {
             bindFileItem(context, item, binding, mediaPresenter.actionModeOn)
+            if (searchText.isNotEmpty()){
+                binding.tvFileName.text = getSpannableColoredString(context,
+                    binding.tvFileName.text.toString(),searchText, R.color.search_Text_color)
+            }
         }
     }
 }

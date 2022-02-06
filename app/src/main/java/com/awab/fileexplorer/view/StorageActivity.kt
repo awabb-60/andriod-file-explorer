@@ -88,8 +88,9 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         }
 
 //        back arrow in the tool bar
-        binding.ivBackButton.setOnClickListener {
+        binding.selectToolBar.setNavigationOnClickListener {
             onBackPressed()
+            Log.d(TAG, "onCreate: setNavigationOnClickListener")
         }
 
         // opening the storage folder

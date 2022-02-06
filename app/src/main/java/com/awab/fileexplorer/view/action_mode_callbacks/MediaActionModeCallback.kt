@@ -7,7 +7,6 @@ import com.awab.fileexplorer.R
 import com.awab.fileexplorer.presenter.contract.MediaPresenterContract
 
 class MediaActionModeCallback(private val presenter: MediaPresenterContract) : ActionMode.Callback {
-    private val TAG = "MediaActionModeCallback"
     override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
         mode?.menuInflater?.inflate(R.menu.media_action_mode_menu, menu)
         return true
@@ -15,7 +14,7 @@ class MediaActionModeCallback(private val presenter: MediaPresenterContract) : A
 
     override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
         mode?.title = presenter.getActionModeTitle()
-        menu?.findItem(R.id.miMediaOpenWith)?.isVisible = presenter.oneItemSelected()
+        menu?.findItem(R.id.miMediaOpenWith)?.isVisible = presenter.showMIOpenWith()
         return true
     }
 

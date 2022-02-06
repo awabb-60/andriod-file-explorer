@@ -6,13 +6,13 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
-import com.awab.fileexplorer.model.data_models.FileModel
 import com.awab.fileexplorer.model.RecentFiles
+import com.awab.fileexplorer.model.data_models.FileModel
 import com.awab.fileexplorer.model.types.FileType
 import com.awab.fileexplorer.model.types.MimeType
+import com.awab.fileexplorer.model.utils.*
 import com.awab.fileexplorer.view.contract.StorageView
 import java.io.File
-import com.awab.fileexplorer.model.utils.*
 import java.text.SimpleDateFormat
 
 interface StoragePresenterContract {
@@ -31,7 +31,7 @@ interface StoragePresenterContract {
 
     var supPresenter: SupPresenter
 
-    var actionModeOn:Boolean
+    var actionModeOn: Boolean
 
     val view: StorageView
 
@@ -49,40 +49,42 @@ interface StoragePresenterContract {
      * show or hide the main menu based on visibility
      * @param visible the menu visibility state
      */
-    fun updateMaineMenu(visible:Boolean){
+    fun updateMaineMenu(visible: Boolean) {
         view.showMenu = visible
         view.updateMenu()
     }
+
     /**
      * to check is the storage is authorized
      * mainly for sd card
      */
-    fun isAuthorized():Boolean
+    fun isAuthorized(): Boolean
 
     fun saveTreeUri(treeUri: Uri)
 
     fun requestPermission()
 
-    fun isValidTreeUri(treeUri: Uri):Boolean
+    fun isValidTreeUri(treeUri: Uri): Boolean
 
-    fun createFolder(path:String)
+    fun createFolder(path: String)
 
-    fun confirmDelete(){
+    fun confirmDelete() {
         view.confirmDelete()
     }
 
     fun delete()
 
-    fun getMIRenameVisibility():Boolean{
+    fun showMIRename(): Boolean {
 //        true to show rename
         val count = supPresenter.getSelectedItemCount()
-        return count ==1
+        return count == 1
     }
-    fun removeBreadcrumb(){
+
+    fun removeBreadcrumb() {
         view.removeBreadcrumb()
     }
 
-    fun getSelectedTitle():String{
+    fun getActionModeTitle(): String {
         val count = supPresenter.getSelectedItemCount()
 
         return if (count <= 1)
@@ -91,48 +93,48 @@ interface StoragePresenterContract {
             "$count items Selected"
     }
 
-    fun selectAll(){
+    fun selectAll() {
         supPresenter.selectAll()
         view.updateActionMode()
     }
 
-    fun shouldStopActionMode():Boolean{
+    fun shouldStopActionMode(): Boolean {
         val count = supPresenter.getSelectedItemCount()
         return count <= 0
     }
 
-    fun stopActionMode(){
+    fun stopActionMode() {
         actionModeOn = false
         view.stopActionMode()
         supPresenter.stopActionMode()
     }
 
-    fun showDetails(){
+    fun showDetails() {
         val selectedList = supPresenter.getSelectedItems()
 
-        if (selectedList.size == 1){
+        if (selectedList.size == 1) {
             val item = selectedList[0]
             val date = SimpleDateFormat(DATE_FORMAT_PATTERN).format(item.date)
-            if (item.type == FileType.FILE){
+            if (item.type == FileType.FILE) {
                 view.showItemDetails(item.name, date, item.size, item.path)
-            } else{
+            } else {
                 val sizeInBytes = getFolderSizeBytes(File(item.path))
                 val size = getSize(sizeInBytes)
                 view.showItemDetails(item.name, date, size, item.path)
             }
-        }else{
+        } else {
             val contains = getContains(selectedList)
             val totalSize = getTotalSize(selectedList)
             view.showItemsDetails(contains, totalSize)
         }
     }
 
-    fun getTotalSize(selectedList: List<FileModel>?): String{
+    fun getTotalSize(selectedList: List<FileModel>?): String {
         var totalSizeBytes = 0L
         selectedList?.forEach {
-            totalSizeBytes += if (it.type == FileType.FILE){
+            totalSizeBytes += if (it.type == FileType.FILE) {
                 File(it.path).length()
-            }else
+            } else
                 getFolderSizeBytes(File(it.path))
         }
         return getSize(totalSizeBytes)
@@ -143,9 +145,9 @@ interface StoragePresenterContract {
         var folderCount = 0
         selectedList?.forEach {
             if (it.type == FileType.FILE)
-                fileCount ++
-            else{
-                folderCount ++
+                fileCount++
+            else {
+                folderCount++
                 fileCount += getInnerFilesCount(File(it.path))
                 folderCount += getInnerFoldersCount(File(it.path))
             }
@@ -153,16 +155,16 @@ interface StoragePresenterContract {
         return "$fileCount Files, $folderCount Folders"
     }
 
-    fun confirmRename(){
+    fun confirmRename() {
         val item = supPresenter.getSelectedItems().get(0)
-            view.showRenameDialog(item.path, item.name)
+        view.showRenameDialog(item.path, item.name)
     }
 
-    fun rename(path:String, newName:String)
+    fun rename(path: String, newName: String)
 
-    fun onFileClicked(file: FileModel){
+    fun onFileClicked(file: FileModel) {
 //        selecting unselecting the item
-        if (actionModeOn){
+        if (actionModeOn) {
             supPresenter.selectOrUnSelectItem(file)
             view.updateActionMode()
             return
@@ -171,18 +173,18 @@ interface StoragePresenterContract {
 //        opining the item
         if (file.type == FileType.FILE) {
 //            file cant be opened
-        if (file.mimeType == MimeType.UNKNOWN) {
-            Toast.makeText(view.context(), "unsupported file format", Toast.LENGTH_SHORT).show()
-            return
-        }
+            if (file.mimeType == MimeType.UNKNOWN) {
+                Toast.makeText(view.context(), "unsupported file format", Toast.LENGTH_SHORT).show()
+                return
+            }
 //            opening the file
-        view.openFile(getOpenFileIntent(file))
-    } else // navigating to folder
-        view.navigateToFolder(file.name, file.path)
-}
+            view.openFile(getOpenFileIntent(file))
+        } else // navigating to folder
+            view.navigateToFolder(file.name, file.path)
+    }
 
-    fun onFileClickedFromSearch(file: FileModel){
-        if(file.type == FileType.DIRECTORY){
+    fun onFileClickedFromSearch(file: FileModel) {
+        if (file.type == FileType.DIRECTORY) {
             view.showMenu = false
             view.updateMenu()
         }
@@ -190,17 +192,21 @@ interface StoragePresenterContract {
         onFileClicked(file)
     }
 
-    fun onFileLongClicked(file: FileModel){
+    fun onFileLongClicked(file: FileModel) {
+        // long click a selected item do nothing
+        if (file.selected)
+            return
 //        starting the action mode
-       if (!actionModeOn){
-           actionModeOn = true
-           supPresenter.selectOrUnSelectItem(file)
-           view.startActionMode()
-       }else{ // selecting unselecting the item
-           supPresenter.selectOrUnSelectItem(file)
-           view.updateActionMode()
-       }
-}
+        if (actionModeOn) {
+            // selecting unselecting the item
+            supPresenter.selectOrUnSelectItem(file)
+            view.updateActionMode()
+            return
+        }
+        actionModeOn = true
+        supPresenter.selectOrUnSelectItem(file)
+        view.startActionMode()
+    }
 
     fun getOpenFileIntent(file: FileModel): Intent {
         RecentFiles.recentFilesList.add(file.path)
@@ -231,7 +237,7 @@ interface StoragePresenterContract {
 
     // to copy or move to the sd card or the internal storage, you have to have a folder
     // named (Paste) in location you try to copy to.
-    fun copy(to:String) {
+    fun copy(to: String) {
         val selectedItem = supPresenter.getSelectedItems()
         if (selectedItem.isEmpty())
             return
@@ -244,10 +250,10 @@ interface StoragePresenterContract {
                 Intent(COPY_BROADCAST_ACTION).apply {
                     putExtra(COPY_PATHS_EXTRA, arrayOf(*listPath.toTypedArray()))
                     //  the copy location
-                    putExtra(PASTE_LOCATION, internalStoragePath + File.separator +"Paste")
+                    putExtra(PASTE_LOCATION, internalStoragePath + File.separator + "Paste")
                 }
             }
-            "S" ->{
+            "S" -> {
                 Intent(COPY_BROADCAST_ACTION).apply {
                     putExtra(COPY_PATHS_EXTRA, arrayOf(*listPath.toTypedArray()))
                     //  the copy location
@@ -257,7 +263,7 @@ interface StoragePresenterContract {
                 }
             }
 
-            else-> Intent("Noop")
+            else -> Intent("Noop")
         }
 
         intent.putExtra(COPY_TYPE_EXTRA, COPY)
@@ -265,7 +271,7 @@ interface StoragePresenterContract {
         view.context().sendBroadcast(intent)
     }
 
-    fun move(to:String){
+    fun move(to: String) {
         val selectedItem = supPresenter.getSelectedItems()
         if (selectedItem.isEmpty())
             return
@@ -278,12 +284,12 @@ interface StoragePresenterContract {
                 Intent(COPY_BROADCAST_ACTION).apply {
                     putExtra(COPY_PATHS_EXTRA, arrayOf(*listPath.toTypedArray()))
                     //  the copy location
-                    putExtra(PASTE_LOCATION, internalStoragePath + File.separator +"Paste")
+                    putExtra(PASTE_LOCATION, internalStoragePath + File.separator + "Paste")
                     putExtra(TREE_URI_FOR_COPY_EXTRA, getTreeUri(view.context(), sdCardName).toString())
                     putExtra(EXTERNAL_STORAGE_PATH_EXTRA, sdCardPath)
                 }
             }
-            "S" ->{
+            "S" -> {
                 Intent(COPY_BROADCAST_ACTION).apply {
                     putExtra(COPY_PATHS_EXTRA, arrayOf(*listPath.toTypedArray()))
                     putExtra(PASTE_LOCATION, sdCardPath + File.separator + "Paste")
@@ -292,7 +298,7 @@ interface StoragePresenterContract {
                 }
             }
 
-            else-> Intent("Noop")
+            else -> Intent("Noop")
         }
 
         intent.putExtra(COPY_TYPE_EXTRA, MOVE)
@@ -308,8 +314,8 @@ interface StoragePresenterContract {
         return sp.getString(TREE_URI_ + storageName, "")!!.toUri()
     }
 
-    fun updateCopyProgress(p:Int) {
-        view.updateCopyProgress(p, 10,"","")
+    fun updateCopyProgress(p: Int) {
+        view.updateCopyProgress(p, 10, "", "")
     }
 
     fun cancelCopy() {

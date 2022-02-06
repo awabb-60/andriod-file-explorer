@@ -8,8 +8,7 @@ import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 
 class FilesActionModeCallBack(private val presenterContract: StoragePresenterContract):ActionMode.Callback{
     override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-        mode?.menuInflater?.inflate(R.menu.action_mode_menu, menu)
-
+        mode?.menuInflater?.inflate(R.menu.storage_action_mode_menu, menu)
         return true
     }
 
@@ -18,8 +17,8 @@ class FilesActionModeCallBack(private val presenterContract: StoragePresenterCon
             onDestroyActionMode(mode)
             return false
         }
-        mode?.title = presenterContract.getSelectedTitle()
-        menu?.findItem(R.id.miRename)?.isVisible = presenterContract.getMIRenameVisibility()
+        mode?.title = presenterContract.getActionModeTitle()
+        menu?.findItem(R.id.miRename)?.isVisible = presenterContract.showMIRename()
         return true
     }
 

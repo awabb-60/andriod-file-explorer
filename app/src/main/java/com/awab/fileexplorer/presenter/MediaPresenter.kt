@@ -22,8 +22,11 @@ import java.util.*
 class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
     private val TAG = "MediaPresenter"
 
-    private val mediaLoaderCallback = object:LoadMediaCallback{
+    var mediaItemsList = listOf<MediaItemModel>()
+
+    private val mediaLoaderCallback = object : LoadMediaCallback {
         override fun onSuccess(list: List<MediaItemModel>) {
+            mediaItemsList = list
             view.mediaAdapter.setList(list)
 
         }
@@ -37,29 +40,37 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
     override var actionModeOn: Boolean = false
 
     override fun loadMedia(intent: Intent) {
+        if (mediaItemsList.isNotEmpty()) {
+            view.mediaAdapter.setList(mediaItemsList)
+            return
+        }
         val category = intent.getSerializableExtra(MEDIA_CATEGORY_EXTRA)
-        if (category !is MediaCategory){
+        if (category !is MediaCategory) {
             view.mediaAdapter.setList(listOf())
             return
         }
-        when(category) {
-            MediaCategory.IMAGES->{
+        when (category) {
+            MediaCategory.IMAGES -> {
                 val contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
                 getMediaFiles(contentUri, PROJECTION, null, null)
+                view.setTitle("Images")
             }
-            MediaCategory.VIDEOS->{
+            MediaCategory.VIDEOS -> {
                 val contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
                 getMediaFiles(contentUri, PROJECTION, null, null)
+                view.setTitle("Videos")
             }
-            MediaCategory.AUDIO->{
+            MediaCategory.AUDIO -> {
                 val contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
                 getMediaFiles(contentUri, PROJECTION, null, null)
+                view.setTitle("Audio")
             }
             MediaCategory.DOCUMENTS -> {
                 val docsContentUri = MediaStore.Files.getContentUri("external")
                 val selection = "_data LIKE ? OR _data LIKE ? OR _data LIKE ? OR _data LIKE ? "
                 val selectionArgs = arrayOf("%.pdf%", "%.txt%", "%.html%", "%.xml%")
                 getMediaFiles(docsContentUri, PROJECTION, selection, selectionArgs)
+                view.setTitle("Documents")
             }
         }
     }
@@ -92,8 +103,11 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
     }
 
     override fun mediaItemLongClicked(item: MediaItemModel) {
+        // long click a selected item do nothing
+        if (item.selected)
+            return
         if (actionModeOn) {
-//            handle click while action mode is on
+            // handle click while action mode is on
             processClick(item)
             return
         }
@@ -109,13 +123,17 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
         val items = view.mediaAdapter.getSelectedItems()
         if (items.isEmpty()) {
 //            stop the action mode with the normal flow
-            view.pressBack()
+            view.finishActionMode()
         }
     }
 
     override fun getActionModeTitle(): String {
-        val items = view.mediaAdapter.getSelectedItems()
-        return items.count().toString()
+        val count = view.mediaAdapter.getSelectedItems().count()
+
+        return if (count <= 1)
+            "$count item Selected"
+        else
+            "$count items Selected"
     }
 
     override fun stopActionMode() {
@@ -125,7 +143,7 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
         view.mediaAdapter.unselectAll()
     }
 
-    override fun oneItemSelected(): Boolean {
+    override fun showMIOpenWith(): Boolean {
         return view.mediaAdapter.getSelectedItems().count() == 1
     }
 
@@ -169,8 +187,10 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
         view.openFile(chooserIntent)
     }
 
-    private fun getMediaFiles(contentUri: Uri, projection:Array<String>?,
-                              selection:String?, selectionArgs:Array<String>?){
+    private fun getMediaFiles(
+        contentUri: Uri, projection: Array<String>?,
+        selection: String?, selectionArgs: Array<String>?
+    ) {
 
         //  load the media items
         val query = view.context().contentResolver.query(
@@ -215,4 +235,9 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
         MediaLoaderWorkerThread(work, mediaLoaderCallback).execute()
     }
 
+    override fun searchTextChanged(newText: String) {
+        val query = mediaItemsList.filter { it.name.lowercase().contains(newText.lowercase()) }
+        view.mediaAdapter.searchText = newText
+        view.mediaAdapter.setList(query)
+    }
 }

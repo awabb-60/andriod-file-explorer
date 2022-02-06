@@ -8,11 +8,11 @@
     <string name="miDetails">Details</string>
     <string name="miSelectAll">Select All</string>
     <string name="mi_open_with">Open With</string>
-
     <string name="title_activity_media">MediaActivity</string>
 
     <string name="open_with_chooser_title">open with</string>
 
     <string name="loading">loading…</string>
     <string name="search_hint">Enter search text</string>
+    <string name="miSearch">Search</string>
 </resources>

@@ -5,11 +5,14 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
+import android.view.Menu
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.awab.fileexplorer.R
 import com.awab.fileexplorer.adapters.MediaAdapter
 import com.awab.fileexplorer.databinding.ActivityMediaBinding
 import com.awab.fileexplorer.databinding.ItemDetailsLayoutBinding
@@ -19,7 +22,7 @@ import com.awab.fileexplorer.presenter.contract.MediaPresenterContract
 import com.awab.fileexplorer.view.action_mode_callbacks.MediaActionModeCallback
 import com.awab.fileexplorer.view.contract.MediaView
 
-class MediaActivity : AppCompatActivity(), MediaView {
+class MediaActivity : AppCompatActivity(), MediaView, SearchView.OnQueryTextListener, SearchView.OnCloseListener {
 
     private lateinit var binding: ActivityMediaBinding
     private lateinit var presenter: MediaPresenterContract
@@ -28,18 +31,19 @@ class MediaActivity : AppCompatActivity(), MediaView {
 
     private var actionMode: ActionMode? = null
 
+    private val TAG = "MediaActivity"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMediaBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.ivBackButton.setOnClickListener {
+        setSupportActionBar(binding.toolBar)
+
+        binding.toolBar.setNavigationOnClickListener {
             onBackPressed()
         }
 
-        setSupportActionBar(binding.toolBar)
-
-        title = ""
         presenter = MediaPresenter(this)
 
         adapter = MediaAdapter(this, presenter)
@@ -52,11 +56,43 @@ class MediaActivity : AppCompatActivity(), MediaView {
         presenter.loadMedia(intent)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.media_main_menu, menu)
+
+        val searchItem = menu?.findItem(R.id.miMediaSearch)
+        val searchView = searchItem?.actionView as SearchView
+        searchView.setOnQueryTextListener(this)
+        searchView.setOnCloseListener(this)
+        searchView.queryHint = getString(R.string.search_hint)
+        return true
+    }
+
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        if (query != null)
+            presenter.searchTextChanged(query)
+        return false
+    }
+
+    override fun onQueryTextChange(newText: String?): Boolean {
+        if (newText != null)
+            presenter.searchTextChanged(newText)
+        return false
+    }
+
+    override fun onClose(): Boolean {
+        presenter.loadMedia(intent)
+        return false
+    }
+
     override val mediaAdapter: MediaAdapter
         get() = adapter
 
     override fun context(): Context {
         return this
+    }
+
+    override fun setTitle(title: String) {
+        this.title = title
     }
 
     override fun showToast(message: String) {
@@ -69,9 +105,6 @@ class MediaActivity : AppCompatActivity(), MediaView {
         dialogBinding.apply {
             tvDetailsName.text = name
             tvDetailsPath.text = path
-            tvDetailsName.movementMethod = ScrollingMovementMethod()
-            tvDetailsPath.movementMethod = ScrollingMovementMethod()
-
             tvDetailsSize.text = size
             tvDetailsLastModified.text = dateStr
         }
@@ -123,7 +156,7 @@ class MediaActivity : AppCompatActivity(), MediaView {
         actionMode = null
     }
 
-    override fun pressBack() {
+    override fun finishActionMode() {
         actionMode?.finish()
     }
 }

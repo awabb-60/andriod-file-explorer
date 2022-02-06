@@ -11,6 +11,8 @@ interface MediaView {
 
     fun context():Context
 
+    fun setTitle(title:String)
+
     fun openFile(intent: Intent)
 
     fun startActionMode()
@@ -19,7 +21,7 @@ interface MediaView {
 
     fun stopActionMode()
 
-    fun pressBack()
+    fun finishActionMode()
 
     fun showDetails(name: String, path: String, size: String, dateStr: String)
 

@@ -1,14 +1,12 @@
 package com.awab.fileexplorer.adapters.utils
 
 import android.content.Context
-import android.graphics.Color
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.awab.fileexplorer.R
-import com.awab.fileexplorer.adapters.Anim
 import com.awab.fileexplorer.databinding.FileItemBinding
 import com.awab.fileexplorer.model.data_models.AppIconModelData
 import com.awab.fileexplorer.model.data_models.FileModel
@@ -20,10 +18,9 @@ import java.io.File
 
 fun bindFileItem(context: Context, item: FileModel, binding:FileItemBinding, modeOn:Boolean){
     if (modeOn && item.selected) {
-//                animating the selected items
-        val anim = Anim(24, binding.selected)
-        anim.duration = 200
-        binding.selected.animation = anim
+        binding.selected.rotation = -90F
+        binding.selected.animate().rotation(0F).setDuration(400L).start()
+        binding.selected.layoutParams.width = binding.selected.layoutParams.height
     } else
         binding.selected.layoutParams.width = 0
 
@@ -79,9 +76,11 @@ fun bindFileItem(context: Context, item: FileModel, binding:FileItemBinding, mod
 
 fun bindFileItem(context: Context, item: MediaItemModel, binding:FileItemBinding, modeOn:Boolean){
     if (modeOn && item.selected) {
-        binding.root.setBackgroundColor(ContextCompat.getColor(context, R.color.light_gray))
+        binding.selected.rotation = -90F
+        binding.selected.animate().rotation(0F).setDuration(400L).start()
+        binding.selected.layoutParams.width = binding.selected.layoutParams.height
     } else
-        binding.root.setBackgroundColor(Color.WHITE)
+        binding.selected.layoutParams.width = 0
 
     binding.tvFileName.text = item.name
     binding.tvFileSize.text = item.size
