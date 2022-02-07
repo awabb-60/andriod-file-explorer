@@ -7,7 +7,6 @@ import android.webkit.MimeTypeMap
 import androidx.core.net.toUri
 import com.awab.fileexplorer.model.data_models.BreadcrumbsModel
 import com.awab.fileexplorer.model.data_models.FileModel
-import com.awab.fileexplorer.model.data_models.MediaItemModel
 import com.awab.fileexplorer.model.types.FileType
 import com.awab.fileexplorer.model.types.MimeType
 import java.io.File
@@ -15,12 +14,15 @@ import java.util.*
 
 private const val TAG = "fileUtils"
 
-fun isEmpty(file: File): Boolean {
+fun isEmpty(file: File, showHidingFiles: Boolean): Boolean {
     if (file.isFile)
         return true
     return try {
-        val files = file.listFiles()
-        files!!.isEmpty()
+        val files = file.listFiles()!!
+        if (showHidingFiles)
+            files.isEmpty()
+        else // the hidden files will not get counted
+            files.filter { !it.isHidden }.isEmpty()
     } catch (e: Exception) {
         true
     }
@@ -28,27 +30,27 @@ fun isEmpty(file: File): Boolean {
 
 fun makeFilesList(
     file: File,
-    showHidingFiles: Boolean = false,
-    sortingType: String = SORTING_TYPE_NAME,
-    sortingOrder: String = SORTING_ORDER_DEC
+    sortingBy: String = SORTING_BY_NAME,
+    sortingOrder: String = SORTING_ORDER_DEC,
+    showHidingFiles: Boolean = false
 ): List<FileModel> {
 
     return try {
 //         getting and sorting the list
-        val listFiles = when (sortingType) {
-            SORTING_TYPE_SIZE -> {
+        val listFiles = when (sortingBy) {
+            SORTING_BY_SIZE -> {
                 if (sortingOrder == SORTING_ORDER_ASC)
                     file.listFiles()!!.sortedBy { it.length() }
                 else
                     file.listFiles()!!.sortedByDescending { it.length() }
             }
-            SORTING_TYPE_DATE -> {
+            SORTING_BY_DATE -> {
                 if (sortingOrder == SORTING_ORDER_ASC)
                     file.listFiles()!!.sortedBy { it.lastModified() }
                 else
                     file.listFiles()!!.sortedByDescending { it.lastModified() }
             }
-//            sorting by name
+            //  default sorting by name
             else -> {
                 if (sortingOrder == SORTING_ORDER_ASC)
                     file.listFiles()!!.sortedBy { it.name }
@@ -57,9 +59,11 @@ fun makeFilesList(
             }
         }
 //        turn it into file models
-        var modelsList = makeFileModels(listFiles)
+        var modelsList = makeFileModels(listFiles, showHidingFiles)
+
 //        filtering the hiding files
         modelsList = modelsList.filter { !it.name.startsWith('.') || showHidingFiles }
+
 //        shoe the folder first
         modelsList.sortedBy { it.type == FileType.FILE }
     } catch (e: Exception) {
@@ -68,6 +72,19 @@ fun makeFilesList(
     }
 }
 
+fun makeFileModels(listFiles: List<File>, showHiddenFiles: Boolean = false): List<FileModel> =
+    listFiles.map {
+        FileModel(
+            name = it.name,
+            path = it.absolutePath,
+            size = getSize(it.length()),
+            date = Date(it.lastModified()),
+            type = getFileType(it),
+            mimeType = getMime(it),
+            uri = it.toUri(),
+            isEmpty = isEmpty(it, showHiddenFiles)
+        )
+    }
 
 fun getSize(sizeInBytes: Long): String {
     var size = sizeInBytes.div(1024.0)
@@ -90,12 +107,20 @@ fun getFolderSizeBytes(folder: File): Long {
     return sizeBytes
 }
 
-fun getInnerFilesCount(file: File): Int {
-    return file.walkTopDown().filter { it.isFile }.count()
+fun getInnerFilesCount(file: File, countHeddinFiles: Boolean): Int {
+    return if (countHeddinFiles)
+        file.walkTopDown().filter { it.isFile }.count()
+    else // not counting the hidden files
+        file.walkTopDown().filter { it.isFile }.filter { !it.isHidden }.count()
 }
 
-fun getInnerFoldersCount(file: File): Int {
-    return file.walkTopDown().drop(1).filter { it.isDirectory }.count()
+fun getInnerFoldersCount(file: File, countHiddenFiles: Boolean): Int {
+    // drop(1) to drop the parent folder
+    return if (countHiddenFiles)
+        file.walkTopDown().drop(1).filter { it.isDirectory }.count()
+    else
+        file.walkTopDown().drop(1).filter { it.isDirectory }.filter { !it.isHidden }.count()
+
 }
 
 fun getTotalSize(list: List<FileModel>?): String {
@@ -109,7 +134,7 @@ fun getTotalSize(list: List<FileModel>?): String {
     return getSize(totalSizeBytes)
 }
 
-fun getContains(list: List<FileModel>?): String {
+fun getContains(list: List<FileModel>?, countHiddenFiles: Boolean): String {
     var fileCount = 0
     var folderCount = 0
     list?.forEach {
@@ -117,8 +142,8 @@ fun getContains(list: List<FileModel>?): String {
             fileCount++
         else {
             folderCount++
-            fileCount += getInnerFilesCount(File(it.path))
-            folderCount += getInnerFoldersCount(File(it.path))
+            fileCount += getInnerFilesCount(File(it.path), countHiddenFiles)
+            folderCount += getInnerFoldersCount(File(it.path), countHiddenFiles)
         }
     }
     return "$fileCount Files, $folderCount Folders"
@@ -176,20 +201,6 @@ fun getMime(type: String): MimeType {
         else -> MimeType.UNKNOWN
     }
 }
-
-fun makeFileModels(listFiles: List<File>): List<FileModel> =
-    listFiles.map {
-        FileModel(
-            name = it.name,
-            path = it.absolutePath,
-            size = getSize(it.length()),
-            date = Date(it.lastModified()),
-            type = getFileType(it),
-            mimeType = getMime(it),
-            uri = it.toUri(),
-            isEmpty = isEmpty(it)
-        )
-    }
 
 /**
  * when the new folder name is duplicated the function give a unique name
@@ -367,7 +378,7 @@ fun recreateBreadcrumbsFromPath(
 
     var itemPath = storagePath
     topPath.removePrefix(storagePath).forEach {
-        if (it == File.separatorChar && itemPath.isNotEmpty()){
+        if (it == File.separatorChar && itemPath.isNotEmpty()) {
             val item = BreadcrumbsModel(File(itemPath).name, itemPath)
             list.add(item)
         }

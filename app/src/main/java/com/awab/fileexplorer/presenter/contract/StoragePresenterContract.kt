@@ -3,9 +3,13 @@ package com.awab.fileexplorer.presenter.contract
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.view.LayoutInflater
+import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
+import com.awab.fileexplorer.R
+import com.awab.fileexplorer.databinding.PickViewSettingsLayoutBinding
 import com.awab.fileexplorer.model.RecentFiles
 import com.awab.fileexplorer.model.data_models.FileModel
 import com.awab.fileexplorer.model.data_models.SelectedItemsDetailsModel
@@ -14,23 +18,16 @@ import com.awab.fileexplorer.model.types.MimeType
 import com.awab.fileexplorer.model.utils.*
 import com.awab.fileexplorer.presenter.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.presenter.threads.SelectedFilesDetailsAsyncTask
+import com.awab.fileexplorer.view.CustomDialog
 import com.awab.fileexplorer.view.contract.StorageView
 import java.io.File
 import java.text.SimpleDateFormat
 
 interface StoragePresenterContract {
 
-    // the name of your sd card
-    val sdCardName: String
-        get() = ""
 
-    // the path of your sd card
-    val sdCardPath: String
-        get() = ""
-
-    // the path of your sd card
-    val internalStoragePath: String
-        get() = ""
+    // the path of the current storage
+    val storagePath: String
 
     var supPresenter: SupPresenter
 
@@ -93,7 +90,6 @@ interface StoragePresenterContract {
             requestPermission()
             return
         }
-        view.confirmDelete()
         val item = supPresenter.getSelectedItems()[0]
         view.showRenameDialog(item.path, item.name)
     }
@@ -166,7 +162,8 @@ interface StoragePresenterContract {
         } else {
             // loading large files on a background thread
             view.loadingDialog.show()
-            SelectedFilesDetailsAsyncTask(object:SimpleSuccessAndFailureCallback<SelectedItemsDetailsModel>{
+            SelectedFilesDetailsAsyncTask(viewHiddenFilesSettings(),
+                object:SimpleSuccessAndFailureCallback<SelectedItemsDetailsModel>{
                 override fun onSuccess(data: SelectedItemsDetailsModel) {
                     view.showDetails(data.contains, data.totalSize)
                     view.loadingDialog.dismiss()
@@ -176,7 +173,6 @@ interface StoragePresenterContract {
                 }
             }).execute(items)
         }
-
     }
 
     fun onFileClicked(file: FileModel) {
@@ -262,30 +258,30 @@ interface StoragePresenterContract {
         val listPath = selectedItem.map { it.path }
         view.openCopyProgress("Copying")
 
-        val intent = when (to) {
-            "I" -> {
-                Intent(COPY_BROADCAST_ACTION).apply {
-                    putExtra(COPY_PATHS_EXTRA, arrayOf(*listPath.toTypedArray()))
-                    //  the copy location
-                    putExtra(PASTE_LOCATION, internalStoragePath + File.separator + "Paste")
-                }
-            }
-            "S" -> {
-                Intent(COPY_BROADCAST_ACTION).apply {
-                    putExtra(COPY_PATHS_EXTRA, arrayOf(*listPath.toTypedArray()))
-                    //  the copy location
-                    putExtra(PASTE_LOCATION, sdCardPath + File.separator + "Paste")
-                    putExtra(TREE_URI_FOR_COPY_EXTRA, getTreeUri(view.context(), sdCardName).toString())
-                    putExtra(EXTERNAL_STORAGE_PATH_EXTRA, sdCardPath)
-                }
-            }
-
-            else -> Intent("Noop")
-        }
-
-        intent.putExtra(COPY_TYPE_EXTRA, COPY)
-//        starting the copy service
-        view.context().sendBroadcast(intent)
+//        val intent = when (to) {
+//            "I" -> {
+//                Intent(COPY_BROADCAST_ACTION).apply {
+//                    putExtra(COPY_PATHS_EXTRA, arrayOf(*listPath.toTypedArray()))
+//                    //  the copy location
+//                    putExtra(PASTE_LOCATION, internalStoragePath + File.separator + "Paste")
+//                }
+//            }
+//            "S" -> {
+//                Intent(COPY_BROADCAST_ACTION).apply {
+//                    putExtra(COPY_PATHS_EXTRA, arrayOf(*listPath.toTypedArray()))
+//                    //  the copy location
+//                    putExtra(PASTE_LOCATION, sdCardPath + File.separator + "Paste")
+//                    putExtra(TREE_URI_FOR_COPY_EXTRA, getTreeUri(view.context(), sdCardName).toString())
+//                    putExtra(EXTERNAL_STORAGE_PATH_EXTRA, sdCardPath)
+//                }
+//            }
+//
+//            else -> Intent("Noop")
+//        }
+//
+//        intent.putExtra(COPY_TYPE_EXTRA, COPY)
+////        starting the copy service
+//        view.context().sendBroadcast(intent)
     }
 
     fun move(to: String) {
@@ -296,31 +292,31 @@ interface StoragePresenterContract {
         val listPath = selectedItem.map { it.path }
         view.openCopyProgress("Moving")
 
-        val intent = when (to) {
-            "I" -> {
-                Intent(COPY_BROADCAST_ACTION).apply {
-                    putExtra(COPY_PATHS_EXTRA, arrayOf(*listPath.toTypedArray()))
-                    //  the copy location
-                    putExtra(PASTE_LOCATION, internalStoragePath + File.separator + "Paste")
-                    putExtra(TREE_URI_FOR_COPY_EXTRA, getTreeUri(view.context(), sdCardName).toString())
-                    putExtra(EXTERNAL_STORAGE_PATH_EXTRA, sdCardPath)
-                }
-            }
-            "S" -> {
-                Intent(COPY_BROADCAST_ACTION).apply {
-                    putExtra(COPY_PATHS_EXTRA, arrayOf(*listPath.toTypedArray()))
-                    putExtra(PASTE_LOCATION, sdCardPath + File.separator + "Paste")
-                    putExtra(TREE_URI_FOR_COPY_EXTRA, getTreeUri(view.context(), sdCardName).toString())
-                    putExtra(EXTERNAL_STORAGE_PATH_EXTRA, sdCardPath)
-                }
-            }
-
-            else -> Intent("Noop")
-        }
-
-        intent.putExtra(COPY_TYPE_EXTRA, MOVE)
-//        starting the copy service
-        view.context().sendBroadcast(intent)
+//        val intent = when (to) {
+//            "I" -> {
+//                Intent(COPY_BROADCAST_ACTION).apply {
+//                    putExtra(COPY_PATHS_EXTRA, arrayOf(*listPath.toTypedArray()))
+//                    //  the copy location
+//                    putExtra(PASTE_LOCATION, internalStoragePath + File.separator + "Paste")
+//                    putExtra(TREE_URI_FOR_COPY_EXTRA, getTreeUri(view.context(), sdCardName).toString())
+//                    putExtra(EXTERNAL_STORAGE_PATH_EXTRA, sdCardPath)
+//                }
+//            }
+//            "S" -> {
+//                Intent(COPY_BROADCAST_ACTION).apply {
+//                    putExtra(COPY_PATHS_EXTRA, arrayOf(*listPath.toTypedArray()))
+//                    putExtra(PASTE_LOCATION, sdCardPath + File.separator + "Paste")
+//                    putExtra(TREE_URI_FOR_COPY_EXTRA, getTreeUri(view.context(), sdCardName).toString())
+//                    putExtra(EXTERNAL_STORAGE_PATH_EXTRA, sdCardPath)
+//                }
+//            }
+//
+//            else -> Intent("Noop")
+//        }
+//
+//        intent.putExtra(COPY_TYPE_EXTRA, MOVE)
+////        starting the copy service
+//        view.context().sendBroadcast(intent)
     }
 
     fun getTreeUri(context: Context, storageName: String): Uri {
@@ -331,16 +327,72 @@ interface StoragePresenterContract {
         return sp.getString(TREE_URI_ + storageName, "")!!.toUri()
     }
 
-    fun updateCopyProgress(p: Int) {
-        view.updateCopyProgress(p, 10, "", "")
-    }
-
     fun cancelCopy() {
         CopyServices.cancelCopy()
         view.stopCloseCopyScreen()
         stopActionMode()
         supPresenter.loadFiles()
         Toast.makeText(view.context(), "copy done", Toast.LENGTH_SHORT).show()
+    }
+
+
+    fun pickViewSettings() {
+        val viewSortBy = viewSortBySettings()
+        val viewSortOrder = viewSortOrderSettings()
+        val showHiddenFiles = viewHiddenFilesSettings()
+
+        val dialogBinding = PickViewSettingsLayoutBinding.inflate(LayoutInflater.from(view.context()))
+        val rgSortingBy: RadioGroup = dialogBinding.rgViewType
+        val rgSortingOrder: RadioGroup = dialogBinding.rgViewOrder
+
+        // putting the saved viewing setting data
+        when (viewSortBy) {
+            SORTING_BY_NAME -> rgSortingBy.check(R.id.rbName)
+            SORTING_BY_SIZE -> rgSortingBy.check(R.id.rbSize)
+            SORTING_BY_DATE -> rgSortingBy.check(R.id.rbDate)
+
+            // sort by name is the default
+            else -> rgSortingBy.check(R.id.rbName)
+        }
+        when (viewSortOrder) {
+            SORTING_ORDER_ASC -> rgSortingOrder.check(R.id.rbAscending)
+            SORTING_ORDER_DEC -> rgSortingOrder.check(R.id.rbDescending)
+
+            // sort ascending is the default
+            else -> rgSortingBy.check(R.id.rbName)
+        }
+        dialogBinding.btnShowHiddenFiles.isChecked = showHiddenFiles
+        val dialog = CustomDialog.makeDialog(view.context(), dialogBinding.root)
+        view.pickNewViewingSettings(dialog, dialogBinding)
+    }
+
+    fun viewSortBySettings(): String? {
+        val sp = view.context().getSharedPreferences(VIEW_SETTINGS_SHARED_PREFERENCES, AppCompatActivity.MODE_PRIVATE)
+        return sp.getString(SHARED_PREFERENCES_SORTING_BY, SORTING_BY_NAME)
+    }
+
+    fun viewSortOrderSettings(): String? {
+        val sp = view.context().getSharedPreferences(VIEW_SETTINGS_SHARED_PREFERENCES, AppCompatActivity.MODE_PRIVATE)
+        return sp.getString(SHARED_PREFERENCES_SORTING_ORDER, SORTING_ORDER_ASC)
+    }
+
+    fun viewHiddenFilesSettings(): Boolean {
+        val sp = view.context().getSharedPreferences(VIEW_SETTINGS_SHARED_PREFERENCES, AppCompatActivity.MODE_PRIVATE)
+        return sp.getBoolean(SHARED_PREFERENCES_SHOW_HIDDEN_FILES, false)
+    }
+
+    fun saveViewingSettings(sortBy: String, order: String, showHiddenFiles:Boolean) {
+        val sharedPreferencesEditor = view.context().getSharedPreferences(VIEW_SETTINGS_SHARED_PREFERENCES,
+            AppCompatActivity.MODE_PRIVATE
+        ).edit()
+        sharedPreferencesEditor.putString(SHARED_PREFERENCES_SORTING_BY, sortBy)
+        sharedPreferencesEditor.putString(SHARED_PREFERENCES_SORTING_ORDER, order)
+        sharedPreferencesEditor.putBoolean(SHARED_PREFERENCES_SHOW_HIDDEN_FILES, showHiddenFiles)
+        sharedPreferencesEditor.apply()
+    }
+
+    fun refreshTopFragment() {
+        supPresenter.loadFiles()
     }
 
 

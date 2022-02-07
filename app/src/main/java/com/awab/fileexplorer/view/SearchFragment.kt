@@ -14,8 +14,6 @@ import com.awab.fileexplorer.R
 import com.awab.fileexplorer.adapters.SearchAdapter
 import com.awab.fileexplorer.databinding.FragmentSearchBinding
 import com.awab.fileexplorer.model.data_models.FileModel
-import com.awab.fileexplorer.model.utils.SEARCH_CURRENT_FOLDER_ARGS
-import com.awab.fileexplorer.model.utils.SEARCH_STORAGE_NAME_ARGS
 import com.awab.fileexplorer.model.utils.SEARCH_STORAGE_PATH_ARGS
 import com.awab.fileexplorer.presenter.SearchFragmentPresenter
 import com.awab.fileexplorer.presenter.contract.SearchPresenterContract
@@ -30,9 +28,7 @@ class SearchFragment : Fragment(), ISearchFragmentView {
     private lateinit var mSearchFragmentPresenter: SearchPresenterContract
     private lateinit var mMainPresenter: StoragePresenterContract
 
-    private lateinit var storageName: String
     private lateinit var storagePath: String
-    lateinit var currentFolderPath: String
 
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
@@ -46,8 +42,6 @@ class SearchFragment : Fragment(), ISearchFragmentView {
         if (context is StorageView) {
             mMainPresenter = context.presenter
 
-            currentFolderPath = arguments?.getString(SEARCH_CURRENT_FOLDER_ARGS)!!
-            storageName = arguments?.getString(SEARCH_STORAGE_NAME_ARGS)!!
             storagePath = arguments?.getString(SEARCH_STORAGE_PATH_ARGS)!!
             mSearchFragmentPresenter = SearchFragmentPresenter(this, storagePath, mMainPresenter)
         }
@@ -142,7 +136,7 @@ class SearchFragment : Fragment(), ISearchFragmentView {
 
         // showing the keyboard
         val imm = requireContext().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.showSoftInput(binding.searchView, 0)
+        imm.showSoftInput(binding.searchView, InputMethodManager.SHOW_IMPLICIT)
     }
 
     override fun removeInputMethod() {
@@ -175,15 +169,15 @@ class SearchFragment : Fragment(), ISearchFragmentView {
         mSearchFragmentPresenter.onTextChanged(text.toString())
     }
 
-
+    override fun finishFragmnet() {
+        activity?.supportFragmentManager?.popBackStack()
+    }
 
     companion object {
-        fun newInstance(currentFolderPath: String, storageName: String, storagePath: String): SearchFragment {
+        fun newInstance(storagePath: String): SearchFragment {
             val fragment = SearchFragment()
 
             val args = Bundle().apply {
-                putString(SEARCH_CURRENT_FOLDER_ARGS, currentFolderPath)
-                putString(SEARCH_STORAGE_NAME_ARGS, storageName)
                 putString(SEARCH_STORAGE_PATH_ARGS, storagePath)
             }
             fragment.arguments = args

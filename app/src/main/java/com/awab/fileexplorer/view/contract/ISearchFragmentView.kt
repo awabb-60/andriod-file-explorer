@@ -24,4 +24,6 @@ interface ISearchFragmentView {
     fun getSelectedItems(): List<FileModel>
 
     fun stopActionMode()
+
+    fun finishFragmnet()
 }

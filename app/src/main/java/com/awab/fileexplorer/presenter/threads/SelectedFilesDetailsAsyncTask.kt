@@ -14,13 +14,13 @@ import java.io.File
 /**
  * this gets all the selected items data from the media items
  */
-class SelectedFilesDetailsAsyncTask(private val callBack: SimpleSuccessAndFailureCallback<SelectedItemsDetailsModel>) :
+class SelectedFilesDetailsAsyncTask(val countHiddenFiles:Boolean, private val callBack: SimpleSuccessAndFailureCallback<SelectedItemsDetailsModel>) :
     AsyncTask<List<FileModel>, Unit, SelectedItemsDetailsModel>() {
 
     override fun doInBackground(vararg params:List<FileModel>): SelectedItemsDetailsModel {
         // getting details for the selected items
         val list = params[0]
-        return SelectedItemsDetailsModel(getTotalSize(list), getContains(list))
+        return SelectedItemsDetailsModel(getTotalSize(list), getContains(list, countHiddenFiles))
     }
 
     override fun onPostExecute(result: SelectedItemsDetailsModel?) {

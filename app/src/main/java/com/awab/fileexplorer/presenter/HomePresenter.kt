@@ -1,6 +1,7 @@
 package com.awab.fileexplorer.presenter
 
 import android.content.Intent
+import androidx.core.content.ContextCompat
 import com.awab.fileexplorer.R
 import com.awab.fileexplorer.model.data_models.StorageModel
 import com.awab.fileexplorer.model.types.MediaCategory
@@ -60,8 +61,17 @@ class HomePresenter(private val homeView: HomeView): HomePresenterContract {
         view.openActivity(mediaIntent)
     }
 
-    fun makeStoragesModels(storages: List<File?>): List<StorageModel> {
+    override fun makeStoragesModels(): List<StorageModel> {
+        val storagesPaths = ContextCompat.getExternalFilesDirs(view.context(), null)
+
+        // this only get the storage path of the internal storage and sd Card
+        val storages = storagesPaths.map {
+            it?.parentFile?.parentFile?.parentFile?.parentFile
+        }
+
         val list = mutableListOf<StorageModel>()
+
+        // the internal storage will be at the first
         val internalDir = storages[0]
         if (internalDir != null)
             makeStorageModel(INTERNAL_STORAGE_DISPLAY_NAME, internalDir, StorageType.INTERNAL)?.let { list.add(it) }

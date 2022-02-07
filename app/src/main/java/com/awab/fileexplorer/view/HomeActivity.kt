@@ -12,13 +12,14 @@ import com.awab.fileexplorer.adapters.StoragesAdapter
 import com.awab.fileexplorer.presenter.HomePresenter
 import com.awab.fileexplorer.databinding.ActivityHomeBinding
 import com.awab.fileexplorer.model.utils.storageAccess
+import com.awab.fileexplorer.presenter.contract.HomePresenterContract
 import com.awab.fileexplorer.view.contract.HomeView
 
 class HomeActivity : AppCompatActivity(), HomeView {
     private val TAG = "HomeActivity"
 
     private lateinit var binding: ActivityHomeBinding
-    private lateinit var mHomePresenter: HomePresenter
+    private lateinit var mHomePresenter: HomePresenterContract
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,10 +76,6 @@ class HomeActivity : AppCompatActivity(), HomeView {
     }
 
     private fun getStorages(): List<StorageModel> {
-        val storagesPaths = ContextCompat.getExternalFilesDirs(this, null)
-        val storages = storagesPaths.map {
-            it?.parentFile?.parentFile?.parentFile?.parentFile
-        }
-        return mHomePresenter.makeStoragesModels(storages)
+        return mHomePresenter.makeStoragesModels()
     }
 }

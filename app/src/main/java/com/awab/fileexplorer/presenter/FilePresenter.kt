@@ -22,10 +22,11 @@ class FilePresenter(
     }
 
     override fun loadFiles() {
-        val sp = view.context().getSharedPreferences(VIEW_TYPE_SHARED_PREFERENCES, Context.MODE_PRIVATE)
-        val type = sp.getString(SHARED_PREFERENCES_SORTING_TYPE, SORTING_TYPE_NAME)!!
+        val sp = view.context().getSharedPreferences(VIEW_SETTINGS_SHARED_PREFERENCES, Context.MODE_PRIVATE)
+        val sortBy = sp.getString(SHARED_PREFERENCES_SORTING_BY, SORTING_BY_NAME)!!
         val order = sp.getString(SHARED_PREFERENCES_SORTING_ORDER, SORTING_ORDER_DEC)!!
-        val list = makeFilesList(folder, sortingType = type, sortingOrder = order)
+        val showHiddenFiles = sp.getBoolean(SHARED_PREFERENCES_SHOW_HIDDEN_FILES,false)
+        val list = makeFilesList(folder, sortingBy = sortBy, sortingOrder = order, showHidingFiles = showHiddenFiles)
         view.updateList(list)
     }
 

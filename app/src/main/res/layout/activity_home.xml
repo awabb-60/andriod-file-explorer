@@ -72,25 +72,25 @@
 
         <ImageButton
             android:id="@+id/btnMediaImages"
-            style="@style/MediaItemStyle"
+            style="@style/MediaCategoryItemStyle"
             android:layout_height="match_parent"
             android:src="@drawable/ic_default_image_file" />
 
         <ImageButton
             android:id="@+id/btnMediaVideo"
-            style="@style/MediaItemStyle"
+            style="@style/MediaCategoryItemStyle"
             android:layout_height="match_parent"
             android:src="@drawable/ic_default_video_file" />
 
         <ImageButton
             android:id="@+id/btnMediaAudio"
-            style="@style/MediaItemStyle"
+            style="@style/MediaCategoryItemStyle"
             android:layout_height="match_parent"
             android:src="@drawable/ic_default_audio_file" />
 
         <ImageButton
             android:id="@+id/btnMediaDocs"
-            style="@style/MediaItemStyle"
+            style="@style/MediaCategoryItemStyle"
             android:layout_height="match_parent"
             android:src="@drawable/ic_default_pdf_file" />
     </LinearLayout>

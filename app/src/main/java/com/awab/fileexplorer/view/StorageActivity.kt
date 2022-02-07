@@ -11,7 +11,6 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
-import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
@@ -21,14 +20,14 @@ import androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_FADE
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.awab.fileexplorer.*
 import com.awab.fileexplorer.adapters.BreadcrumbsAdapter
-import com.awab.fileexplorer.presenter.*
 import com.awab.fileexplorer.databinding.*
 import com.awab.fileexplorer.model.data_models.BreadcrumbsModel
 import com.awab.fileexplorer.model.data_models.FileModel
 import com.awab.fileexplorer.model.types.StorageType
-import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 import com.awab.fileexplorer.model.utils.*
 import com.awab.fileexplorer.model.utils.listeners.BreadcrumbsListener
+import com.awab.fileexplorer.presenter.*
+import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 import com.awab.fileexplorer.view.action_mode_callbacks.FilesActionModeCallBack
 import com.awab.fileexplorer.view.contract.StorageView
 import java.io.File
@@ -48,29 +47,42 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
     private var progressDialogBinding: ProgressDialogLayoutBinding? = null
     private var progressDialog: AlertDialog? = null
 
-    lateinit var storageName:String
-    lateinit var storagePath:String
+    lateinit var storageName: String
+    lateinit var storagePath: String
 
-    private lateinit var _loadingDialog:AlertDialog
+    private lateinit var _loadingDialog: AlertDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        createController()
+        // this have to be before the super call
+        // because when a configuration chang happen the fragments will get recreated again
+        // the recreation happen is this supper call (not really sure)
+        // so the storage presenter need to initialized before the fragments recreation
+        createPresenter()
         super.onCreate(savedInstanceState)
+
         binding = ActivityStorageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // putting the toolbar as the support action bar
         setSupportActionBar(binding.selectToolBar)
         supportActionBar?.title = ""
 
+//        preform a back button click when tha Navigation icon in the tool bar is clicked
+        binding.selectToolBar.setNavigationOnClickListener {
+            onBackPressed()
+        }
+
+        // adding the item listener to the mani menu
         binding.selectToolBar.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.miCreateFolder -> mStoragePresenter.confirmCreateFolder()
-                R.id.miView -> pickViewType()
-                R.id.miSearch -> {openSearchFragment()}
+                R.id.miView -> presenter.pickViewSettings()
+                R.id.miSearch -> openSearchFragment()
             }
             true
         }
 
+        // the breadcrumbs adapter will show the navigation map and the curren fplder loaction
         breadcrumbsAdapter = BreadcrumbsAdapter().apply {
             setListener(this@StorageActivity as BreadcrumbsListener)
         }
@@ -81,19 +93,14 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
             false
         )
 
-        //  to close this activity when back pressed
+        //  to close this activity when back pressed and no fragment are open
         supportFragmentManager.addOnBackStackChangedListener {
             if (supportFragmentManager.backStackEntryCount == 0)
                 finish()
         }
 
-//        back arrow in the tool bar
-        binding.selectToolBar.setNavigationOnClickListener {
-            onBackPressed()
-            Log.d(TAG, "onCreate: setNavigationOnClickListener")
-        }
-
         // opening the storage folder
+        // only work at the beginning of the storage activity
         if (savedInstanceState == null) {
             storageName = intent.getStringExtra(STORAGE_DISPLAY_NAME_EXTRA)!!
             storagePath = intent.getStringExtra(STORAGE_PATH_EXTRA)!!
@@ -104,23 +111,28 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         _loadingDialog = CustomDialog.makeLoadingDialog(this)
     }
 
-    private fun createController() {
+    private fun createPresenter() {
         val storagePath = intent.getStringExtra(STORAGE_PATH_EXTRA)!!
+
+        // the storage name in the file system
         val rawStorageName = File(storagePath).name
-//        getting the controller type... sd controller has more work
+
+//        getting the presenter type... sd controller has more work
         val type = intent.getSerializableExtra(STORAGE_TYPE_EXTRA)!!
         if (type is StorageType) {
             when (type) {
                 StorageType.INTERNAL -> {
-                    mStoragePresenter = InternalStoragePresenter(this, rawStorageName, storagePath)
+                    mStoragePresenter = InternalStoragePresenter(this, storagePath)
                 }
                 StorageType.SDCARD -> {
-                    mStoragePresenter = SdCardPresenter(this, rawStorageName, storagePath)
+                    mStoragePresenter = SdCardPresenterSAF(this, storagePath)
                 }
             }
+        } else { // this storage can be opened
+            Toast.makeText(this, "cant open this storage", Toast.LENGTH_SHORT).show()
+            finish()
         }
     }
-
 
     override val presenter: StoragePresenterContract
         get() = mStoragePresenter
@@ -182,7 +194,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         actionMode?.finish()
     }
 
-    override fun showCreateFolderDialog()  {
+    override fun showCreateFolderDialog() {
         val dirPath = breadcrumbsAdapter.list.last().path
         val dialogBinding = NamingFileLayoutBinding.inflate(layoutInflater, null, false)
         val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
@@ -206,7 +218,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         val dialogBinding = NamingFileLayoutBinding.inflate(layoutInflater, null, false)
         dialogBinding.etNameFile.setText(currentName)
 
-        val dialog = CustomDialog.makeDialog(this,dialogBinding.root)
+        val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
 
 
         dialog.setTitle("Rename File")
@@ -258,7 +270,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         dialogBinding.tvOk.setOnClickListener { dialog.cancel() }
     }
 
-    override fun showDetails(contains: String, totalSize: String)  {
+    override fun showDetails(contains: String, totalSize: String) {
         val dialogBinding = ItemsDetailsLayoutBinding.inflate(layoutInflater)
         dialogBinding.tvDetailsContains.text = contains
         dialogBinding.tvDetailsTotalSize.text = totalSize
@@ -266,6 +278,33 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
         dialog.show()
         dialogBinding.tvOk.setOnClickListener { dialog.cancel() }
+    }
+
+    override fun pickNewViewingSettings(dialog: AlertDialog, dialogBinding: PickViewSettingsLayoutBinding) {
+        dialog.show()
+        dialogBinding.tvSave.setOnClickListener {
+            val sortBy = when (dialogBinding.rgViewType.checkedRadioButtonId) {
+                R.id.rbName -> {
+                    SORTING_BY_NAME
+                }
+                R.id.rbSize -> {
+                    SORTING_BY_SIZE
+                }
+                R.id.rbDate -> {
+                    SORTING_BY_DATE
+                }
+                else -> SORTING_BY_NAME
+            }
+            val order = when (dialogBinding.rgViewOrder.checkedRadioButtonId) {
+                R.id.rbAscending -> SORTING_ORDER_ASC
+                R.id.rbDescending -> SORTING_ORDER_DEC
+                else -> SORTING_ORDER_ASC
+            }
+            val showHiddenFiles = dialogBinding.btnShowHiddenFiles.isChecked
+            presenter.saveViewingSettings(sortBy, order, showHiddenFiles)
+            presenter.refreshTopFragment()
+            dialog.cancel()
+        }
     }
 
     override fun startCopyScreen() {
@@ -317,7 +356,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         }
     }
 
-    override fun openCopyProgress(action:String) {
+    override fun openCopyProgress(action: String) {
         val dialogBinding = ProgressDialogLayoutBinding.inflate(layoutInflater)
         val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
 
@@ -356,7 +395,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        if(showMenu)
+        if (showMenu)
             menuInflater.inflate(R.menu.main_menu, menu)
         return true
     }
@@ -467,8 +506,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
     }
 
     private fun openSearchFragment() {
-        val currentFolderPath = breadcrumbsAdapter.list.last().path
-        val searchFragment = SearchFragment.newInstance(currentFolderPath, storageName, storagePath)
+        val searchFragment = SearchFragment.newInstance(storagePath)
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragmentContainer, searchFragment)
             .setTransition(TRANSIT_FRAGMENT_FADE)
@@ -481,84 +519,4 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         supportFragmentManager.popBackStack()
         navigateToFolder(name, path)
     }
-
-
-    private fun pickViewType() {
-        val viewingData = loadViewingData()
-        val dialogBinding = PickViewTypeLayoutBinding.inflate(layoutInflater, null, false)
-//        val pickViewTypeView = layoutInflater.inflate(R.layout.pick_view_type_layout, null)
-
-        val rgSortingType: RadioGroup = dialogBinding.rgViewType
-        val rgSortingOrder: RadioGroup = dialogBinding.rgViewOrder
-        when (viewingData[0]) {
-            SORTING_TYPE_NAME -> rgSortingType.check(R.id.rbName)
-            SORTING_TYPE_SIZE -> rgSortingType.check(R.id.rbSize)
-            SORTING_TYPE_DATE -> rgSortingType.check(R.id.rbDate)
-        }
-        when (viewingData[1]) {
-            SORTING_ORDER_ASC -> rgSortingOrder.check(R.id.rbAscending)
-            SORTING_ORDER_DEC -> rgSortingOrder.check(R.id.rbDescending)
-        }
-
-        val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
-        dialog.show()
-        dialogBinding.tvSave.setOnClickListener {
-            val type = when (rgSortingType.checkedRadioButtonId) {
-                R.id.rbName -> {
-                    SORTING_TYPE_NAME
-                }
-                R.id.rbSize -> {
-                    SORTING_TYPE_SIZE
-                }
-                R.id.rbDate -> {
-                    SORTING_TYPE_DATE
-                }
-                else -> "Noop"
-            }
-            val order = when (rgSortingOrder.checkedRadioButtonId) {
-                R.id.rbAscending -> SORTING_ORDER_ASC
-                R.id.rbDescending -> SORTING_ORDER_DEC
-                else -> "noop"
-            }
-            saveViewingData(type, order)
-            refreshTopFragment()
-            dialog.cancel()
-        }
-    }
-
-    private fun loadViewingData(): List<String> {
-        val sp = getSharedPreferences(VIEW_TYPE_SHARED_PREFERENCES, MODE_PRIVATE)
-        val savedType = sp.getString(SHARED_PREFERENCES_SORTING_TYPE, SORTING_TYPE_NAME)
-        val savedOrder = sp.getString(SHARED_PREFERENCES_SORTING_ORDER, SORTING_ORDER_ASC)
-        return listOf(savedType!!, savedOrder!!)
-    }
-
-    private fun saveViewingData(type: String, order: String) {
-        val sharedPreferencesEditor = getSharedPreferences(VIEW_TYPE_SHARED_PREFERENCES, MODE_PRIVATE).edit()
-        sharedPreferencesEditor.putString(SHARED_PREFERENCES_SORTING_TYPE, type)
-        sharedPreferencesEditor.putString(SHARED_PREFERENCES_SORTING_ORDER, order)
-        sharedPreferencesEditor.apply()
-    }
-
-    private fun refreshTopFragment() {
-        val topFragment = supportFragmentManager.fragments.last()
-        if (topFragment is FilesFragment) {
-            topFragment.refreshList()
-        }
-    }
-
-    private fun showAlertDialog(
-        title: String?,
-        message: String?,
-        view: View?,
-    ) {
-        AlertDialog.Builder(this)
-            .setTitle(title)
-            .setMessage(message)
-            .setView(view)
-            .show()
-
-    }
-
-    private fun BuildAlertDialog() = AlertDialog.Builder(this)
 }

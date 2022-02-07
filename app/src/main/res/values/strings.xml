@@ -15,4 +15,6 @@
     <string name="loading">loading…</string>
     <string name="search_hint">Enter search text</string>
     <string name="miSearch">Search</string>
+    <string name="empty_folder">Empty Folder</string>
+    <string name="show_hidden_files">show hidden files</string>
 </resources>

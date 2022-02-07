@@ -13,11 +13,12 @@ import java.io.File
 
 class InternalStoragePresenter(
     private val storageView: StorageView,
-    private val storageName: String,
-    private val storagePath: String
+    private val _storagePath: String
 ) : StoragePresenterContract {
 
-    val copyLocation = ""
+
+    override val storagePath: String
+        get() = _storagePath
 
     override lateinit var supPresenter: SupPresenter
 

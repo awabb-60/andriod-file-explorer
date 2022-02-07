@@ -54,6 +54,13 @@
             android:layout_height="wrap_content"/>
     </RadioGroup>
 
+    <androidx.appcompat.widget.SwitchCompat
+        android:padding="10dp"
+        android:id="@+id/btnShowHiddenFiles"
+        android:text="@string/show_hidden_files"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
     <TextView
         android:id="@+id/tvSave"
         android:layout_width="wrap_content"

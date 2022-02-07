@@ -178,8 +178,8 @@ class CopyServices : JobIntentService() {
                 count++
             else {
                 count++
-                count += getInnerFilesCount(File(it.path))
-                count += getInnerFoldersCount(File(it.path))
+                count += getInnerFilesCount(File(it.path), true)
+                count += getInnerFoldersCount(File(it.path), true)
             }
         }
         return count

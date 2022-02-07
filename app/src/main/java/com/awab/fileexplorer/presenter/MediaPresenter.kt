@@ -1,5 +1,6 @@
 package com.awab.fileexplorer.presenter
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.MediaStore
@@ -195,11 +196,15 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
         view.openFile(chooserIntent)
     }
 
+    fun showHiddenFiles():Boolean{
+        val sp = view.context().getSharedPreferences(VIEW_SETTINGS_SHARED_PREFERENCES, Context.MODE_PRIVATE)
+        return sp.getBoolean(SHARED_PREFERENCES_SHOW_HIDDEN_FILES, false)
+    }
+
     private fun getMediaFiles(
         contentUri: Uri, projection: Array<String>?,
         selection: String?, selectionArgs: Array<String>?
     ) {
-
         //  load the media items
         val query = view.context().contentResolver.query(
             contentUri, projection, selection, selectionArgs,
@@ -242,8 +247,11 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
         // with the callback
         MediaLoaderAsyncTask(work, object : SimpleSuccessAndFailureCallback<List<MediaItemModel>> {
             override fun onSuccess(data: List<MediaItemModel>) {
-                mediaItemsList = data
-                view.mediaAdapter.setList(data)
+                mediaItemsList = if (!showHiddenFiles()) // filtering the hidden files
+                    data.filter { !it.name.startsWith('.') }
+                else
+                    data
+                view.mediaAdapter.setList(mediaItemsList)
             }
 
             override fun onFailure(message: String) {

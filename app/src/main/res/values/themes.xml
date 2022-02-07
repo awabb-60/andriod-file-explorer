@@ -27,6 +27,11 @@
         <item name="android:background">@color/colorPrimary</item>
     </style>
 
+    <style name="FileListRecyclerView">
+        <item name="android:scrollbars">vertical</item>
+        <item name="android:scrollbarStyle">outsideOverlay</item>
+    </style>
+
     <style name="DetailsItem">
         <item name="android:textAppearance">@style/TextAppearance.AppCompat.Title</item>
     </style>
@@ -35,7 +40,7 @@
         <item name="android:background">@color/white</item>
     </style>
 
-    <style name="MediaItemStyle">
+    <style name="MediaCategoryItemStyle">
         <item name="android:layout_width">0dp</item>
         <item name="android:background">@drawable/media_button_background</item>
         <item name="android:layout_weight">1</item>

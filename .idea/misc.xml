@@ -7,6 +7,7 @@
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/circuler_shape.xml" value="0.17175925925925925" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/dialog_background.xml" value="0.20989583333333334" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/done_background.xml" value="0.20989583333333334" />
+        <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/ic_arrow_up.xml" value="0.18744588744588744" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/ic_baseline_insert_drive_file_24.xml" value="0.2064814814814815" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/ic_chevron_left.xml" value="0.22552083333333334" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/ic_chevron_right.xml" value="0.22552083333333334" />
@@ -57,6 +58,7 @@
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/items_details_layout.xml" value="0.17222222222222222" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/loading_layout.xml" value="0.25" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/naming_file_layout.xml" value="0.209375" />
+        <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/pick_view_settings_layout.xml" value="0.1763157894736842" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/pick_view_type_layout.xml" value="0.22" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/progress_dialog_layout.xml" value="0.18611111111111112" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/recent_file_item.xml" value="0.1" />

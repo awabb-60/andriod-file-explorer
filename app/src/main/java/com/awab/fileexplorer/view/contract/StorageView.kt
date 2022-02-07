@@ -3,6 +3,7 @@ package com.awab.fileexplorer.view.contract
 import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AlertDialog
+import com.awab.fileexplorer.databinding.PickViewSettingsLayoutBinding
 import com.awab.fileexplorer.model.data_models.FileModel
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 
@@ -95,6 +96,11 @@ interface StorageView {
     fun showDetails(contains:String, totalSize:String)
 
     /**
+     * show a dialog to let the user pick new viewing settings
+     */
+    fun pickNewViewingSettings(dialog: AlertDialog, dialogBinding: PickViewSettingsLayoutBinding)
+
+    /**
      * to pick the paste location of the copy items
      */
     fun startCopyScreen()
@@ -118,5 +124,4 @@ interface StorageView {
      * to cancel any ui that has to do with copying/moving
      */
     fun stopCloseCopyScreen()
-
 }
