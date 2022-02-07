@@ -3,11 +3,14 @@ package com.awab.fileexplorer.view
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.view.Menu
 import android.widget.SearchView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -17,6 +20,7 @@ import com.awab.fileexplorer.adapters.MediaAdapter
 import com.awab.fileexplorer.databinding.ActivityMediaBinding
 import com.awab.fileexplorer.databinding.ItemDetailsLayoutBinding
 import com.awab.fileexplorer.databinding.ItemsDetailsLayoutBinding
+import com.awab.fileexplorer.databinding.LoadingLayoutBinding
 import com.awab.fileexplorer.presenter.MediaPresenter
 import com.awab.fileexplorer.presenter.contract.MediaPresenterContract
 import com.awab.fileexplorer.view.action_mode_callbacks.MediaActionModeCallback
@@ -30,6 +34,10 @@ class MediaActivity : AppCompatActivity(), MediaView, SearchView.OnQueryTextList
     private lateinit var adapter: MediaAdapter
 
     private var actionMode: ActionMode? = null
+
+    private lateinit var _loadingDialog:AlertDialog
+    override val loadingDialog: AlertDialog
+        get() = _loadingDialog
 
     private val TAG = "MediaActivity"
 
@@ -54,6 +62,9 @@ class MediaActivity : AppCompatActivity(), MediaView, SearchView.OnQueryTextList
         binding.rvMedia.setHasFixedSize(true)
 
         presenter.loadMedia(intent)
+
+
+        _loadingDialog = CustomDialog.makeLoadingDialog(this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

@@ -8,10 +8,13 @@ import androidx.core.net.toUri
 import com.awab.fileexplorer.R
 import com.awab.fileexplorer.model.RecentFiles
 import com.awab.fileexplorer.model.data_models.MediaItemModel
+import com.awab.fileexplorer.model.data_models.SelectedItemsDetailsModel
 import com.awab.fileexplorer.model.types.MediaCategory
 import com.awab.fileexplorer.model.types.MimeType
 import com.awab.fileexplorer.model.utils.*
+import com.awab.fileexplorer.presenter.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.presenter.contract.MediaPresenterContract
+import com.awab.fileexplorer.presenter.threads.SelectedMediaDetailsAsyncTask
 import com.awab.fileexplorer.view.callbacks.LoadMediaCallback
 import com.awab.fileexplorer.view.contract.MediaView
 import com.awab.fileexplorer.view.threads.MediaLoaderWorkerThread
@@ -149,25 +152,43 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
 
     override fun showDetails() {
         val items = view.mediaAdapter.getSelectedItems()
-        if (items.size == 1) {
-            val selectedItem = items[0]
-            val name = selectedItem.name
-            val path = selectedItem.path
-            val size = selectedItem.size
-            val date = Date(File(selectedItem.path).lastModified())
-            val dateStr = SimpleDateFormat(DATE_FORMAT_PATTERN).format(date)
+        when (items.size) {
+            1 -> {
+                val selectedItem = items[0]
+                val name = selectedItem.name
+                val path = selectedItem.path
+                val size = selectedItem.size
+                val date = Date(File(selectedItem.path).lastModified())
+                val dateStr = SimpleDateFormat(DATE_FORMAT_PATTERN).format(date)
 
-            view.showDetails(name, path, size, dateStr)
-        } else if (items.size > 1) {
-            val contains = "${items.size} Files"
-            var totalSizeBytes = 0L
-
-            items.forEach {
-                totalSizeBytes += File(it.path).length()
+                view.showDetails(name, path, size, dateStr)
             }
-            val totalSize = getSize(totalSizeBytes)
+            in 1 until 1000 -> {
+                // getting the details for many items
+                val contains = "${items.size} Files"
 
-            view.showDetails(contains, totalSize)
+                var totalSizeBytes = 0L
+                items.forEach {
+                    totalSizeBytes += File(it.path).length()
+                }
+                val totalSize = getSize(totalSizeBytes)
+
+                view.showDetails(contains,totalSize)
+            }
+            else -> {
+                // loading large items in background thread
+                view.loadingDialog.show()
+                SelectedMediaDetailsAsyncTask(object:SimpleSuccessAndFailureCallback<SelectedItemsDetailsModel>{
+                    override fun onSuccess(data: SelectedItemsDetailsModel) {
+                        view.showDetails(data.contains, data.totalSize)
+                        view.loadingDialog.dismiss()
+                    }
+                    override fun onFailure(message: String) {
+                        view.loadingDialog.dismiss()
+                        view.showToast("some error occur")
+                    }
+                }).execute(items)
+            }
         }
     }
 

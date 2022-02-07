@@ -2,11 +2,11 @@ package com.awab.fileexplorer.view.contract
 
 import android.content.Context
 import android.content.Intent
+import androidx.appcompat.app.AlertDialog
 import com.awab.fileexplorer.model.data_models.FileModel
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 
 interface StorageView {
-
 
     /**
      * get the presenter that control this view
@@ -14,6 +14,11 @@ interface StorageView {
     val presenter:StoragePresenterContract
 
     var showMenu:Boolean
+
+    /**
+     * the dialog that indicate that the screen is loading
+     */
+    val loadingDialog: AlertDialog
 
     fun context(): Context
 
@@ -72,12 +77,12 @@ interface StorageView {
     /**
      * this is when one item is selected
      */
-    fun showItemDetails(name:String, lastModified:String, size:String, path:String)
+    fun showDetails(name:String, lastModified:String, size:String, path:String)
 
     /**
      * this is when many items are selected
      */
-    fun showItemsDetails(contains:String, totalSize:String)
+    fun showDetails(contains:String, totalSize:String)
 
     /**
      * to pick the paste location of the copy items

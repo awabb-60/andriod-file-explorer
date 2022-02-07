@@ -51,7 +51,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
     lateinit var storageName:String
     lateinit var storagePath:String
 
-    override var showMenu = true
+    private lateinit var _loadingDialog:AlertDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         createController()
@@ -99,6 +99,9 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
             storagePath = intent.getStringExtra(STORAGE_PATH_EXTRA)!!
             navigateToFolder(storageName, storagePath)
         }
+
+        // make the loading dialog
+        _loadingDialog = CustomDialog.makeLoadingDialog(this)
     }
 
     private fun createController() {
@@ -121,6 +124,11 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
 
     override val presenter: StoragePresenterContract
         get() = mStoragePresenter
+
+    override val loadingDialog: AlertDialog
+        get() = _loadingDialog
+
+    override var showMenu = true
 
     override fun context(): Context {
         return this
@@ -224,7 +232,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         }
     }
 
-    override fun showItemDetails(name: String, lastModified: String, size: String, path: String) {
+    override fun showDetails(name: String, lastModified: String, size: String, path: String) {
         val dialogBinding = ItemDetailsLayoutBinding.inflate(layoutInflater)
         dialogBinding.tvDetailsName.text = name
         dialogBinding.tvDetailsLastModified.text = lastModified
@@ -236,7 +244,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         dialogBinding.tvOk.setOnClickListener { dialog.cancel() }
     }
 
-    override fun showItemsDetails(contains: String, totalSize: String) {
+    override fun showDetails(contains: String, totalSize: String)  {
         val dialogBinding = ItemsDetailsLayoutBinding.inflate(layoutInflater)
         dialogBinding.tvDetailsContains.text = contains
         dialogBinding.tvDetailsTotalSize.text = totalSize

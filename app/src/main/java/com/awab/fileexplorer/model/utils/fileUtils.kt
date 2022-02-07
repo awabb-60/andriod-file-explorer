@@ -7,6 +7,7 @@ import android.webkit.MimeTypeMap
 import androidx.core.net.toUri
 import com.awab.fileexplorer.model.data_models.BreadcrumbsModel
 import com.awab.fileexplorer.model.data_models.FileModel
+import com.awab.fileexplorer.model.data_models.MediaItemModel
 import com.awab.fileexplorer.model.types.FileType
 import com.awab.fileexplorer.model.types.MimeType
 import java.io.File
@@ -95,6 +96,32 @@ fun getInnerFilesCount(file: File): Int {
 
 fun getInnerFoldersCount(file: File): Int {
     return file.walkTopDown().drop(1).filter { it.isDirectory }.count()
+}
+
+fun getTotalSize(list: List<FileModel>?): String {
+    var totalSizeBytes = 0L
+    list?.forEach {
+        totalSizeBytes += if (it.type == FileType.FILE) {
+            File(it.path).length()
+        } else
+            getFolderSizeBytes(File(it.path))
+    }
+    return getSize(totalSizeBytes)
+}
+
+fun getContains(list: List<FileModel>?): String {
+    var fileCount = 0
+    var folderCount = 0
+    list?.forEach {
+        if (it.type == FileType.FILE)
+            fileCount++
+        else {
+            folderCount++
+            fileCount += getInnerFilesCount(File(it.path))
+            folderCount += getInnerFoldersCount(File(it.path))
+        }
+    }
+    return "$fileCount Files, $folderCount Folders"
 }
 
 fun getFileType(file: File): FileType = if (file.isFile) FileType.FILE else FileType.DIRECTORY

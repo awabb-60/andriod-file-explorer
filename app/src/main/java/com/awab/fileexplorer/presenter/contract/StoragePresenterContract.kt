@@ -8,9 +8,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import com.awab.fileexplorer.model.RecentFiles
 import com.awab.fileexplorer.model.data_models.FileModel
+import com.awab.fileexplorer.model.data_models.SelectedItemsDetailsModel
 import com.awab.fileexplorer.model.types.FileType
 import com.awab.fileexplorer.model.types.MimeType
 import com.awab.fileexplorer.model.utils.*
+import com.awab.fileexplorer.presenter.callbacks.SimpleSuccessAndFailureCallback
+import com.awab.fileexplorer.presenter.threads.SelectedFilesDetailsAsyncTask
+import com.awab.fileexplorer.presenter.threads.SelectedMediaDetailsAsyncTask
 import com.awab.fileexplorer.view.contract.StorageView
 import java.io.File
 import java.text.SimpleDateFormat
@@ -110,49 +114,32 @@ interface StoragePresenterContract {
     }
 
     fun showDetails() {
-        val selectedList = supPresenter.getSelectedItems()
+        val items = supPresenter.getSelectedItems()
 
-        if (selectedList.size == 1) {
-            val item = selectedList[0]
+        if (items.size == 1) {
+            val item = items[0]
             val date = SimpleDateFormat(DATE_FORMAT_PATTERN).format(item.date)
             if (item.type == FileType.FILE) {
-                view.showItemDetails(item.name, date, item.size, item.path)
+                view.showDetails(item.name, date, item.size, item.path)
             } else {
                 val sizeInBytes = getFolderSizeBytes(File(item.path))
                 val size = getSize(sizeInBytes)
-                view.showItemDetails(item.name, date, size, item.path)
+                view.showDetails(item.name, date, size, item.path)
             }
         } else {
-            val contains = getContains(selectedList)
-            val totalSize = getTotalSize(selectedList)
-            view.showItemsDetails(contains, totalSize)
+            // loading large files on a background thread
+            view.loadingDialog.show()
+            SelectedFilesDetailsAsyncTask(object:SimpleSuccessAndFailureCallback<SelectedItemsDetailsModel>{
+                override fun onSuccess(data: SelectedItemsDetailsModel) {
+                    view.showDetails(data.contains, data.totalSize)
+                    view.loadingDialog.dismiss()
+                }
+                override fun onFailure(message: String) {
+                    view.loadingDialog.dismiss()
+                }
+            }).execute(items)
         }
-    }
 
-    fun getTotalSize(selectedList: List<FileModel>?): String {
-        var totalSizeBytes = 0L
-        selectedList?.forEach {
-            totalSizeBytes += if (it.type == FileType.FILE) {
-                File(it.path).length()
-            } else
-                getFolderSizeBytes(File(it.path))
-        }
-        return getSize(totalSizeBytes)
-    }
-
-    fun getContains(selectedList: List<FileModel>?): String {
-        var fileCount = 0
-        var folderCount = 0
-        selectedList?.forEach {
-            if (it.type == FileType.FILE)
-                fileCount++
-            else {
-                folderCount++
-                fileCount += getInnerFilesCount(File(it.path))
-                folderCount += getInnerFoldersCount(File(it.path))
-            }
-        }
-        return "$fileCount Files, $folderCount Folders"
     }
 
     fun confirmRename() {
