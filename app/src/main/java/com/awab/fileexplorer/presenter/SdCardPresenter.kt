@@ -7,11 +7,13 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.documentfile.provider.DocumentFile
-import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 import com.awab.fileexplorer.model.utils.PICKER_REQUEST_CODE
 import com.awab.fileexplorer.model.utils.SD_CARD_TREE_URI_SP
 import com.awab.fileexplorer.model.utils.TREE_URI_
+import com.awab.fileexplorer.presenter.callbacks.SimpleSuccessAndFailureCallback
+import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 import com.awab.fileexplorer.presenter.contract.SupPresenter
+import com.awab.fileexplorer.presenter.threads.DeleteFromSdCardAsyncTask
 import com.awab.fileexplorer.view.contract.StorageView
 
 class SdCardPresenter(
@@ -19,8 +21,6 @@ class SdCardPresenter(
     private val storageName: String,
     private val storagePath: String
 ) : StoragePresenterContract {
-
-    val copyLocation = ""
 
     override lateinit var supPresenter: SupPresenter
 
@@ -64,6 +64,10 @@ class SdCardPresenter(
     }
 
     override fun createFolder(path: String) {
+        if (!isAuthorized()){
+            requestPermission()
+            return
+        }
         try {
 //        cutting the parent directory path from sd card path
             val newFolderName = path.split('/').last().trim()
@@ -89,22 +93,33 @@ class SdCardPresenter(
     override fun delete() {
         try {
             val selectedItems = supPresenter.getSelectedItems()
-            val parentDir = getTreeUriFile()
-            if (selectedItems.isEmpty())
+            val parentFolderUri = getTreeUriFile()
+
+            // the parent folder that contains the files that will get deleted
+            val parentFolder = navigateToParentTreeFile(parentFolderUri, selectedItems[0].path)
+            if (selectedItems.isEmpty() || parentFolder == null)
                 return
-            val file = navigateToParentTreeFile(parentDir, selectedItems[0].path)
-            selectedItems.forEach {
-                if (file != null) {
-                    val success = file.findFile(it.name)?.delete()
-//                    some error occur... the file was node found or couldn't delete this file
-                    if (success == null || !success)
-                        Toast.makeText(view.context(), "error deleting ${it.name}", Toast.LENGTH_SHORT).show()
-                } else
-//                    error navigating to the file
-                    Toast.makeText(view.context(), "error deleting ${it.name}", Toast.LENGTH_SHORT).show()
-            }
+
+            view.loadingDialog.show()
+            // deleting the files
+            DeleteFromSdCardAsyncTask(parentFolder, object : SimpleSuccessAndFailureCallback<Boolean> {
+                override fun onSuccess(data: Boolean) {
+                    view.loadingDialog.dismiss()
+                    if (!data)
+                        view.showToast("some error occur while deleting the files")
+                    else
+                        view.showToast("items deleted successfully")
+
+                    supPresenter.loadFiles()
+                }
+                // this called when file some files are not deleted
+                // so the loading ui will stile going
+                override fun onFailure(message: String) {
+                    view.showToast(message)
+                }
+            }).execute(selectedItems)
+
             view.stopActionMode()
-            supPresenter.loadFiles()
         } catch (e: Exception) {
             Toast.makeText(view.context(), "error deleting files", Toast.LENGTH_SHORT).show()
         }
@@ -157,6 +172,4 @@ class SdCardPresenter(
         spE.putString(TREE_URI_ + storageName, treeUri.toString())
         spE.apply()
     }
-
-
 }

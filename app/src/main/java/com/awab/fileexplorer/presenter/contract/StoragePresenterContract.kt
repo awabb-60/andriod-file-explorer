@@ -14,7 +14,6 @@ import com.awab.fileexplorer.model.types.MimeType
 import com.awab.fileexplorer.model.utils.*
 import com.awab.fileexplorer.presenter.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.presenter.threads.SelectedFilesDetailsAsyncTask
-import com.awab.fileexplorer.presenter.threads.SelectedMediaDetailsAsyncTask
 import com.awab.fileexplorer.view.contract.StorageView
 import java.io.File
 import java.text.SimpleDateFormat
@@ -70,9 +69,47 @@ interface StoragePresenterContract {
 
     fun isValidTreeUri(treeUri: Uri): Boolean
 
+    /**
+     * to check the write permission is granted... if so a dialog will open to continue the presses
+     * else the the user will be asked for the permission
+     */
+    fun confirmCreateFolder() {
+        if (!isAuthorized()){
+            requestPermission()
+            return
+        }
+        view.showCreateFolderDialog()
+    }
+
     fun createFolder(path: String)
 
+
+    /**
+     * to check the write permission is granted... if so a dialog will open to continue the presses
+     * else the the user will be asked for the permission
+     */
+    fun confirmRename() {
+        if (!isAuthorized()){
+            requestPermission()
+            return
+        }
+        view.confirmDelete()
+        val item = supPresenter.getSelectedItems()[0]
+        view.showRenameDialog(item.path, item.name)
+    }
+
+    fun rename(path: String, newName: String)
+
+
+    /**
+     * to check the write permission is granted... if so a dialog will open to continue the presses
+     * else the the user will be asked for the permission
+     */
     fun confirmDelete() {
+        if (!isAuthorized()){
+            requestPermission()
+            return
+        }
         view.confirmDelete()
     }
 
@@ -141,13 +178,6 @@ interface StoragePresenterContract {
         }
 
     }
-
-    fun confirmRename() {
-        val item = supPresenter.getSelectedItems().get(0)
-        view.showRenameDialog(item.path, item.name)
-    }
-
-    fun rename(path: String, newName: String)
 
     fun onFileClicked(file: FileModel) {
 //        selecting unselecting the item
@@ -312,5 +342,6 @@ interface StoragePresenterContract {
         supPresenter.loadFiles()
         Toast.makeText(view.context(), "copy done", Toast.LENGTH_SHORT).show()
     }
+
 
 }

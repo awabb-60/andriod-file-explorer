@@ -64,7 +64,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
 
         binding.selectToolBar.setOnMenuItemClickListener {
             when (it.itemId) {
-                R.id.miCreateFolder -> createNewFolder()
+                R.id.miCreateFolder -> mStoragePresenter.confirmCreateFolder()
                 R.id.miView -> pickViewType()
                 R.id.miSearch -> {openSearchFragment()}
             }
@@ -134,6 +134,10 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         return this
     }
 
+    override fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
     override fun openFile(intent: Intent) {
         startActivity(intent)
     }
@@ -178,35 +182,27 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         actionMode?.finish()
     }
 
-    override fun confirmDelete() {
-        if (!mStoragePresenter.isAuthorized()) {
-            mStoragePresenter.requestPermission()
-            return
-        }
-
-        val dialogBinding = ConfirmDeleteLayoutBinding.inflate(layoutInflater)
+    override fun showCreateFolderDialog()  {
+        val dirPath = breadcrumbsAdapter.list.last().path
+        val dialogBinding = NamingFileLayoutBinding.inflate(layoutInflater, null, false)
         val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
-
-        dialog.setTitle("Confirm Delete")
-        dialog.setMessage("do you want to delete?")
         dialog.show()
 
-        dialogBinding.tvDelete.setOnClickListener {
-            mStoragePresenter.delete()
-            dialog.cancel()
-        }
+        dialogBinding.etNameFile.requestFocus()
+        val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(dialogBinding.etNameFile, 0)
 
-        dialogBinding.tvCancel.setOnClickListener {
+        dialogBinding.tvSave.setOnClickListener {
+            val etCreateFolderName = dialogBinding.etNameFile
+            if (etCreateFolderName.text.isNotBlank()) {
+                val name = etCreateFolderName.text.toString()
+                mStoragePresenter.createFolder("$dirPath/$name")
+            }
             dialog.cancel()
         }
     }
 
     override fun showRenameDialog(path: String, currentName: String) {
-        if (!mStoragePresenter.isAuthorized()) {
-            mStoragePresenter.requestPermission()
-            return
-        }
-
         val dialogBinding = NamingFileLayoutBinding.inflate(layoutInflater, null, false)
         dialogBinding.etNameFile.setText(currentName)
 
@@ -228,6 +224,24 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
                 mStoragePresenter.rename(path, name)
             } else
                 Toast.makeText(this, "invalid name", Toast.LENGTH_SHORT).show()
+            dialog.cancel()
+        }
+    }
+
+    override fun confirmDelete() {
+        val dialogBinding = ConfirmDeleteLayoutBinding.inflate(layoutInflater)
+        val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
+
+        dialog.setTitle("Confirm Delete")
+        dialog.setMessage("do you want to delete?")
+        dialog.show()
+
+        dialogBinding.tvDelete.setOnClickListener {
+            mStoragePresenter.delete()
+            dialog.cancel()
+        }
+
+        dialogBinding.tvCancel.setOnClickListener {
             dialog.cancel()
         }
     }
@@ -468,32 +482,6 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         navigateToFolder(name, path)
     }
 
-    private fun createNewFolder() {
-//        checking the authorization for the sdCard
-        if (!mStoragePresenter.isAuthorized()) {
-            mStoragePresenter.requestPermission()
-            return
-        }
-
-        val dirPath = breadcrumbsAdapter.list.last().path
-
-        val dialogBinding = NamingFileLayoutBinding.inflate(layoutInflater, null, false)
-        val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
-        dialog.show()
-
-        dialogBinding.etNameFile.requestFocus()
-        val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.showSoftInput(dialogBinding.etNameFile, 0)
-
-        dialogBinding.tvSave.setOnClickListener {
-            val etCreateFolderName = dialogBinding.etNameFile
-            if (etCreateFolderName.text.isNotBlank()) {
-                val name = etCreateFolderName.text.toString()
-                mStoragePresenter.createFolder("$dirPath/$name")
-            }
-            dialog.cancel()
-        }
-    }
 
     private fun pickViewType() {
         val viewingData = loadViewingData()

@@ -3,12 +3,11 @@ package com.awab.fileexplorer.presenter
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
-import com.awab.fileexplorer.model.types.FileType
-import com.awab.fileexplorer.presenter.contract.FilesListPresenterContract
-import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 import com.awab.fileexplorer.model.utils.*
-import com.awab.fileexplorer.presenter.contract.SearchPresenterContract
+import com.awab.fileexplorer.presenter.callbacks.SimpleSuccessAndFailureCallback
+import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 import com.awab.fileexplorer.presenter.contract.SupPresenter
+import com.awab.fileexplorer.presenter.threads.DeleteFromInternalStorageAsyncTask
 import com.awab.fileexplorer.view.contract.StorageView
 import java.io.File
 
@@ -57,20 +56,24 @@ class InternalStoragePresenter(
     }
 
     override fun delete() {
-        try {
-            val selectedItems = supPresenter.getSelectedItems()
-            selectedItems.forEach {
-                if (it.type == FileType.DIRECTORY)
-                    deleteFolderIO(it.path)
+        view.loadingDialog.show()
+        DeleteFromInternalStorageAsyncTask(object : SimpleSuccessAndFailureCallback<Boolean> {
+            override fun onSuccess(data: Boolean) {
+                if (!data)
+                    view.showToast("some error occur while deleting the files")
                 else
-                    deleteFileIO(it.path)
+                    view.showToast("items deleted successfully")
+
+                supPresenter.loadFiles()
             }
 
-            view.stopActionMode()
-            supPresenter.loadFiles()
-        } catch (e: Exception) {
-            Toast.makeText(view.context(), "error deleting files", Toast.LENGTH_SHORT).show()
-        }
+            // this called when file some files are not deleted
+            // so the loading ui will stile going
+            override fun onFailure(message: String) {
+                view.showToast(message)
+            }
+        })
+        view.stopActionMode()
     }
 
     //    not really used

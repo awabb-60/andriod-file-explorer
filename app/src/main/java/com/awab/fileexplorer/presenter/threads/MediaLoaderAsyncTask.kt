@@ -1,20 +1,20 @@
-package com.awab.fileexplorer.view.threads
+package com.awab.fileexplorer.presenter.threads
 
 import android.os.AsyncTask
+import android.util.Log
 import com.awab.fileexplorer.model.data_models.MediaItemModel
-import com.awab.fileexplorer.view.callbacks.LoadMediaCallback
+import com.awab.fileexplorer.presenter.callbacks.SimpleSuccessAndFailureCallback
 
-class MediaLoaderWorkerThread(
+class MediaLoaderAsyncTask(
     private val work: (Unit) -> List<MediaItemModel>,
-    private val callback: LoadMediaCallback
+    private val callback: SimpleSuccessAndFailureCallback<List<MediaItemModel>>
 ) :
     AsyncTask<Unit, Unit, (List<MediaItemModel>)>() {
 
     override fun doInBackground(vararg params: Unit?): List<MediaItemModel> {
         return try {
             //  loading the media files
-            val list = work.invoke(Unit)
-            list
+            work.invoke(Unit)
         } catch (e: Exception) {
             //  some error happen will loading the files
             listOf()
@@ -27,5 +27,10 @@ class MediaLoaderWorkerThread(
         }else
             callback.onFailure("unable to load media")
         super.onPostExecute(result)
+    }
+
+    override fun onCancelled() {
+        Log.d("TAG", "onCancelled: noop")
+        super.onCancelled()
     }
 }

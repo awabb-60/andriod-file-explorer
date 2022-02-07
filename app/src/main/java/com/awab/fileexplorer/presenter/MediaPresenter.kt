@@ -15,9 +15,8 @@ import com.awab.fileexplorer.model.utils.*
 import com.awab.fileexplorer.presenter.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.presenter.contract.MediaPresenterContract
 import com.awab.fileexplorer.presenter.threads.SelectedMediaDetailsAsyncTask
-import com.awab.fileexplorer.view.callbacks.LoadMediaCallback
 import com.awab.fileexplorer.view.contract.MediaView
-import com.awab.fileexplorer.view.threads.MediaLoaderWorkerThread
+import com.awab.fileexplorer.presenter.threads.MediaLoaderAsyncTask
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -26,19 +25,6 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
     private val TAG = "MediaPresenter"
 
     var mediaItemsList = listOf<MediaItemModel>()
-
-    private val mediaLoaderCallback = object : LoadMediaCallback {
-        override fun onSuccess(list: List<MediaItemModel>) {
-            mediaItemsList = list
-            view.mediaAdapter.setList(list)
-
-        }
-
-        override fun onFailure(message: String) {
-            view.mediaAdapter.setList(listOf())
-            view.showToast(message)
-        }
-    }
 
     override var actionModeOn: Boolean = false
 
@@ -173,16 +159,17 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
                 }
                 val totalSize = getSize(totalSizeBytes)
 
-                view.showDetails(contains,totalSize)
+                view.showDetails(contains, totalSize)
             }
             else -> {
                 // loading large items in background thread
                 view.loadingDialog.show()
-                SelectedMediaDetailsAsyncTask(object:SimpleSuccessAndFailureCallback<SelectedItemsDetailsModel>{
+                SelectedMediaDetailsAsyncTask(object : SimpleSuccessAndFailureCallback<SelectedItemsDetailsModel> {
                     override fun onSuccess(data: SelectedItemsDetailsModel) {
                         view.showDetails(data.contains, data.totalSize)
                         view.loadingDialog.dismiss()
                     }
+
                     override fun onFailure(message: String) {
                         view.loadingDialog.dismiss()
                         view.showToast("some error occur")
@@ -253,7 +240,17 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
 
         // the worker thread that will handle the work and then notify the ui with the work results
         // with the callback
-        MediaLoaderWorkerThread(work, mediaLoaderCallback).execute()
+        MediaLoaderAsyncTask(work, object : SimpleSuccessAndFailureCallback<List<MediaItemModel>> {
+            override fun onSuccess(data: List<MediaItemModel>) {
+                mediaItemsList = data
+                view.mediaAdapter.setList(data)
+            }
+
+            override fun onFailure(message: String) {
+                view.mediaAdapter.setList(listOf())
+                view.showToast(message)
+            }
+        }).execute()
     }
 
     override fun searchTextChanged(newText: String) {

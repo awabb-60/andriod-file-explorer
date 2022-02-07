@@ -23,6 +23,11 @@ interface StorageView {
     fun context(): Context
 
     /**
+     * showing toast message on the screen
+     */
+    fun showToast(message:String)
+
+    /**
      * this opens the media file that in the intent
      */
     fun openFile(intent:Intent)
@@ -65,14 +70,19 @@ interface StorageView {
     fun stopActionMode()
 
     /**
-     * to ask the user to confirm deleting the selected items
+     * to ask the user to chose the new name to the new folder
      */
-    fun confirmDelete()
+    fun showCreateFolderDialog()
 
     /**
      * to ask the user to chose the new name to the renamed item
      */
     fun showRenameDialog(path:String, currentName:String)
+
+    /**
+     * to ask the user to confirm deleting the selected items
+     */
+    fun confirmDelete()
 
     /**
      * this is when one item is selected
@@ -108,4 +118,5 @@ interface StorageView {
      * to cancel any ui that has to do with copying/moving
      */
     fun stopCloseCopyScreen()
+
 }
