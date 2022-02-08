@@ -25,7 +25,6 @@ import java.text.SimpleDateFormat
 
 interface StoragePresenterContract {
 
-
     // the path of the current storage
     val storagePath: String
 
@@ -71,7 +70,7 @@ interface StoragePresenterContract {
      * else the the user will be asked for the permission
      */
     fun confirmCreateFolder() {
-        if (!isAuthorized()){
+        if (!isAuthorized()) {
             requestPermission()
             return
         }
@@ -80,13 +79,12 @@ interface StoragePresenterContract {
 
     fun createFolder(path: String)
 
-
     /**
      * to check the write permission is granted... if so a dialog will open to continue the presses
      * else the the user will be asked for the permission
      */
     fun confirmRename() {
-        if (!isAuthorized()){
+        if (!isAuthorized()) {
             requestPermission()
             return
         }
@@ -96,13 +94,12 @@ interface StoragePresenterContract {
 
     fun rename(path: String, newName: String)
 
-
     /**
      * to check the write permission is granted... if so a dialog will open to continue the presses
      * else the the user will be asked for the permission
      */
     fun confirmDelete() {
-        if (!isAuthorized()){
+        if (!isAuthorized()) {
             requestPermission()
             return
         }
@@ -163,15 +160,16 @@ interface StoragePresenterContract {
             // loading large files on a background thread
             view.loadingDialog.show()
             SelectedFilesDetailsAsyncTask(viewHiddenFilesSettings(),
-                object:SimpleSuccessAndFailureCallback<SelectedItemsDetailsModel>{
-                override fun onSuccess(data: SelectedItemsDetailsModel) {
-                    view.showDetails(data.contains, data.totalSize)
-                    view.loadingDialog.dismiss()
-                }
-                override fun onFailure(message: String) {
-                    view.loadingDialog.dismiss()
-                }
-            }).execute(items)
+                object : SimpleSuccessAndFailureCallback<SelectedItemsDetailsModel> {
+                    override fun onSuccess(data: SelectedItemsDetailsModel) {
+                        view.showDetails(data.contains, data.totalSize)
+                        view.loadingDialog.dismiss()
+                    }
+
+                    override fun onFailure(message: String) {
+                        view.loadingDialog.dismiss()
+                    }
+                }).execute(items)
         }
     }
 
@@ -335,7 +333,6 @@ interface StoragePresenterContract {
         Toast.makeText(view.context(), "copy done", Toast.LENGTH_SHORT).show()
     }
 
-
     fun pickViewSettings() {
         val viewSortBy = viewSortBySettings()
         val viewSortOrder = viewSortOrderSettings()
@@ -367,22 +364,26 @@ interface StoragePresenterContract {
     }
 
     fun viewSortBySettings(): String? {
-        val sp = view.context().getSharedPreferences(VIEW_SETTINGS_SHARED_PREFERENCES, AppCompatActivity.MODE_PRIVATE)
+        val sp =
+            view.context().getSharedPreferences(VIEW_SETTINGS_SHARED_PREFERENCES, AppCompatActivity.MODE_PRIVATE)
         return sp.getString(SHARED_PREFERENCES_SORTING_BY, SORTING_BY_NAME)
     }
 
     fun viewSortOrderSettings(): String? {
-        val sp = view.context().getSharedPreferences(VIEW_SETTINGS_SHARED_PREFERENCES, AppCompatActivity.MODE_PRIVATE)
+        val sp =
+            view.context().getSharedPreferences(VIEW_SETTINGS_SHARED_PREFERENCES, AppCompatActivity.MODE_PRIVATE)
         return sp.getString(SHARED_PREFERENCES_SORTING_ORDER, SORTING_ORDER_ASC)
     }
 
     fun viewHiddenFilesSettings(): Boolean {
-        val sp = view.context().getSharedPreferences(VIEW_SETTINGS_SHARED_PREFERENCES, AppCompatActivity.MODE_PRIVATE)
+        val sp =
+            view.context().getSharedPreferences(VIEW_SETTINGS_SHARED_PREFERENCES, AppCompatActivity.MODE_PRIVATE)
         return sp.getBoolean(SHARED_PREFERENCES_SHOW_HIDDEN_FILES, false)
     }
 
-    fun saveViewingSettings(sortBy: String, order: String, showHiddenFiles:Boolean) {
-        val sharedPreferencesEditor = view.context().getSharedPreferences(VIEW_SETTINGS_SHARED_PREFERENCES,
+    fun saveViewingSettings(sortBy: String, order: String, showHiddenFiles: Boolean) {
+        val sharedPreferencesEditor = view.context().getSharedPreferences(
+            VIEW_SETTINGS_SHARED_PREFERENCES,
             AppCompatActivity.MODE_PRIVATE
         ).edit()
         sharedPreferencesEditor.putString(SHARED_PREFERENCES_SORTING_BY, sortBy)
@@ -394,6 +395,4 @@ interface StoragePresenterContract {
     fun refreshTopFragment() {
         supPresenter.loadFiles()
     }
-
-
 }
