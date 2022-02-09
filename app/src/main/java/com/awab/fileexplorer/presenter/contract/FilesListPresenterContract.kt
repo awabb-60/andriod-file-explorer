@@ -9,5 +9,8 @@ interface FilesListPresenterContract:SupPresenter {
     override val mainMenuState: Boolean
         get() = true
 
+    /**
+     * removing the breadcrumb of this fragment when
+     */
     fun removeBreadcrumb()
 }

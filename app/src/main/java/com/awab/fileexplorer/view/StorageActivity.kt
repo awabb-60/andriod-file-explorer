@@ -22,7 +22,6 @@ import com.awab.fileexplorer.*
 import com.awab.fileexplorer.adapters.BreadcrumbsAdapter
 import com.awab.fileexplorer.databinding.*
 import com.awab.fileexplorer.model.data_models.BreadcrumbsModel
-import com.awab.fileexplorer.model.data_models.FileModel
 import com.awab.fileexplorer.model.types.StorageType
 import com.awab.fileexplorer.model.utils.*
 import com.awab.fileexplorer.model.utils.listeners.BreadcrumbsListener
@@ -30,7 +29,6 @@ import com.awab.fileexplorer.presenter.*
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 import com.awab.fileexplorer.view.action_mode_callbacks.FilesActionModeCallBack
 import com.awab.fileexplorer.view.contract.StorageView
-import java.io.File
 
 
 class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
@@ -47,8 +45,8 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
     private var progressDialogBinding: ProgressDialogLayoutBinding? = null
     private var progressDialog: AlertDialog? = null
 
-    lateinit var storageName: String
-    lateinit var storagePath: String
+    private lateinit var storageName: String
+    private lateinit var storagePath: String
 
     private lateinit var _loadingDialog: AlertDialog
 
@@ -82,7 +80,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
             true
         }
 
-        // the breadcrumbs adapter will show the navigation map and the curren fplder loaction
+        // the breadcrumbs adapter will show the navigation map and the current folder location
         breadcrumbsAdapter = BreadcrumbsAdapter().apply {
             setListener(this@StorageActivity as BreadcrumbsListener)
         }
@@ -113,9 +111,6 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
 
     private fun createPresenter() {
         val storagePath = intent.getStringExtra(STORAGE_PATH_EXTRA)!!
-
-        // the storage name in the file system
-        val rawStorageName = File(storagePath).name
 
 //        getting the presenter type... sd controller has more work
         val type = intent.getSerializableExtra(STORAGE_TYPE_EXTRA)!!
@@ -168,9 +163,6 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
 
     override fun updateMenu() {
         invalidateOptionsMenu()
-    }
-
-    override fun onFileClickFromSearch(file: FileModel) {
     }
 
     override fun removeBreadcrumb() {
@@ -302,7 +294,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
             }
             val showHiddenFiles = dialogBinding.btnShowHiddenFiles.isChecked
             presenter.saveViewingSettings(sortBy, order, showHiddenFiles)
-            presenter.refreshTopFragment()
+            presenter.refreshList()
             dialog.cancel()
         }
     }
@@ -514,9 +506,4 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
             .commit()
     }
 
-    private fun navigateToFolderFromSearch(name: String, path: String) {
-//        removing the search fragment
-        supportFragmentManager.popBackStack()
-        navigateToFolder(name, path)
-    }
 }

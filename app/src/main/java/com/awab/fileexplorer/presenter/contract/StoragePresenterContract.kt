@@ -23,15 +23,31 @@ import com.awab.fileexplorer.view.contract.StorageView
 import java.io.File
 import java.text.SimpleDateFormat
 
+/**
+ * this the presenter class interface
+ * the view foreword the user interactions to this class
+ * currently it handles all the logic and the data base stuff
+ * and it responsible of updating the view
+ */
 interface StoragePresenterContract {
 
     // the path of the current storage
     val storagePath: String
 
+    /**
+     * the presenter that control the fragments
+     */
     var supPresenter: SupPresenter
 
+    /**
+     * this indicates when tha action mode is active... so the view show the action mode ui
+     */
     var actionModeOn: Boolean
 
+    /**
+     * the current view that is linked with this presenter
+     * the presenter will update this view
+     */
     val view: StorageView
 
     /**
@@ -59,10 +75,19 @@ interface StoragePresenterContract {
      */
     fun isAuthorized(): Boolean
 
+    /**
+     * save the uir for the sd card to the shared preferences for later us
+     */
     fun saveTreeUri(treeUri: Uri)
 
+    /**
+     * request the permission to do write operations to the storage
+     */
     fun requestPermission()
 
+    /**
+     * checks if the return uri that the user has selected is for the sd card or not
+     */
     fun isValidTreeUri(treeUri: Uri): Boolean
 
     /**
@@ -77,6 +102,9 @@ interface StoragePresenterContract {
         view.showCreateFolderDialog()
     }
 
+    /**
+     * create a new folder in the storage
+     */
     fun createFolder(path: String)
 
     /**
@@ -92,6 +120,11 @@ interface StoragePresenterContract {
         view.showRenameDialog(item.path, item.name)
     }
 
+    /**
+     * rename the selected file to the new name
+     * @param path the path of the selected file
+     * @param newName the new name of the file
+     */
     fun rename(path: String, newName: String)
 
     /**
@@ -106,18 +139,34 @@ interface StoragePresenterContract {
         view.confirmDelete()
     }
 
+    /**
+     * delete all the selected file after the confirmation.
+     */
     fun delete()
 
+    /**
+     * the "rename" menu item must only be shown when one ite is selected
+     * this method will decide to show this menu item or not
+     * @return true when the "rename" menu item must be shown, false otherwise.
+     */
     fun showMIRename(): Boolean {
 //        true to show rename
         val count = supPresenter.getSelectedItemCount()
         return count == 1
     }
 
+    /**
+     * removes the last Breadcrumb item from the view
+     */
     fun removeBreadcrumb() {
         view.removeBreadcrumb()
     }
 
+    /**
+     * gives the title that must be displayed on the view while the action mode is active
+     * the title represent tha number of the selected items
+     * @return the title of the action mode, which is the number of selected items
+     */
     fun getActionModeTitle(): String {
         val count = supPresenter.getSelectedItemCount()
 
@@ -127,22 +176,37 @@ interface StoragePresenterContract {
             "$count items Selected"
     }
 
+    /**
+     * select all the items in the list
+     */
     fun selectAll() {
         supPresenter.selectAll()
         view.updateActionMode()
     }
 
+    /**
+     * it will decide if the action mode should continue or it must be stopped
+     * this method check if there is no selected items, if so the action mode must stop
+     * @return true if there is no selected items and the action mode must stop, false otherwise
+     */
     fun shouldStopActionMode(): Boolean {
         val count = supPresenter.getSelectedItemCount()
         return count <= 0
     }
 
+    /**
+     * stop the action mode view state and return the view to the normal state
+     */
     fun stopActionMode() {
         actionModeOn = false
         view.stopActionMode()
         supPresenter.stopActionMode()
     }
 
+    /**
+     * this call from the action mode menu
+     * it will show all the details of the selected items in a dialog
+     */
     fun showDetails() {
         val items = supPresenter.getSelectedItems()
 
@@ -163,16 +227,20 @@ interface StoragePresenterContract {
                 object : SimpleSuccessAndFailureCallback<SelectedItemsDetailsModel> {
                     override fun onSuccess(data: SelectedItemsDetailsModel) {
                         view.showDetails(data.contains, data.totalSize)
-                        view.loadingDialog.dismiss()
+                         view.loadingDialog.dismiss()
                     }
 
                     override fun onFailure(message: String) {
+                        view.showToast(message)
                         view.loadingDialog.dismiss()
                     }
                 }).execute(items)
         }
     }
 
+    /**
+     * this will get called when a file item is click in the list
+     */
     fun onFileClicked(file: FileModel) {
 //        selecting unselecting the item
         if (actionModeOn) {
@@ -189,20 +257,14 @@ interface StoragePresenterContract {
                 return
             }
 //            opening the file
-            view.openFile(getOpenFileIntent(file))
+            view.openFile(getOpenMediaFileIntent(file))
         } else // navigating to folder
             view.navigateToFolder(file.name, file.path)
     }
 
-    fun onFileClickedFromSearch(file: FileModel) {
-        if (file.type == FileType.DIRECTORY) {
-            view.showMenu = false
-            view.updateMenu()
-        }
-
-        onFileClicked(file)
-    }
-
+    /**
+     * this will get called when a file item is long clicked in the list
+     */
     fun onFileLongClicked(file: FileModel) {
         // long click a selected item do nothing
         if (file.selected)
@@ -219,7 +281,12 @@ interface StoragePresenterContract {
         view.startActionMode()
     }
 
-    fun getOpenFileIntent(file: FileModel): Intent {
+    /**
+     * it will return an intent to open or to view a media file:Image, video ...
+     * @param file the that will be open or viewed
+     * @return an intent with ACTION_VIEW and has the data and type of the given file
+     */
+    fun getOpenMediaFileIntent(file: FileModel): Intent {
         RecentFiles.recentFilesList.add(file.path)
         if (file.mimeType == MimeType.APPLICATION) {
             return Intent(Intent.ACTION_VIEW).apply {
@@ -317,6 +384,10 @@ interface StoragePresenterContract {
 //        view.context().sendBroadcast(intent)
     }
 
+    /**
+     * it will load the saved tree uri of the sd card from the shared preferences
+     * @return the tree uri of the sd card
+     */
     fun getTreeUri(context: Context, storageName: String): Uri {
         val sp = context.getSharedPreferences(
             SD_CARD_TREE_URI_SP,
@@ -333,6 +404,9 @@ interface StoragePresenterContract {
         Toast.makeText(view.context(), "copy done", Toast.LENGTH_SHORT).show()
     }
 
+    /**
+     * it will show a screen for the user to edit the view settings
+     */
     fun pickViewSettings() {
         val viewSortBy = viewSortBySettings()
         val viewSortOrder = viewSortOrderSettings()
@@ -363,24 +437,42 @@ interface StoragePresenterContract {
         view.pickNewViewingSettings(dialog, dialogBinding)
     }
 
+    /**
+     * it will return the saved sort argument
+     * @return the a string that represent the sort argument
+     */
     fun viewSortBySettings(): String? {
         val sp =
             view.context().getSharedPreferences(VIEW_SETTINGS_SHARED_PREFERENCES, AppCompatActivity.MODE_PRIVATE)
         return sp.getString(SHARED_PREFERENCES_SORTING_BY, SORTING_BY_NAME)
     }
 
+    /**
+     * it will return the saved sort order
+     * @return the a string that represent the sort order
+     */
     fun viewSortOrderSettings(): String? {
         val sp =
             view.context().getSharedPreferences(VIEW_SETTINGS_SHARED_PREFERENCES, AppCompatActivity.MODE_PRIVATE)
-        return sp.getString(SHARED_PREFERENCES_SORTING_ORDER, SORTING_ORDER_ASC)
+        return sp.getString(SHARED_PREFERENCES_SORTING_ORDER, SORTING_ORDER_DEC)
     }
 
+    /**
+     * it will return the saved setting for showing the hidden file
+     * @return true to show the hidden file, false otherwise
+     */
     fun viewHiddenFilesSettings(): Boolean {
         val sp =
             view.context().getSharedPreferences(VIEW_SETTINGS_SHARED_PREFERENCES, AppCompatActivity.MODE_PRIVATE)
         return sp.getBoolean(SHARED_PREFERENCES_SHOW_HIDDEN_FILES, false)
     }
 
+    /**
+     * save the view settings to the shared preferences.
+     * @param sortBy the sort argument.
+     * @param order the sort order.
+     * @param showHiddenFiles the hidden files visibility.
+     */
     fun saveViewingSettings(sortBy: String, order: String, showHiddenFiles: Boolean) {
         val sharedPreferencesEditor = view.context().getSharedPreferences(
             VIEW_SETTINGS_SHARED_PREFERENCES,
@@ -392,7 +484,10 @@ interface StoragePresenterContract {
         sharedPreferencesEditor.apply()
     }
 
-    fun refreshTopFragment() {
+    /**
+     * refresh the files list
+     */
+    fun refreshList() {
         supPresenter.loadFiles()
     }
 }

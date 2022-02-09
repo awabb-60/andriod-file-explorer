@@ -14,6 +14,9 @@ interface StorageView {
      */
     val presenter:StoragePresenterContract
 
+    /**
+     * it used to tell the view to show the main menu or not
+     */
     var showMenu:Boolean
 
     /**
@@ -42,8 +45,6 @@ interface StorageView {
      * to update the menu
      */
     fun updateMenu()
-
-    fun onFileClickFromSearch(file: FileModel)
 
     /**
      * removes the breadcrumb item when the navigating out from the file

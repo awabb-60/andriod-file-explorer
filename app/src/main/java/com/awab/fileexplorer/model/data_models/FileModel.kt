@@ -5,6 +5,9 @@ import com.awab.fileexplorer.model.types.FileType
 import com.awab.fileexplorer.model.types.MimeType
 import java.util.*
 
+/**
+ * a data class to represent a file in the storage
+ */
 data class FileModel(
     val name: String,
     val path: String,

@@ -72,7 +72,7 @@ class SearchFragmentPresenter(
 
     override fun onFileClick(file: FileModel) {
         view.removeInputMethod()
-        mainStoragePresenter.onFileClickedFromSearch(file)
+        mainStoragePresenter.onFileClicked(file)
     }
 
     override fun onFileLongClick(file: FileModel) {

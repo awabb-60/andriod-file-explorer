@@ -1,5 +1,8 @@
 package com.awab.fileexplorer.model.types
 
+/**
+ * the mime type of the media or the extension of the file
+ */
 enum class MimeType(val mimeString:String) {
     IMAGE("image/*"),
     AUDIO("audio/*"),

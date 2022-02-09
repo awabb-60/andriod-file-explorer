@@ -20,9 +20,7 @@
         <item name="android:actionModeBackground">@color/colorPrimary</item>
     </style>
 
-
     <style name="FileExplorerToolBar" parent="Theme.MaterialComponents.Light">
-        <item name="actionMenuTextColor">@color/colorOnPrimary</item>
         <item name="navigationIcon">@drawable/ic_chevron_left</item>
         <item name="android:background">@color/colorPrimary</item>
     </style>

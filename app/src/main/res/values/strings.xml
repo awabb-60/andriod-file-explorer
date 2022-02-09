@@ -17,4 +17,7 @@
     <string name="miSearch">Search</string>
     <string name="empty_folder">Empty Folder</string>
     <string name="show_hidden_files">show hidden files</string>
+    <string name="search">Search</string>
+    <string name="new_folder">New Folder</string>
+    <string name="view">View</string>
 </resources>
