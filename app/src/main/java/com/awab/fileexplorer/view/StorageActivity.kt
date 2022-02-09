@@ -190,18 +190,24 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         val dirPath = breadcrumbsAdapter.list.last().path
         val dialogBinding = NamingFileLayoutBinding.inflate(layoutInflater, null, false)
         val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
+        dialog.setTitle("Create new folder")
         dialog.show()
 
+        // showing the keyboard
         dialogBinding.etNameFile.requestFocus()
         val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.showSoftInput(dialogBinding.etNameFile, 0)
+        imm.showSoftInput(dialogBinding.etNameFile, InputMethodManager.SHOW_IMPLICIT)
 
-        dialogBinding.tvSave.setOnClickListener {
+        dialogBinding.buttonsLayout.addButton("Save") {
             val etCreateFolderName = dialogBinding.etNameFile
             if (etCreateFolderName.text.isNotBlank()) {
                 val name = etCreateFolderName.text.toString()
                 mStoragePresenter.createFolder("$dirPath/$name")
             }
+            dialog.cancel()
+        }
+        // adding the cancel button
+        dialogBinding.buttonsLayout.addButton("Cancel") {
             dialog.cancel()
         }
     }
@@ -221,8 +227,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(dialogBinding.etNameFile, InputMethodManager.SHOW_IMPLICIT)
 
-        dialogBinding.tvSave.setOnClickListener {
-
+        dialogBinding.buttonsLayout.addButton("Save"){
             if (dialogBinding.etNameFile.text.isNotBlank()) {
                 val name = dialogBinding.etNameFile.text.toString().trim()
                 mStoragePresenter.rename(path, name)
@@ -259,7 +264,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
 
         val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
         dialog.show()
-        dialogBinding.tvOk.setOnClickListener { dialog.cancel() }
+        dialogBinding.buttonsLayout.addButton("Ok") { dialog.cancel() }
     }
 
     override fun showDetails(contains: String, totalSize: String) {
@@ -269,12 +274,12 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
 
         val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
         dialog.show()
-        dialogBinding.tvOk.setOnClickListener { dialog.cancel() }
+        dialogBinding.buttonsLayout.addButton("Ok") { dialog.cancel() }
     }
 
     override fun pickNewViewingSettings(dialog: AlertDialog, dialogBinding: PickViewSettingsLayoutBinding) {
         dialog.show()
-        dialogBinding.tvSave.setOnClickListener {
+        dialogBinding.buttonsLayout.addButton("Save") {
             val sortBy = when (dialogBinding.rgViewType.checkedRadioButtonId) {
                 R.id.rbName -> {
                     SORTING_BY_NAME

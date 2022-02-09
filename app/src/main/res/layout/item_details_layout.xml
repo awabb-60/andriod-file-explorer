@@ -102,16 +102,9 @@
             tools:text="MyDevice/Storage" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/tvOk"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:alpha="0.8"
-        android:background="?attr/selectableItemBackground"
-        android:padding="15dp"
-        android:text="Ok"
-        android:textColor="@color/colorOnPrimary"
-        android:textSize="15sp" />
-
+    <com.awab.fileexplorer.view.DialogButtonsLayout
+        android:id="@+id/buttons_layout"
+        style="@style/dialogButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </LinearLayout>

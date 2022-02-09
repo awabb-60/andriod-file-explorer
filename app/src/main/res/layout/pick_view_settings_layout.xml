@@ -4,13 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="SortBy"
-        android:layout_margin="5dp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
-
     <RadioGroup
         android:id="@+id/rgViewType"
         android:layout_width="match_parent"
@@ -61,16 +54,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <TextView
-        android:id="@+id/tvSave"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:background="?attr/selectableItemBackground"
-        android:text="Save"
-        android:textColor="@color/colorOnPrimary"
-        android:padding="10dp"
-        android:alpha="0.8"
-        android:layout_margin="10dp"
-        android:textSize="15sp" />
+    <com.awab.fileexplorer.view.DialogButtonsLayout
+        android:id="@+id/buttons_layout"
+        style="@style/dialogButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </LinearLayout>

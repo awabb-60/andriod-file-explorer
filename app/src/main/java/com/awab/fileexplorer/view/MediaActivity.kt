@@ -3,10 +3,7 @@ package com.awab.fileexplorer.view
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.text.method.ScrollingMovementMethod
 import android.view.Menu
 import android.widget.SearchView
 import android.widget.Toast
@@ -20,7 +17,6 @@ import com.awab.fileexplorer.adapters.MediaAdapter
 import com.awab.fileexplorer.databinding.ActivityMediaBinding
 import com.awab.fileexplorer.databinding.ItemDetailsLayoutBinding
 import com.awab.fileexplorer.databinding.ItemsDetailsLayoutBinding
-import com.awab.fileexplorer.databinding.LoadingLayoutBinding
 import com.awab.fileexplorer.presenter.MediaPresenter
 import com.awab.fileexplorer.presenter.contract.MediaPresenterContract
 import com.awab.fileexplorer.view.action_mode_callbacks.MediaActionModeCallback
@@ -38,8 +34,6 @@ class MediaActivity : AppCompatActivity(), MediaView, SearchView.OnQueryTextList
     private lateinit var _loadingDialog:AlertDialog
     override val loadingDialog: AlertDialog
         get() = _loadingDialog
-
-    private val TAG = "MediaActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -124,9 +118,7 @@ class MediaActivity : AppCompatActivity(), MediaView, SearchView.OnQueryTextList
 
         dialog.show()
 
-        dialogBinding.tvOk.setOnClickListener {
-            dialog.cancel()
-        }
+        dialogBinding.buttonsLayout.addButton("Ok") { dialog.cancel() }
     }
 
     override fun showDetails(contains: String, totalSize: String) {
@@ -142,9 +134,7 @@ class MediaActivity : AppCompatActivity(), MediaView, SearchView.OnQueryTextList
         dialog.setTitle("Details")
 
         dialog.show()
-        dialogBinding.tvOk.setOnClickListener {
-            dialog.cancel()
-        }
+        dialogBinding.buttonsLayout.addButton("Ok") { dialog.cancel() }
     }
 
     override fun openFile(intent: Intent) {

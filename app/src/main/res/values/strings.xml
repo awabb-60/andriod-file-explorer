@@ -20,4 +20,5 @@
     <string name="search">Search</string>
     <string name="new_folder">New Folder</string>
     <string name="view">View</string>
+    <string name="name">name</string>
 </resources>

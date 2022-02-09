@@ -433,7 +433,7 @@ interface StoragePresenterContract {
             else -> rgSortingBy.check(R.id.rbName)
         }
         dialogBinding.btnShowHiddenFiles.isChecked = showHiddenFiles
-        val dialog = CustomDialog.makeDialog(view.context(), dialogBinding.root)
+        val dialog = CustomDialog.makeDialog(view.context(), dialogBinding.root).apply { setTitle("View Settings") }
         view.pickNewViewingSettings(dialog, dialogBinding)
     }
 
