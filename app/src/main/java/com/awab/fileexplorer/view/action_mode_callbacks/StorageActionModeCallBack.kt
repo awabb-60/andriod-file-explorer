@@ -6,7 +6,7 @@ import androidx.appcompat.view.ActionMode
 import com.awab.fileexplorer.R
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 
-class FilesActionModeCallBack(private val presenterContract: StoragePresenterContract):ActionMode.Callback{
+class StorageActionModeCallBack(private val presenterContract: StoragePresenterContract):ActionMode.Callback{
     override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
         mode?.menuInflater?.inflate(R.menu.storage_action_mode_menu, menu)
         return true
@@ -19,6 +19,7 @@ class FilesActionModeCallBack(private val presenterContract: StoragePresenterCon
         }
         mode?.title = presenterContract.getActionModeTitle()
         menu?.findItem(R.id.miRename)?.isVisible = presenterContract.showMIRename()
+        menu?.findItem(R.id.miOpenWith)?.isVisible = presenterContract.showMIOpenWith()
         return true
     }
 
@@ -28,6 +29,7 @@ class FilesActionModeCallBack(private val presenterContract: StoragePresenterCon
             R.id.miMove-> presenterContract.startMoveScreen()
             R.id.miCopy-> presenterContract.startCopyScreen()
             R.id.miRename-> presenterContract.confirmRename()
+            R.id.miOpenWith-> presenterContract.openWith()
             R.id.miDetails-> presenterContract.showDetails()
             R.id.miSelectAll-> presenterContract.selectAll()
         }

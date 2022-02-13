@@ -16,7 +16,6 @@ class InternalStoragePresenter(
     private val _storagePath: String
 ) : StoragePresenterContract {
 
-
     override val storagePath: String
         get() = _storagePath
 
@@ -60,6 +59,7 @@ class InternalStoragePresenter(
         view.loadingDialog.show()
         DeleteFromInternalStorageAsyncTask(object : SimpleSuccessAndFailureCallback<Boolean> {
             override fun onSuccess(data: Boolean) {
+                view.loadingDialog.dismiss()
                 if (!data)
                     view.showToast("some error occur while deleting the files")
                 else
@@ -73,7 +73,7 @@ class InternalStoragePresenter(
             override fun onFailure(message: String) {
                 view.showToast(message)
             }
-        })
+        }).execute(supPresenter.getSelectedItems())
         view.stopActionMode()
     }
 

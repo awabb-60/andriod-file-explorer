@@ -18,7 +18,7 @@ import com.awab.fileexplorer.model.types.MimeType
 import com.awab.fileexplorer.model.utils.*
 import com.awab.fileexplorer.presenter.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.presenter.threads.SelectedFilesDetailsAsyncTask
-import com.awab.fileexplorer.view.CustomDialog
+import com.awab.fileexplorer.view.helper_view.CustomDialog
 import com.awab.fileexplorer.view.contract.StorageView
 import java.io.File
 import java.text.SimpleDateFormat
@@ -145,7 +145,7 @@ interface StoragePresenterContract {
     fun delete()
 
     /**
-     * the "rename" menu item must only be shown when one ite is selected
+     * the "rename" menu item must only be shown when one item is selected
      * this method will decide to show this menu item or not
      * @return true when the "rename" menu item must be shown, false otherwise.
      */
@@ -153,6 +153,17 @@ interface StoragePresenterContract {
 //        true to show rename
         val count = supPresenter.getSelectedItemCount()
         return count == 1
+    }
+
+    /**
+     * the "open with" menu item must only be shown when one item is selected and that item must be a file
+     * this method will decide to show this menu item or not
+     * @return true when the "open with" menu item must be shown, false otherwise.
+     */
+    fun showMIOpenWith(): Boolean {
+//        true to show rename
+        val items = supPresenter.getSelectedItems()
+        return items.count() == 1 && items[0].type == FileType.FILE
     }
 
     /**
@@ -257,7 +268,7 @@ interface StoragePresenterContract {
                 return
             }
 //            opening the file
-            view.openFile(getOpenMediaFileIntent(file))
+            view.openFile(getOpenFileIntent(file))
         } else // navigating to folder
             view.navigateToFolder(file.name, file.path)
     }
@@ -286,7 +297,7 @@ interface StoragePresenterContract {
      * @param file the that will be open or viewed
      * @return an intent with ACTION_VIEW and has the data and type of the given file
      */
-    fun getOpenMediaFileIntent(file: FileModel): Intent {
+    fun getOpenFileIntent(file: FileModel): Intent {
         RecentFiles.recentFilesList.add(file.path)
         if (file.mimeType == MimeType.APPLICATION) {
             return Intent(Intent.ACTION_VIEW).apply {
@@ -300,10 +311,11 @@ interface StoragePresenterContract {
     }
 
     fun startCopyScreen() {
-        val selectedItem = supPresenter.getSelectedItems()
-        if (selectedItem.isEmpty())
-            return
-        view.startCopyScreen()
+        view.showPickLocation()
+//        val selectedItem = supPresenter.getSelectedItems()
+//        if (selectedItem.isEmpty())
+//            return
+//        view.startCopyScreen()
     }
 
     fun startMoveScreen() {
@@ -420,7 +432,7 @@ interface StoragePresenterContract {
         when (viewSortBy) {
             SORTING_BY_NAME -> rgSortingBy.check(R.id.rbName)
             SORTING_BY_SIZE -> rgSortingBy.check(R.id.rbSize)
-            SORTING_BY_DATE -> rgSortingBy.check(R.id.rbDate)
+            DEFAULT_SORTING_ARGUMENT -> rgSortingBy.check(R.id.rbDate)
 
             // sort by name is the default
             else -> rgSortingBy.check(R.id.rbName)
@@ -444,7 +456,7 @@ interface StoragePresenterContract {
     fun viewSortBySettings(): String? {
         val sp =
             view.context().getSharedPreferences(VIEW_SETTINGS_SHARED_PREFERENCES, AppCompatActivity.MODE_PRIVATE)
-        return sp.getString(SHARED_PREFERENCES_SORTING_BY, SORTING_BY_NAME)
+        return sp.getString(SHARED_PREFERENCES_SORTING_BY, DEFAULT_SORTING_ARGUMENT)
     }
 
     /**
@@ -454,7 +466,7 @@ interface StoragePresenterContract {
     fun viewSortOrderSettings(): String? {
         val sp =
             view.context().getSharedPreferences(VIEW_SETTINGS_SHARED_PREFERENCES, AppCompatActivity.MODE_PRIVATE)
-        return sp.getString(SHARED_PREFERENCES_SORTING_ORDER, SORTING_ORDER_DEC)
+        return sp.getString(SHARED_PREFERENCES_SORTING_ORDER, DEFAULT_SORTING_ORDER)
     }
 
     /**
@@ -464,7 +476,7 @@ interface StoragePresenterContract {
     fun viewHiddenFilesSettings(): Boolean {
         val sp =
             view.context().getSharedPreferences(VIEW_SETTINGS_SHARED_PREFERENCES, AppCompatActivity.MODE_PRIVATE)
-        return sp.getBoolean(SHARED_PREFERENCES_SHOW_HIDDEN_FILES, false)
+        return sp.getBoolean(SHARED_PREFERENCES_SHOW_HIDDEN_FILES, DEFAULT_SHOW_HIDDEN_FILES)
     }
 
     /**
@@ -490,4 +502,25 @@ interface StoragePresenterContract {
     fun refreshList() {
         supPresenter.loadFiles()
     }
+
+    fun openWith() {
+        val intent = getOpenFileIntent(supPresenter.getSelectedItems()[0])
+        val chooserIntent =
+            Intent.createChooser(intent, view.context().getString(R.string.open_with_chooser_title))
+        view.openFile(chooserIntent)
+    }
+
+//    fun getTransferResult(): Intent {
+//        val items  = supPresenter.getSelectedItems()
+//        val type = COPY
+//        val l = ArrayList<String>()
+//
+//        items.forEach { l.add(it.path) }
+//        val bundle = Bundle().apply {
+//            putStringArrayList("T_ITEMS",l)
+//            putString("T_T",type)
+//        }
+//
+//        return Intent().putExtra("T_DATA", bundle)
+//    }
 }

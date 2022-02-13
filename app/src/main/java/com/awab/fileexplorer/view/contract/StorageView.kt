@@ -125,4 +125,6 @@ interface StorageView {
      * to cancel any ui that has to do with copying/moving
      */
     fun stopCloseCopyScreen()
+
+    fun showPickLocation()
 }

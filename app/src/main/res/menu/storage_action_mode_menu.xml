@@ -11,16 +11,22 @@
         android:id="@+id/miMove"
         android:title="@string/miMove"
         android:visible="false"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/miCopy"
         android:title="@string/miCopy"
         android:visible="false"
         app:showAsAction="never" />
+
     <item
         android:id="@+id/miRename"
         android:title="@string/miRename"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/miOpenWith"
+        android:title="@string/mi_open_with"
         app:showAsAction="never" />
 
     <item

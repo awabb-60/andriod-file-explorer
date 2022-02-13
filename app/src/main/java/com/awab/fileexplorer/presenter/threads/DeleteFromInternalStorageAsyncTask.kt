@@ -17,7 +17,8 @@ class DeleteFromInternalStorageAsyncTask(
 ) : AsyncTask<List<FileModel>, String, Boolean>() {
 
     override fun doInBackground(vararg params: List<FileModel>?): Boolean {
-        Thread.sleep(100)
+        // so the loading screen looks good
+        Thread.sleep(200)
         var allFilesDeleted = true
         val list = params[0]
         list?.forEach {

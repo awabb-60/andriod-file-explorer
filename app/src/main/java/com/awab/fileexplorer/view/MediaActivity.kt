@@ -21,6 +21,7 @@ import com.awab.fileexplorer.presenter.MediaPresenter
 import com.awab.fileexplorer.presenter.contract.MediaPresenterContract
 import com.awab.fileexplorer.view.action_mode_callbacks.MediaActionModeCallback
 import com.awab.fileexplorer.view.contract.MediaView
+import com.awab.fileexplorer.view.helper_view.CustomDialog
 
 class MediaActivity : AppCompatActivity(), MediaView, SearchView.OnQueryTextListener, SearchView.OnCloseListener {
 

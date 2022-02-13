@@ -38,6 +38,12 @@ fun makeFilesList(
     return try {
 //         getting and sorting the list
         val listFiles = when (sortingBy) {
+            SORTING_BY_NAME -> {
+                if (sortingOrder == SORTING_ORDER_ASC)
+                    file.listFiles()!!.sortedBy { it.name }
+                else
+                    file.listFiles()!!.sortedByDescending { it.name }
+            }
             SORTING_BY_SIZE -> {
                 if (sortingOrder == SORTING_ORDER_ASC)
                     file.listFiles()!!.sortedBy { it.length() }
@@ -50,8 +56,7 @@ fun makeFilesList(
                 else
                     file.listFiles()!!.sortedByDescending { it.lastModified() }
             }
-            //  default sorting by name
-            else -> {
+            else -> { // default sorting by name
                 if (sortingOrder == SORTING_ORDER_ASC)
                     file.listFiles()!!.sortedBy { it.name }
                 else

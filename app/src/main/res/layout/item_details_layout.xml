@@ -102,7 +102,7 @@
             tools:text="MyDevice/Storage" />
     </LinearLayout>
 
-    <com.awab.fileexplorer.view.DialogButtonsLayout
+    <com.awab.fileexplorer.view.helper_view.DialogButtonsLayout
         android:id="@+id/buttons_layout"
         style="@style/dialogButtons"
         android:layout_width="match_parent"

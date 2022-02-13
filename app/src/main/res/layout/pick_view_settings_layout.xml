@@ -54,7 +54,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <com.awab.fileexplorer.view.DialogButtonsLayout
+    <com.awab.fileexplorer.view.helper_view.DialogButtonsLayout
         android:id="@+id/buttons_layout"
         style="@style/dialogButtons"
         android:layout_width="match_parent"

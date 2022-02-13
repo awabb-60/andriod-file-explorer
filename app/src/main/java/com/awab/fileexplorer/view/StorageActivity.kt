@@ -1,6 +1,5 @@
 package com.awab.fileexplorer.view
 
-
 import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -27,9 +26,10 @@ import com.awab.fileexplorer.model.utils.*
 import com.awab.fileexplorer.model.utils.listeners.BreadcrumbsListener
 import com.awab.fileexplorer.presenter.*
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
-import com.awab.fileexplorer.view.action_mode_callbacks.FilesActionModeCallBack
+import com.awab.fileexplorer.view.action_mode_callbacks.StorageActionModeCallBack
 import com.awab.fileexplorer.view.contract.StorageView
-
+import com.awab.fileexplorer.view.helper_view.CustomDialog
+import com.awab.fileexplorer.view.helper_view.PickPasteLoacationDialogFragmnet
 
 class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
     private val TAG = "StorageActivity"
@@ -93,8 +93,9 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
 
         //  to close this activity when back pressed and no fragment are open
         supportFragmentManager.addOnBackStackChangedListener {
-            if (supportFragmentManager.backStackEntryCount == 0)
+            if (supportFragmentManager.backStackEntryCount == 0){
                 finish()
+            }
         }
 
         // opening the storage folder
@@ -175,7 +176,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
     }
 
     override fun startActionMode() {
-        actionMode = startSupportActionMode(FilesActionModeCallBack(mStoragePresenter))
+        actionMode = startSupportActionMode(StorageActionModeCallBack(mStoragePresenter))
     }
 
     override fun updateActionMode() {
@@ -245,12 +246,12 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         dialog.setMessage("do you want to delete?")
         dialog.show()
 
-        dialogBinding.tvDelete.setOnClickListener {
+        dialogBinding.buttonsLayout.addButton("Delete") {
             mStoragePresenter.delete()
             dialog.cancel()
         }
 
-        dialogBinding.tvCancel.setOnClickListener {
+        dialogBinding.buttonsLayout.addButton("Cancel") {
             dialog.cancel()
         }
     }
@@ -288,7 +289,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
                     SORTING_BY_SIZE
                 }
                 R.id.rbDate -> {
-                    SORTING_BY_DATE
+                    DEFAULT_SORTING_ARGUMENT
                 }
                 else -> SORTING_BY_NAME
             }
@@ -302,6 +303,10 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
             presenter.refreshList()
             dialog.cancel()
         }
+    }
+
+    override fun showPickLocation() {
+
     }
 
     override fun startCopyScreen() {
@@ -437,10 +442,11 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
                         treeUri,
                         Intent.FLAG_GRANT_READ_URI_PERMISSION and Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                     )
-                    contentResolver.takePersistableUriPermission(
-                        treeUri,
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION and Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                    )
+//
+//                    contentResolver.takePersistableUriPermission(
+//                        treeUri,
+//                        Intent.FLAG_GRANT_READ_URI_PERMISSION and Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+//                    )
                 }
                 Toast.makeText(this, "authorization successful !", Toast.LENGTH_SHORT).show()
 
@@ -510,5 +516,4 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
             .addToBackStack(SEARCH_FRAGMENT_TAG)
             .commit()
     }
-
 }

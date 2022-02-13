@@ -3,15 +3,16 @@ package com.awab.fileexplorer.view
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.awab.fileexplorer.model.data_models.StorageModel
 import com.awab.fileexplorer.adapters.StoragesAdapter
-import com.awab.fileexplorer.presenter.HomePresenter
 import com.awab.fileexplorer.databinding.ActivityHomeBinding
+import com.awab.fileexplorer.model.data_models.StorageModel
+import com.awab.fileexplorer.model.utils.TRANSFER_REQUEST_CODE
 import com.awab.fileexplorer.model.utils.storageAccess
+import com.awab.fileexplorer.presenter.HomePresenter
 import com.awab.fileexplorer.presenter.contract.HomePresenterContract
 import com.awab.fileexplorer.view.contract.HomeView
 
@@ -49,16 +50,16 @@ class HomeActivity : AppCompatActivity(), HomeView {
         binding.rvStorages.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         binding.rvStorages.setHasFixedSize(true)
 
-        binding.btnMediaImages.setOnClickListener{
+        binding.btnMediaImages.setOnClickListener {
             mHomePresenter.mediaItemClicked(it.id)
         }
-        binding.btnMediaVideo.setOnClickListener{
+        binding.btnMediaVideo.setOnClickListener {
             mHomePresenter.mediaItemClicked(it.id)
         }
-        binding.btnMediaAudio.setOnClickListener{
+        binding.btnMediaAudio.setOnClickListener {
             mHomePresenter.mediaItemClicked(it.id)
         }
-        binding.btnMediaDocs.setOnClickListener{
+        binding.btnMediaDocs.setOnClickListener {
             mHomePresenter.mediaItemClicked(it.id)
         }
     }
@@ -74,6 +75,16 @@ class HomeActivity : AppCompatActivity(), HomeView {
     override fun openActivity(intent: Intent) {
         startActivity(intent)
     }
+
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        if (requestCode == TRANSFER_REQUEST_CODE && resultCode == RESULT_OK) {
+//            if (data != null) {
+//                val b = data.getBundleExtra("T_DATA")
+//                Toast.makeText(this, "$b", Toast.LENGTH_SHORT).show()
+//            }
+//        }
+//        super.onActivityResult(requestCode, resultCode, data)
+//    }
 
     private fun getStorages(): List<StorageModel> {
         return mHomePresenter.makeStoragesModels()

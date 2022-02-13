@@ -26,6 +26,7 @@ class SdCardPresenterSAF(
     private val _storagePath: String
 ) : StoragePresenterContract {
 
+
     override val storagePath: String
         get() = _storagePath
 
@@ -52,7 +53,7 @@ class SdCardPresenterSAF(
     override fun rename(path: String, newName: String) {
         try {
             val oldName = path.split(File.pathSeparatorChar).last()
-            val sdCardDocumentFile = getTreeUriFile()?:return
+            val sdCardDocumentFile = getTreeUriFile() ?: return
             val parentFolder = navigateToParentTreeFile(sdCardDocumentFile, path)
             if (parentFolder != null) {
                 val success = parentFolder.findFile(oldName)?.renameTo(newName)
@@ -71,7 +72,7 @@ class SdCardPresenterSAF(
     }
 
     override fun createFolder(path: String) {
-        if (!isAuthorized()){
+        if (!isAuthorized()) {
             requestPermission()
             return
         }
@@ -79,7 +80,7 @@ class SdCardPresenterSAF(
 //        cutting the parent directory path from sd card path
             val newFolderName = path.split('/').last().trim()
 
-            val sdCardDocumentFile = getTreeUriFile()?:return
+            val sdCardDocumentFile = getTreeUriFile() ?: return
 
 //        navigating to the parent
             val parentFolder = navigateToParentTreeFile(sdCardDocumentFile, path)
@@ -100,7 +101,7 @@ class SdCardPresenterSAF(
     override fun delete() {
         try {
             val selectedItems = supPresenter.getSelectedItems()
-            val sdCardDocumentFile = getTreeUriFile()?:return
+            val sdCardDocumentFile = getTreeUriFile() ?: return
 
             // the parent folder that contains the files that will get deleted
             val parentFolder = navigateToParentTreeFile(sdCardDocumentFile, selectedItems[0].path)
@@ -115,10 +116,11 @@ class SdCardPresenterSAF(
                     if (!data)
                         view.showToast("some error occur while deleting the files")
                     else
-                        view.showToast("items deleted successfully")
+                        view.showToast("items successfully deleted")
 
                     supPresenter.loadFiles()
                 }
+
                 // this called when file some files are not deleted
                 // so the loading ui will stile going
                 override fun onFailure(message: String) {
@@ -144,13 +146,13 @@ class SdCardPresenterSAF(
         var innerPath = filePath.dropLastWhile { it != File.separatorChar }
 
 //        removing the tree storage name  (sd card)
-        val storageName = treeDocumentFile.name?:return null
+        val storageName = treeDocumentFile.name ?: return null
 
         // the file path without the sd card storage path at the start
         innerPath = innerPath.removeRange(0, filePath.indexOf(storageName) + storageName.length + 1)
 
         // the sd card storage tree document file
-        var file:DocumentFile? = treeDocumentFile
+        var file: DocumentFile? = treeDocumentFile
 
 //        navigating to it parent
         for (fileName in innerPath.split(File.separatorChar).filter { it != "" }) {
@@ -178,7 +180,18 @@ class SdCardPresenterSAF(
     private fun sdCardAuthorized(): Boolean {
         val sp = view.context()
             .getSharedPreferences(SD_CARD_TREE_URI_SP, AppCompatActivity.MODE_PRIVATE)
-        return sp.contains(TREE_URI_ + storageName)
+
+        return if (sp.contains(TREE_URI_ + storageName)) {
+            // updating the permission
+            val uri = getTreeUri(view.context(), storageName)
+            view.context().grantUriPermission(
+                view.context().packageName,
+                uri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION and Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            )
+            true
+        } else
+            false
     }
 
     override fun saveTreeUri(treeUri: Uri) {
