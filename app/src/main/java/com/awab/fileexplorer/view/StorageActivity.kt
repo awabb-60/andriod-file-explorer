@@ -49,7 +49,6 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
 
     private lateinit var storageName: String
     private lateinit var storagePath: String
-    private lateinit var back: OnBackPressedCallback
 
     private lateinit var _loadingDialog: AlertDialog
 
@@ -73,11 +72,6 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
             onBackPressed()
         }
 
-        back = object: OnBackPressedCallback(true){
-            override fun handleOnBackPressed() {
-                Toast.makeText(this@StorageActivity, "josu", Toast.LENGTH_SHORT).show()
-            }
-        }
 
         // adding the item listener to the mani menu
         binding.selectToolBar.setOnMenuItemClickListener {
@@ -165,7 +159,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
     }
 
     override fun navigateToFolder(name: String, path: String) {
-        val fileFragment = FilesFragment.newInstance(path, mStoragePresenter)
+        val fileFragment = FilesFragment.newInstance(path)
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragmentContainer, fileFragment)
             .setTransition(TRANSIT_FRAGMENT_FADE)
