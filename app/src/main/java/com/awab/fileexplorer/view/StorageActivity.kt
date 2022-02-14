@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
@@ -21,6 +22,7 @@ import com.awab.fileexplorer.*
 import com.awab.fileexplorer.adapters.BreadcrumbsAdapter
 import com.awab.fileexplorer.databinding.*
 import com.awab.fileexplorer.model.data_models.BreadcrumbsModel
+import com.awab.fileexplorer.model.data_models.StorageModel
 import com.awab.fileexplorer.model.types.StorageType
 import com.awab.fileexplorer.model.utils.*
 import com.awab.fileexplorer.model.utils.listeners.BreadcrumbsListener
@@ -29,7 +31,7 @@ import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 import com.awab.fileexplorer.view.action_mode_callbacks.StorageActionModeCallBack
 import com.awab.fileexplorer.view.contract.StorageView
 import com.awab.fileexplorer.view.helper_view.CustomDialog
-import com.awab.fileexplorer.view.helper_view.PickPasteLoacationDialogFragmnet
+import com.awab.fileexplorer.view.helper_view.PickPasteLocationDialogFragment
 
 class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
     private val TAG = "StorageActivity"
@@ -47,6 +49,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
 
     private lateinit var storageName: String
     private lateinit var storagePath: String
+    private lateinit var back: OnBackPressedCallback
 
     private lateinit var _loadingDialog: AlertDialog
 
@@ -68,6 +71,12 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
 //        preform a back button click when tha Navigation icon in the tool bar is clicked
         binding.selectToolBar.setNavigationOnClickListener {
             onBackPressed()
+        }
+
+        back = object: OnBackPressedCallback(true){
+            override fun handleOnBackPressed() {
+                Toast.makeText(this@StorageActivity, "josu", Toast.LENGTH_SHORT).show()
+            }
         }
 
         // adding the item listener to the mani menu
@@ -108,6 +117,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
 
         // make the loading dialog
         _loadingDialog = CustomDialog.makeLoadingDialog(this)
+
     }
 
     private fun createPresenter() {
@@ -140,6 +150,10 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
 
     override fun context(): Context {
         return this
+    }
+
+    override fun intent(): Intent {
+        return intent
     }
 
     override fun showToast(message: String) {
@@ -305,9 +319,11 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         }
     }
 
-    override fun showPickLocation() {
-
+    override fun showPickLocation(fragment:PickPasteLocationDialogFragment) {
+        fragment.show(supportFragmentManager, "Pick Paste Location")
     }
+
+
 
     override fun startCopyScreen() {
         if (!mStoragePresenter.isAuthorized()) {

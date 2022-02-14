@@ -6,6 +6,7 @@ import androidx.appcompat.app.AlertDialog
 import com.awab.fileexplorer.databinding.PickViewSettingsLayoutBinding
 import com.awab.fileexplorer.model.data_models.FileModel
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
+import com.awab.fileexplorer.view.helper_view.PickPasteLocationDialogFragment
 
 interface StorageView {
 
@@ -25,6 +26,11 @@ interface StorageView {
     val loadingDialog: AlertDialog
 
     fun context(): Context
+
+    /**
+     * return the intent that started this view
+     */
+    fun intent(): Intent
 
     /**
      * showing toast message on the screen
@@ -126,5 +132,6 @@ interface StorageView {
      */
     fun stopCloseCopyScreen()
 
-    fun showPickLocation()
+    fun showPickLocation(fragment: PickPasteLocationDialogFragment)
+
 }

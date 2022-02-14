@@ -51,6 +51,10 @@ class FilesAdapter(val mContext: Context, val presenter: SupPresenter) : ListAda
         notifyDataSetChanged()
     }
 
+    fun fItem(): FileModel {
+        return currentList.first()
+    }
+
     inner class ViewHolder(private val binding: FileItemBinding) : RecyclerView.ViewHolder(binding.root) {
         init {
             binding.root.setOnClickListener {

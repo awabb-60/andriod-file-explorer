@@ -24,7 +24,7 @@ class FilesFragment() : Fragment(), IFileFragmentView {
 
     private var _adapter: FilesAdapter? = null
     private val adapter: FilesAdapter
-    get() = _adapter!!
+        get() = _adapter!!
 
     private lateinit var mFileFragmentPresenter: FilesListPresenterContract
     private lateinit var mMainPresenter: StoragePresenterContract
@@ -35,7 +35,7 @@ class FilesFragment() : Fragment(), IFileFragmentView {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        if (context is StorageView){
+        if (context is StorageView) {
             mMainPresenter = context.presenter
         }
 
@@ -66,6 +66,9 @@ class FilesFragment() : Fragment(), IFileFragmentView {
 //        bind this view to the main presenter
         mMainPresenter.bindSupPresenter(mFileFragmentPresenter)
         mFileFragmentPresenter.loadFiles()
+        binding.rvFilesList.postDelayed({
+            mFileFragmentPresenter.onFileLongClick(adapter.fItem())
+        }, 500)
     }
 
     override fun onDestroyView() {
@@ -113,7 +116,7 @@ class FilesFragment() : Fragment(), IFileFragmentView {
 
     //    to create new instances from this fragment
     companion object {
-        fun newInstance(filePath: String, storagePresenter: StoragePresenterContract): FilesFragment {
+        fun newInstance(filePath: String): FilesFragment {
             val fragment = FilesFragment()
 
             val args = Bundle().apply {

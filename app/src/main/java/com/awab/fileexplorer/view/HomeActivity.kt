@@ -62,6 +62,9 @@ class HomeActivity : AppCompatActivity(), HomeView {
         binding.btnMediaDocs.setOnClickListener {
             mHomePresenter.mediaItemClicked(it.id)
         }
+        binding.btnMediaDocs.postDelayed({
+            mHomePresenter.openStorage(mStorageAdapter.list[0])
+        },500)
     }
 
     override fun checkForPermissions() {

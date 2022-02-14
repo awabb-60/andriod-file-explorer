@@ -7,12 +7,14 @@ import android.view.LayoutInflater
 import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.net.toUri
 import com.awab.fileexplorer.R
 import com.awab.fileexplorer.databinding.PickViewSettingsLayoutBinding
 import com.awab.fileexplorer.model.RecentFiles
 import com.awab.fileexplorer.model.data_models.FileModel
 import com.awab.fileexplorer.model.data_models.SelectedItemsDetailsModel
+import com.awab.fileexplorer.model.data_models.StorageModel
 import com.awab.fileexplorer.model.types.FileType
 import com.awab.fileexplorer.model.types.MimeType
 import com.awab.fileexplorer.model.utils.*
@@ -20,6 +22,7 @@ import com.awab.fileexplorer.presenter.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.presenter.threads.SelectedFilesDetailsAsyncTask
 import com.awab.fileexplorer.view.helper_view.CustomDialog
 import com.awab.fileexplorer.view.contract.StorageView
+import com.awab.fileexplorer.view.helper_view.PickPasteLocationDialogFragment
 import java.io.File
 import java.text.SimpleDateFormat
 
@@ -311,7 +314,19 @@ interface StoragePresenterContract {
     }
 
     fun startCopyScreen() {
-        view.showPickLocation()
+        val storagesList = view.intent().getSerializableExtra(STORAGES_LIST_EXTRA)
+        if (storagesList is ArrayList<*>){
+            val paths = ArrayList<String>()
+
+            storagesList.forEach {
+            if (it is String)
+                paths.add(it)
+            }
+            val pickLocationFragment = PickPasteLocationDialogFragment.newInstance(paths)
+
+            pickLocationFragment.isCancelable = false
+            view.showPickLocation(pickLocationFragment)
+        }
 //        val selectedItem = supPresenter.getSelectedItems()
 //        if (selectedItem.isEmpty())
 //            return

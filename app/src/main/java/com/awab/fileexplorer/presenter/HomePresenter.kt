@@ -19,6 +19,8 @@ class HomePresenter(private val homeView: HomeView): HomePresenterContract {
 
     private  val TAG = "HomePresenter"
 
+    private val storages = ArrayList<String>()
+
     override val view: HomeView
         get() = homeView
 
@@ -32,6 +34,7 @@ class HomePresenter(private val homeView: HomeView): HomePresenterContract {
             putExtra(STORAGE_DISPLAY_NAME_EXTRA, it.name)
             // the type that will determine the presenter
             putExtra(STORAGE_TYPE_EXTRA, it.storageType)
+            putExtra(STORAGES_LIST_EXTRA, storages)
         }
         view.openActivity(storageIntent)
     }
@@ -83,6 +86,8 @@ class HomePresenter(private val homeView: HomeView): HomePresenterContract {
         val sdCardDir = storages[1]
         if (sdCardDir != null)
             makeStorageModel(EXTERNAL_SDCARD_DISPLAY_NAME, sdCardDir, StorageType.SDCARD)?.let { list.add(it) }
+
+        list.forEach { this.storages.add(it.path) }
         return list
     }
 

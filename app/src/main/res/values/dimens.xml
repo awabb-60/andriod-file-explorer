@@ -1,3 +1,11 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
+
+    <dimen name="file_item_height">55dp</dimen>
+    <dimen name="navigation_file_name_text_size">17sp</dimen>
+    <dimen name="navigation_file_size_text_size">12sp</dimen>
+
+    <dimen name="pick_Location_file_item_height">40dp</dimen>
+    <dimen name="pick_Location_file_name_text_size">10sp</dimen>
+    <dimen name="pick_Location_file_size_text_size">9sp</dimen>
 </resources>
