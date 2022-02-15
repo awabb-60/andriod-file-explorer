@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable
 import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.core.net.toUri
+import androidx.documentfile.provider.DocumentFile
 import com.awab.fileexplorer.model.data_models.BreadcrumbsModel
 import com.awab.fileexplorer.model.data_models.FileModel
 import com.awab.fileexplorer.model.types.FileType
@@ -392,4 +393,28 @@ fun recreateBreadcrumbsFromPath(
     list.add(BreadcrumbsModel(File(itemPath).name, itemPath))
 
     return list
+}
+
+/**
+ * this return the folder inside the treeDocumentFile that contains the file with the given file path
+ */
+fun navigateToTreeFile(treeDocumentFile: DocumentFile, filePath: String): DocumentFile? {
+    val storageName = treeDocumentFile.name ?: return null
+
+    // the file path without the sd card storage path at the start
+    val innerPath = filePath.removeRange(0, filePath.indexOf(storageName) + storageName.length)
+
+    // removing the name from the path
+//    innerPath = innerPath.dropLastWhile { it != File.separatorChar }
+
+    // the sd card storage tree document file
+    var file: DocumentFile? = treeDocumentFile
+
+    // navigating to it parent
+    for (fileName in innerPath.split(File.separatorChar).filter { it != "" }) {
+        file = file?.findFile(fileName)
+        if (file == null)
+            break
+    }
+    return file
 }

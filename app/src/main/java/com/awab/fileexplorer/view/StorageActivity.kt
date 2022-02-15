@@ -111,7 +111,6 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
 
         // make the loading dialog
         _loadingDialog = CustomDialog.makeLoadingDialog(this)
-
     }
 
     private fun createPresenter() {

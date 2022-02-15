@@ -22,6 +22,7 @@ class TransferBroadCast : BroadcastReceiver() {
         val pasteStorage = intent.getParcelableExtra<StorageModel>(PASTE_LOCATION_STORAGE_MODEL_EXTRA)
         when (pasteStorage?.storageType) {
             StorageType.INTERNAL -> TransferToInternalStorageService.startWork(context, intent)
+            StorageType.SDCARD -> TransferToSDCardService.startWork(context, intent)
             else->{}
         }
     }

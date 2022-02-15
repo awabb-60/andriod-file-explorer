@@ -359,10 +359,10 @@ interface StoragePresenterContract {
                 Intent(TransferBroadCast.ACTION).apply {
                     putExtra(TRANSFER_FILES_PATHS_EXTRA, arrayOf(*listPath.toTypedArray()))
                     // the location where the files will go to
-                    putExtra(PASTE_LOCATION_PATH_EXTRA, storage.path)
+                    putExtra(PASTE_LOCATION_PATH_EXTRA, folderLocation)
 
                     // information to write to the sd card : tree uri
-                    putExtra(TREE_URI_FOR_TRANSFER_EXTRA, getTreeUri(view.context(), File(storagePath).name))
+                    putExtra(TREE_URI_FOR_TRANSFER_EXTRA, getTreeUri(view.context(), File(storage.path).name))
 
                     putExtra(EXTERNAL_STORAGE_PATH_EXTRA, storagePath)
                 }

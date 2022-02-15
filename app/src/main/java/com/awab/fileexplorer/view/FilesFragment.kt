@@ -65,10 +65,7 @@ class FilesFragment() : Fragment(), IFileFragmentView {
 
 //        bind this view to the main presenter
         mMainPresenter.bindSupPresenter(mFileFragmentPresenter)
-        mFileFragmentPresenter.loadFiles()
-        binding.rvFilesList.postDelayed({
-            mFileFragmentPresenter.onFileLongClick(adapter.fItem())
-        }, 500)
+
     }
 
     override fun onDestroyView() {
@@ -100,10 +97,6 @@ class FilesFragment() : Fragment(), IFileFragmentView {
         adapter.submitList(list)
 //        hiding the rv to show the empty file indicator
         binding.rvFilesList.visibility = if (list.isEmpty()) View.GONE else View.VISIBLE
-    }
-
-    fun refreshList() {
-        mFileFragmentPresenter.loadFiles()
     }
 
     override fun getSelectedItems(): List<FileModel> {

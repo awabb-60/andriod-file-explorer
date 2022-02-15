@@ -10,6 +10,7 @@ import androidx.documentfile.provider.DocumentFile
 import com.awab.fileexplorer.model.utils.PICKER_REQUEST_CODE
 import com.awab.fileexplorer.model.utils.SD_CARD_TREE_URI_SP
 import com.awab.fileexplorer.model.utils.TREE_URI_
+import com.awab.fileexplorer.model.utils.navigateToTreeFile
 import com.awab.fileexplorer.presenter.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 import com.awab.fileexplorer.presenter.contract.SupPresenter
@@ -52,13 +53,13 @@ class SdCardPresenterSAF(
 
     override fun rename(path: String, newName: String) {
         try {
-            val oldName = path.split(File.pathSeparatorChar).last()
+            val oldName = File(path).name
             val sdCardDocumentFile = getTreeUriFile() ?: return
-            val parentFolder = navigateToParentTreeFile(sdCardDocumentFile, path)
-            if (parentFolder != null) {
-                val success = parentFolder.findFile(oldName)?.renameTo(newName)
+            val file = navigateToTreeFile(sdCardDocumentFile, path)
+            if (file != null) {
+                val success = file.renameTo(newName)
 //                    some error occur... the file was node found or couldn't delete this file
-                if (success == null || !success)
+                if (!success)
                     view.showToast("error renaming $oldName")
             } else { //  error navigating to the file
                 view.showToast("error renaming $oldName")
@@ -83,7 +84,7 @@ class SdCardPresenterSAF(
             val sdCardDocumentFile = getTreeUriFile() ?: return
 
 //        navigating to the parent
-            val parentFolder = navigateToParentTreeFile(sdCardDocumentFile, path)
+            val parentFolder = navigateToTreeFile(sdCardDocumentFile, File(path).parent)
 
 //        creating the new directory and refreshing
             if (parentFolder != null) {
@@ -104,7 +105,7 @@ class SdCardPresenterSAF(
             val sdCardDocumentFile = getTreeUriFile() ?: return
 
             // the parent folder that contains the files that will get deleted
-            val parentFolder = navigateToParentTreeFile(sdCardDocumentFile, selectedItems[0].path)
+            val parentFolder = navigateToTreeFile(sdCardDocumentFile, File(selectedItems[0].path).parent)
             if (selectedItems.isEmpty() || parentFolder == null)
                 return
 
@@ -136,31 +137,6 @@ class SdCardPresenterSAF(
 
     private fun getTreeUriFile(): DocumentFile? {
         return DocumentFile.fromTreeUri(view.context(), getTreeUri(view.context(), storageName))
-    }
-
-    /**
-     * this return the folder inside the treeDocumentFile that contains the file with the given file path
-     */
-    private fun navigateToParentTreeFile(treeDocumentFile: DocumentFile, filePath: String): DocumentFile? {
-//        removing the name from the path
-        var innerPath = filePath.dropLastWhile { it != File.separatorChar }
-
-//        removing the tree storage name  (sd card)
-        val storageName = treeDocumentFile.name ?: return null
-
-        // the file path without the sd card storage path at the start
-        innerPath = innerPath.removeRange(0, filePath.indexOf(storageName) + storageName.length + 1)
-
-        // the sd card storage tree document file
-        var file: DocumentFile? = treeDocumentFile
-
-//        navigating to it parent
-        for (fileName in innerPath.split(File.separatorChar).filter { it != "" }) {
-            file = file?.findFile(fileName)
-            if (file == null)
-                break
-        }
-        return file
     }
 
     @RequiresApi(19)

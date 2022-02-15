@@ -35,13 +35,6 @@ class HomeActivity : AppCompatActivity(), HomeView {
             mHomePresenter.openStorage(it)
         }
 
-//        val adapter = StoragesAdapter(this, ArrayList())
-//        binding.lvListView.adapter = adapter
-//
-//        getStorages().forEach {
-//            adapter.add(it)
-//        }
-
         binding.rvStorages.adapter = mStorageAdapter.apply {
             set(getStorages())
         }
@@ -62,9 +55,7 @@ class HomeActivity : AppCompatActivity(), HomeView {
         binding.btnMediaDocs.setOnClickListener {
             mHomePresenter.mediaItemClicked(it.id)
         }
-        binding.btnMediaDocs.postDelayed({
-            mHomePresenter.openStorage(mStorageAdapter.list[0])
-        },500)
+        
     }
 
     override fun checkForPermissions() {
