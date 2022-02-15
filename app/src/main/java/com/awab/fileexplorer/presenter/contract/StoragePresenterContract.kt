@@ -3,11 +3,11 @@ package com.awab.fileexplorer.presenter.contract
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.net.toUri
 import com.awab.fileexplorer.R
 import com.awab.fileexplorer.databinding.PickViewSettingsLayoutBinding
@@ -17,11 +17,15 @@ import com.awab.fileexplorer.model.data_models.SelectedItemsDetailsModel
 import com.awab.fileexplorer.model.data_models.StorageModel
 import com.awab.fileexplorer.model.types.FileType
 import com.awab.fileexplorer.model.types.MimeType
+import com.awab.fileexplorer.model.types.StorageType
+import com.awab.fileexplorer.model.types.TransferAction
 import com.awab.fileexplorer.model.utils.*
+import com.awab.fileexplorer.model.utils.transfer_utils.TransferToSDCardService
+import com.awab.fileexplorer.model.utils.transfer_utils.TransferBroadCast
 import com.awab.fileexplorer.presenter.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.presenter.threads.SelectedFilesDetailsAsyncTask
-import com.awab.fileexplorer.view.helper_view.CustomDialog
 import com.awab.fileexplorer.view.contract.StorageView
+import com.awab.fileexplorer.view.helper_view.CustomDialog
 import com.awab.fileexplorer.view.helper_view.PickPasteLocationDialogFragment
 import java.io.File
 import java.text.SimpleDateFormat
@@ -241,7 +245,7 @@ interface StoragePresenterContract {
                 object : SimpleSuccessAndFailureCallback<SelectedItemsDetailsModel> {
                     override fun onSuccess(data: SelectedItemsDetailsModel) {
                         view.showDetails(data.contains, data.totalSize)
-                         view.loadingDialog.dismiss()
+                        view.loadingDialog.dismiss()
                     }
 
                     override fun onFailure(message: String) {
@@ -313,102 +317,66 @@ interface StoragePresenterContract {
         }
     }
 
-    fun startCopyScreen() {
-        val storagesList = view.intent().getSerializableExtra(STORAGES_LIST_EXTRA)
-        if (storagesList is ArrayList<*>){
-            val paths = ArrayList<String>()
+    fun pickTransferLocation(transferAction: TransferAction) {
+        val storagesList = view.intent().getParcelableArrayListExtra<StorageModel>(STORAGES_LIST_EXTRA)
 
-            storagesList.forEach {
-            if (it is String)
-                paths.add(it)
-            }
-            val pickLocationFragment = PickPasteLocationDialogFragment.newInstance(paths)
+        storagesList?.let {
+            val pickLocationFragment = PickPasteLocationDialogFragment.newInstance(
+                it.toArray(arrayOf<StorageModel>()),
+                transferAction
+            )
 
             pickLocationFragment.isCancelable = false
             view.showPickLocation(pickLocationFragment)
         }
-//        val selectedItem = supPresenter.getSelectedItems()
-//        if (selectedItem.isEmpty())
-//            return
-//        view.startCopyScreen()
-    }
-
-    fun startMoveScreen() {
-        val selectedItem = supPresenter.getSelectedItems()
-        if (selectedItem.isEmpty())
-            return
-        view.startMoveScreen()
     }
 
     // to copy or move to the sd card or the internal storage, you have to have a folder
     // named (Paste) in location you try to copy to.
-    fun copy(to: String) {
+    fun transfer(folderLocation: String, storage: StorageModel, action: TransferAction) {
+        if (!isAuthorized()) {
+            return
+        }
+
         val selectedItem = supPresenter.getSelectedItems()
         if (selectedItem.isEmpty())
             return
 
         val listPath = selectedItem.map { it.path }
-        view.openCopyProgress("Copying")
+        view.openCopyProgress(action.name)
 
-//        val intent = when (to) {
-//            "I" -> {
-//                Intent(COPY_BROADCAST_ACTION).apply {
-//                    putExtra(COPY_PATHS_EXTRA, arrayOf(*listPath.toTypedArray()))
-//                    //  the copy location
-//                    putExtra(PASTE_LOCATION, internalStoragePath + File.separator + "Paste")
-//                }
-//            }
-//            "S" -> {
-//                Intent(COPY_BROADCAST_ACTION).apply {
-//                    putExtra(COPY_PATHS_EXTRA, arrayOf(*listPath.toTypedArray()))
-//                    //  the copy location
-//                    putExtra(PASTE_LOCATION, sdCardPath + File.separator + "Paste")
-//                    putExtra(TREE_URI_FOR_COPY_EXTRA, getTreeUri(view.context(), sdCardName).toString())
-//                    putExtra(EXTERNAL_STORAGE_PATH_EXTRA, sdCardPath)
-//                }
-//            }
-//
-//            else -> Intent("Noop")
-//        }
-//
-//        intent.putExtra(COPY_TYPE_EXTRA, COPY)
-////        starting the copy service
-//        view.context().sendBroadcast(intent)
-    }
+        val intent = when (storage.storageType) {
+            StorageType.INTERNAL -> {
+                Intent(TransferBroadCast.ACTION).apply {
+                    putExtra(TRANSFER_FILES_PATHS_EXTRA, arrayOf(*listPath.toTypedArray()))
+                    //  the copy location
+                    putExtra(PASTE_LOCATION_PATH_EXTRA, folderLocation)
+                }
+            }
 
-    fun move(to: String) {
-        val selectedItem = supPresenter.getSelectedItems()
-        if (selectedItem.isEmpty())
-            return
+            // transfer to sd card
+            StorageType.SDCARD -> {
+                Intent(TransferBroadCast.ACTION).apply {
+                    putExtra(TRANSFER_FILES_PATHS_EXTRA, arrayOf(*listPath.toTypedArray()))
+                    // the location where the files will go to
+                    putExtra(PASTE_LOCATION_PATH_EXTRA, storage.path)
 
-        val listPath = selectedItem.map { it.path }
-        view.openCopyProgress("Moving")
+                    // information to write to the sd card : tree uri
+                    putExtra(TREE_URI_FOR_TRANSFER_EXTRA, getTreeUri(view.context(), File(storagePath).name))
 
-//        val intent = when (to) {
-//            "I" -> {
-//                Intent(COPY_BROADCAST_ACTION).apply {
-//                    putExtra(COPY_PATHS_EXTRA, arrayOf(*listPath.toTypedArray()))
-//                    //  the copy location
-//                    putExtra(PASTE_LOCATION, internalStoragePath + File.separator + "Paste")
-//                    putExtra(TREE_URI_FOR_COPY_EXTRA, getTreeUri(view.context(), sdCardName).toString())
-//                    putExtra(EXTERNAL_STORAGE_PATH_EXTRA, sdCardPath)
-//                }
-//            }
-//            "S" -> {
-//                Intent(COPY_BROADCAST_ACTION).apply {
-//                    putExtra(COPY_PATHS_EXTRA, arrayOf(*listPath.toTypedArray()))
-//                    putExtra(PASTE_LOCATION, sdCardPath + File.separator + "Paste")
-//                    putExtra(TREE_URI_FOR_COPY_EXTRA, getTreeUri(view.context(), sdCardName).toString())
-//                    putExtra(EXTERNAL_STORAGE_PATH_EXTRA, sdCardPath)
-//                }
-//            }
-//
-//            else -> Intent("Noop")
-//        }
-//
-//        intent.putExtra(COPY_TYPE_EXTRA, MOVE)
-////        starting the copy service
-//        view.context().sendBroadcast(intent)
+                    putExtra(EXTERNAL_STORAGE_PATH_EXTRA, storagePath)
+                }
+            }
+            else -> Intent("Noop")
+        }
+
+        // the transfer action
+        intent.putExtra(TRANSFER_ACTION_EXTRA, action as Parcelable)
+        // the paste location storage model
+        intent.putExtra(PASTE_LOCATION_STORAGE_MODEL_EXTRA, storage)
+
+        // starting the copy service
+        view.context().sendBroadcast(intent)
     }
 
     /**
@@ -424,7 +392,7 @@ interface StoragePresenterContract {
     }
 
     fun cancelCopy() {
-        CopyServices.cancelCopy()
+        TransferToSDCardService.cancelWork()
         view.stopCloseCopyScreen()
         stopActionMode()
         supPresenter.loadFiles()
@@ -447,20 +415,19 @@ interface StoragePresenterContract {
         when (viewSortBy) {
             SORTING_BY_NAME -> rgSortingBy.check(R.id.rbName)
             SORTING_BY_SIZE -> rgSortingBy.check(R.id.rbSize)
-            DEFAULT_SORTING_ARGUMENT -> rgSortingBy.check(R.id.rbDate)
-
+            SORTING_BY_DATE -> rgSortingBy.check(R.id.rbDate)
             // sort by name is the default
             else -> rgSortingBy.check(R.id.rbName)
         }
         when (viewSortOrder) {
             SORTING_ORDER_ASC -> rgSortingOrder.check(R.id.rbAscending)
             SORTING_ORDER_DEC -> rgSortingOrder.check(R.id.rbDescending)
-
             // sort ascending is the default
             else -> rgSortingBy.check(R.id.rbName)
         }
         dialogBinding.btnShowHiddenFiles.isChecked = showHiddenFiles
-        val dialog = CustomDialog.makeDialog(view.context(), dialogBinding.root).apply { setTitle("View Settings") }
+        val dialog =
+            CustomDialog.makeDialog(view.context(), dialogBinding.root).apply { setTitle("View Settings") }
         view.pickNewViewingSettings(dialog, dialogBinding)
     }
 
@@ -524,6 +491,7 @@ interface StoragePresenterContract {
             Intent.createChooser(intent, view.context().getString(R.string.open_with_chooser_title))
         view.openFile(chooserIntent)
     }
+
 
 //    fun getTransferResult(): Intent {
 //        val items  = supPresenter.getSelectedItems()

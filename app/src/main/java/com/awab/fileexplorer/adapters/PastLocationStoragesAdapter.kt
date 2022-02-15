@@ -24,6 +24,9 @@ val listener:LocationStoragesListener) :
 
     override fun getItemCount() = storages.size
 
+    fun getCurrentStorage(): StorageModel =
+        storages[currentSelectedPos]
+
     @SuppressLint("NotifyDataSetChanged")
     inner class ViewHolder(val binding:PickStorageBinding):RecyclerView.ViewHolder(binding.root){
 

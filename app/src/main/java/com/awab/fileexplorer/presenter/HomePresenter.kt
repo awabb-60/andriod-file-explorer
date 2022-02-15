@@ -1,6 +1,7 @@
 package com.awab.fileexplorer.presenter
 
 import android.content.Intent
+import android.os.Parcelable
 import androidx.core.content.ContextCompat
 import com.awab.fileexplorer.R
 import com.awab.fileexplorer.model.data_models.StorageModel
@@ -19,7 +20,7 @@ class HomePresenter(private val homeView: HomeView): HomePresenterContract {
 
     private  val TAG = "HomePresenter"
 
-    private val storages = ArrayList<String>()
+    private val storages = ArrayList<Parcelable>()
 
     override val view: HomeView
         get() = homeView
@@ -87,7 +88,7 @@ class HomePresenter(private val homeView: HomeView): HomePresenterContract {
         if (sdCardDir != null)
             makeStorageModel(EXTERNAL_SDCARD_DISPLAY_NAME, sdCardDir, StorageType.SDCARD)?.let { list.add(it) }
 
-        list.forEach { this.storages.add(it.path) }
+        this.storages.addAll(list)
         return list
     }
 

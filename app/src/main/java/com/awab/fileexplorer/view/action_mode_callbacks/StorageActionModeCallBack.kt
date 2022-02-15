@@ -4,6 +4,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
 import com.awab.fileexplorer.R
+import com.awab.fileexplorer.model.types.TransferAction
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 
 class StorageActionModeCallBack(private val presenterContract: StoragePresenterContract):ActionMode.Callback{
@@ -26,8 +27,8 @@ class StorageActionModeCallBack(private val presenterContract: StoragePresenterC
     override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
         when(item?.itemId){
             R.id.miDelete-> presenterContract.confirmDelete()
-            R.id.miMove-> presenterContract.startMoveScreen()
-            R.id.miCopy-> presenterContract.startCopyScreen()
+            R.id.miMove-> presenterContract.pickTransferLocation(TransferAction.MOVE)
+            R.id.miCopy-> presenterContract.pickTransferLocation(TransferAction.COPY)
             R.id.miRename-> presenterContract.confirmRename()
             R.id.miOpenWith-> presenterContract.openWith()
             R.id.miDetails-> presenterContract.showDetails()

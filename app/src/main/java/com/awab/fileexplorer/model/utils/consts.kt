@@ -70,13 +70,33 @@ const val DEFAULT_SHOW_HIDDEN_FILES = false
 
 const val DATE_FORMAT_PATTERN = "E dd-MMM-y  hh:mm a"
 
-const val COPY_BROADCAST_ACTION = "COPY_BROADCAST_ACTION"
-
 const val PROGRESS_INTENT = "PROGRESS_INTENT"
-const val COPY_PATHS_EXTRA = "COPY_PATHS"
-const val PASTE_LOCATION = "PASTE_LOCATION"
 
-const val TREE_URI_FOR_COPY_EXTRA = "TREE_URI_FOR_COPY_EXTRA"
+/**
+ * the type of transfer that will happened
+ */
+const val TRANSFER_ACTION_EXTRA = "COPY_TYPE_EXTRA"
+
+/**
+ * the paths of the files that will get transferred
+ */
+const val TRANSFER_FILES_PATHS_EXTRA = "TRANSFER_FILES_PATHS_EXTRA"
+
+/**
+ * the location where the files will be transfer to
+ */
+const val PASTE_LOCATION_PATH_EXTRA = "PASTE_LOCATION_PATH_EXTRA"
+
+/**
+ * the location storage model where the files will be transfer to
+ */
+const val PASTE_LOCATION_STORAGE_MODEL_EXTRA = "PASTE_LOCATION_STORAGE_MODEL_EXTRA"
+
+/**
+ * the tree uri that will get used to write to the sd card
+ */
+const val TREE_URI_FOR_TRANSFER_EXTRA = "TREE_URI_FOR_TRANSFER_EXTRA"
+
 const val EXTERNAL_STORAGE_PATH_EXTRA = "EXTERNAL_STORAGE_PATH_EXTRA"
 
 const val CURRENT_COPY_ITEM_NAME_EXTRA = "CURRENT_COPY_ITEM_NAME_EXTRA"
@@ -86,7 +106,7 @@ const val MAX_PROGRESS_EXTRA = "MAX_PROGRESS_EXTRA"
 
 const val FINISH_COPY_INTENT = "FINISH_COPY_INTENT"
 
-const val COPY_TYPE_EXTRA = "COPY_TYPE_EXTRA"
+
 const val COPY = "COPY"
 const val MOVE = "MOVE"
 

@@ -9,7 +9,6 @@ import com.awab.fileexplorer.R
 import com.awab.fileexplorer.adapters.utils.bindFileItem
 import com.awab.fileexplorer.databinding.FileItemBinding
 import com.awab.fileexplorer.model.data_models.FileModel
-import com.awab.fileexplorer.model.data_models.StorageModel
 
 class PastLocationFilesAdapter(val context: Context,var files: List<FileModel>, val listener:LocationFilesListener) :
     RecyclerView.Adapter<PastLocationFilesAdapter.ViewHolder>() {

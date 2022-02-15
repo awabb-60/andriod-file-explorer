@@ -8,14 +8,14 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/miMove"
-        android:title="@string/miMove"
-        android:visible="false"
+        android:id="@+id/miCopy"
+        android:title="@string/miCopy"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/miCopy"
-        android:title="@string/miCopy"
+        android:id="@+id/miMove"
+        android:title="@string/miMove"
+        android:visible="false"
         app:showAsAction="never" />
 
     <item

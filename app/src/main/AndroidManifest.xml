@@ -36,16 +36,29 @@
             android:exported="true" />
 
         <service
-            android:name=".model.utils.CopyServices"
+            android:name=".model.utils.transfer_utils.TransferToSDCardService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <service
+            android:name=".model.utils.transfer_utils.TransferToInternalStorageService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <receiver
-            android:name=".presenter.CopyBreadCast"
+            android:name=".model.utils.transfer_utils.TransferBroadCast"
             android:exported="false">
             <intent-filter>
-                <action android:name="COPY_BROADCAST_ACTION" />
+                <action android:name="com.awab.fileexplorer.ACTION_TRANSFER" />
             </intent-filter>
         </receiver>
+
+        <receiver
+            android:name=".model.utils.transfer_utils.CancelTransferBroadCast"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.awab.fileexplorer.ACTION_CANCEL" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

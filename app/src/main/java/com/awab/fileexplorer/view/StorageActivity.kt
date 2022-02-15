@@ -12,7 +12,6 @@ import android.util.Log
 import android.view.Menu
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
-import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
@@ -22,10 +21,11 @@ import com.awab.fileexplorer.*
 import com.awab.fileexplorer.adapters.BreadcrumbsAdapter
 import com.awab.fileexplorer.databinding.*
 import com.awab.fileexplorer.model.data_models.BreadcrumbsModel
-import com.awab.fileexplorer.model.data_models.StorageModel
 import com.awab.fileexplorer.model.types.StorageType
 import com.awab.fileexplorer.model.utils.*
 import com.awab.fileexplorer.model.utils.listeners.BreadcrumbsListener
+import com.awab.fileexplorer.model.utils.transfer_utils.CancelTransferBroadCast
+import com.awab.fileexplorer.model.utils.transfer_utils.TransferBroadCast
 import com.awab.fileexplorer.presenter.*
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 import com.awab.fileexplorer.view.action_mode_callbacks.StorageActionModeCallBack
@@ -297,9 +297,9 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
                     SORTING_BY_SIZE
                 }
                 R.id.rbDate -> {
-                    DEFAULT_SORTING_ARGUMENT
+                    SORTING_BY_DATE
                 }
-                else -> SORTING_BY_NAME
+                else -> DEFAULT_SORTING_ARGUMENT
             }
             val order = when (dialogBinding.rgViewOrder.checkedRadioButtonId) {
                 R.id.rbAscending -> SORTING_ORDER_ASC
@@ -317,63 +317,13 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         fragment.show(supportFragmentManager, "Pick Paste Location")
     }
 
-
-
-    override fun startCopyScreen() {
-        if (!mStoragePresenter.isAuthorized()) {
-            mStoragePresenter.requestPermission()
-            return
-        }
-
-        val dialogBinding = ChoseLocationBinding.inflate(layoutInflater)
-        val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
-
-        dialog.setTitle("Choose Copy Location")
-        dialog.show()
-
-        dialogBinding.tvCancel.setOnClickListener {
-            dialog.cancel()
-        }
-        dialogBinding.tvCommit.setOnClickListener {
-
-            when (dialogBinding.rgGroup.checkedRadioButtonId) {
-                R.id.rbInternal -> mStoragePresenter.copy("I")
-                R.id.rbSdCard -> mStoragePresenter.copy("S")
-            }
-            dialog.cancel()
-        }
-    }
-
-    override fun startMoveScreen() {
-        if (!mStoragePresenter.isAuthorized()) {
-            mStoragePresenter.requestPermission()
-            return
-        }
-        val dialogBinding = ChoseLocationBinding.inflate(layoutInflater)
-        val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
-
-        dialog.setTitle("Choose Move Location")
-        dialog.show()
-
-        dialogBinding.tvCancel.setOnClickListener {
-            dialog.cancel()
-        }
-
-        dialogBinding.tvCommit.setOnClickListener {
-            when (dialogBinding.rgGroup.checkedRadioButtonId) {
-                R.id.rbInternal -> mStoragePresenter.move("I")
-                R.id.rbSdCard -> mStoragePresenter.move("S")
-            }
-            dialog.cancel()
-        }
-    }
-
     override fun openCopyProgress(action: String) {
         val dialogBinding = ProgressDialogLayoutBinding.inflate(layoutInflater)
         val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
 
-
         dialogBinding.tvCancel.setOnClickListener {
+            sendBroadcast(Intent(CancelTransferBroadCast.ACTION))
+            progressDialog?.dismiss()
             dialog.cancel()
         }
 
@@ -505,7 +455,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
             }
         }
 
-        val copyProgressFilter = IntentFilter(PROGRESS_INTENT)
+        val copyProgressFilter = IntentFilter(StorageView.ACTION_PROGRESS_UPDATE)
         val copyFinishFilter = IntentFilter(FINISH_COPY_INTENT)
 
         registerReceiver(copyProgressReceiver, copyProgressFilter)

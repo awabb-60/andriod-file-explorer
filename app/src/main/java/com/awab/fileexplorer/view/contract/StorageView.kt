@@ -10,6 +10,9 @@ import com.awab.fileexplorer.view.helper_view.PickPasteLocationDialogFragment
 
 interface StorageView {
 
+    companion object{
+        val ACTION_PROGRESS_UPDATE = "com.awab.fileexplorer.ACTION_PROGRESS_UPDATE"
+    }
     /**
      * get the presenter that control this view
      */
@@ -108,14 +111,9 @@ interface StorageView {
     fun pickNewViewingSettings(dialog: AlertDialog, dialogBinding: PickViewSettingsLayoutBinding)
 
     /**
-     * to pick the paste location of the copy items
+     * to pick the paste location
      */
-    fun startCopyScreen()
-
-    /**
-     * to pick the paste location of the move items
-     */
-    fun startMoveScreen()
+    fun showPickLocation(fragment: PickPasteLocationDialogFragment)
 
     /**
      * this open a dialog that will show the copying/ moving progress
@@ -131,7 +129,5 @@ interface StorageView {
      * to cancel any ui that has to do with copying/moving
      */
     fun stopCloseCopyScreen()
-
-    fun showPickLocation(fragment: PickPasteLocationDialogFragment)
 
 }

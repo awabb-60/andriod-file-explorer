@@ -6,5 +6,17 @@ package com.awab.fileexplorer.model.types
 enum class StorageType {
     INTERNAL,
     SDCARD,
-    USB_MOUNTED
+    USB_MOUNTED;
+
+
+    companion object {
+        fun valueOf(name: String): StorageType? {
+            return when (name) {
+                INTERNAL.name -> INTERNAL
+                SDCARD.name -> SDCARD
+                USB_MOUNTED.name -> USB_MOUNTED
+                else -> null
+            }
+        }
+    }
 }

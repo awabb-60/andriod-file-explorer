@@ -1,74 +1,102 @@
-package com.awab.fileexplorer.model.utils
+package com.awab.fileexplorer.model.utils.transfer_utils
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.core.app.JobIntentService
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
+import com.awab.fileexplorer.model.types.TransferAction
+import com.awab.fileexplorer.model.utils.*
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 
-class CopyServices : JobIntentService() {
+class TransferToSDCardService : JobIntentService() {
     private val progressUpdateAfter = 2000
 
-    private val onProgressLam: (max: Int, progress: Int, done: Int, left: Int, name: String) ->
-    Unit = { max, p, done, left, name ->
+    private val onProgressLam: (max: Int, progress: Int) ->
+    Unit = { max, p ->
         val progressIntent = Intent(PROGRESS_INTENT).apply {
             putExtra(MAX_PROGRESS_EXTRA, max)
             putExtra(PROGRESS_EXTRA, p)
-            putExtra(DONE_AND_LEFT_EXTRA, "$done of $left")
-            putExtra(CURRENT_COPY_ITEM_NAME_EXTRA, name)
+            putExtra(DONE_AND_LEFT_EXTRA, "$doneCount of $totalCount")
+            putExtra(CURRENT_COPY_ITEM_NAME_EXTRA, inProgressFileName)
         }
         sendBroadcast(progressIntent)
     }
 
+    /**
+     * the total number of files
+     */
+    private var totalCount = 0
+
+    /**
+     * the number of files that has been transferred
+     */
+    private var doneCount = 0
+
+    /**
+     * the current file getting transferred
+     */
+    private var inProgressFileName = ""
+
+    /**
+     * the uri that will get used to write to the sd card
+     */
+    private var treeUriFile: DocumentFile? = null
+
     companion object {
-        private var treeUriFile: DocumentFile? = null
-        private var externalStoragePath: String? = null
-
-        private var cancelCopy = false
-
-        private var leftCount = 0
-        private var doneCount = 0
-
-        private var currentCopyItemName = ""
 
         fun startWork(context: Context, intent: Intent) {
-            enqueueWork(context, CopyServices::class.java, 123, intent)
+            stop = false
+            enqueueWork(context, TransferToSDCardService::class.java, 22, intent)
         }
 
-        fun cancelCopy() {
-            cancelCopy = true
+        /**
+         * used to stop the transfer work
+         */
+        var stop = false
+
+        fun cancelWork() {
+            stop = true
         }
     }
 
 
     override fun onHandleWork(intent: Intent) {
-        cancelCopy = false
-        leftCount = 0
-        doneCount = 0
-        currentCopyItemName = ""
 
-        val treeUri = intent.getStringExtra(TREE_URI_FOR_COPY_EXTRA)?.toUri()
+        // getting the tree uri
+        val treeUri = intent.getStringExtra(TREE_URI_FOR_TRANSFER_EXTRA)?.toUri()
         if (treeUri != null)
             treeUriFile = DocumentFile.fromTreeUri(this, treeUri)
 
-        externalStoragePath = intent.getStringExtra(EXTERNAL_STORAGE_PATH_EXTRA)
 
-        val pastLocation = intent.getStringExtra(PASTE_LOCATION)
-        val list = intent.getStringArrayExtra(COPY_PATHS_EXTRA)
+        // the paste location
+        val pastLocation = intent.getStringExtra(PASTE_LOCATION_PATH_EXTRA)
+
+        // the selected files
+        val list = intent.getStringArrayExtra(TRANSFER_FILES_PATHS_EXTRA)
+
+        // the transfer action
+        val transferAction = intent.getParcelableExtra<TransferAction>(TRANSFER_ACTION_EXTRA)
         if (list != null && pastLocation != null) {
             val pastFolder = File(pastLocation)
+
+            // turning the paths into files
             val listFiles = list.map { File(it) }
 
-            leftCount = getContains(listFiles)
+            // count all the files and folders in the list
+            totalCount = getTransferContains(listFiles)
+            doneCount = 0
 
-            val copyType = intent.getStringExtra(COPY_TYPE_EXTRA)
-            if (copyType == COPY)
-                copy(listFiles, pastFolder)
-            else if (copyType == MOVE)
-                move(listFiles, pastFolder)
+            // start transferring
+            if (transferAction == TransferAction.COPY)
+                Log.d("TAG", "onHandleWork: COPY")
+//                copy(listFiles, pastFolder)
+            else if (transferAction == TransferAction.MOVE)
+                Log.d("TAG", "onHandleWork: MOVE")
+//                move(listFiles, pastFolder)
         }
 
         val finishCopyIntent = Intent(FINISH_COPY_INTENT)
@@ -82,7 +110,7 @@ class CopyServices : JobIntentService() {
 
     private fun copy(files: List<File>, to: File) {
         files.forEach {
-            if (cancelCopy)
+            if (stop)
                 return
             if (it.isFile)
                 copyFileToFolder(File(it.path), to)
@@ -100,7 +128,8 @@ class CopyServices : JobIntentService() {
                     if (success) {
                         delete(it)
                     }
-                } catch (e: Exception) { }
+                } catch (e: Exception) {
+                }
             } else if (it.isDirectory)
                 try {
 //            copying the folder and what inside it
@@ -109,21 +138,15 @@ class CopyServices : JobIntentService() {
 //                deleting the folder and what inside it
                         delete(it)
                     }
-                } catch (e: Exception) { }
+                } catch (e: Exception) {
+                }
         }
     }
 
     private fun delete(file: File) {
-        if (fileInSDCard(file)){
-            val parentFile = navigateToParentTreeFile(treeUriFile, file.absolutePath)
-            val targetedFile = parentFile?.findFile(file.name)
-            targetedFile?.delete()
-        }else{
-            try {
-                file.deleteRecursively()
-            }catch (e:Exception){}
-        }
-
+        val parentFile = navigateToParentTreeFile(treeUriFile, file.absolutePath)
+        val targetedFile = parentFile?.findFile(file.name)
+        targetedFile?.delete()
     }
 
     private fun copyFileToFolder(file: File, folder: File): Boolean {
@@ -134,7 +157,7 @@ class CopyServices : JobIntentService() {
         return try {
             val newFile = createFile(file, folder) ?: return false
 
-            val success = bufferCopy(file, newFile, onProgressLam)
+            val success = bufferCopyToSDCard(file, newFile, onProgressLam)
             doneCount++
             success
         } catch (e: Exception) {
@@ -171,56 +194,23 @@ class CopyServices : JobIntentService() {
         return file.length() < folder.freeSpace
     }
 
-    private fun getContains(selectedList: List<File>?): Int {
-        var count = 0
-        selectedList?.forEach {
-            if (it.isFile)
-                count++
-            else {
-                count++
-                count += getInnerFilesCount(File(it.path), true)
-                count += getInnerFoldersCount(File(it.path), true)
-            }
-        }
-        return count
-    }
-
     private fun createFile(file: File, destFolder: File): File? {
-//        sd card
-        if (fileInSDCard(destFolder)) {
-            val parentFile = navigateToParentTreeFile(treeUriFile, destFolder.absolutePath)
-            val newFile = parentFile?.findFile(destFolder.name)?.createFile(file.extension, file.name)
+        val parentFile = navigateToParentTreeFile(treeUriFile, destFolder.absolutePath)
+        val newFile = parentFile?.findFile(destFolder.name)?.createFile(file.extension, file.name)
 
-            return if (newFile != null)
-                File(destFolder.absolutePath + File.separator + file.name)
-            else
-                null
-
-        } else {
-            val newFile = File(destFolder.absolutePath + File.separator + file.name)
-            if (newFile.createNewFile()) {
-                return newFile
-            }
-            return null
-        }
+        return if (newFile != null)
+            File(destFolder.absolutePath + File.separator + file.name)
+        else
+            null
     }
 
     private fun createFolder(folder: File, destFolder: File): File? {
-//        sd card
-        if (fileInSDCard(destFolder)) {
-            val parentFile = navigateToParentTreeFile(treeUriFile, destFolder.absolutePath)
-            val newFolder = parentFile?.findFile(destFolder.name)?.createDirectory(folder.name)
-            return if (newFolder != null)
-                File(destFolder.absolutePath + File.separator + newFolder.name)
-            else
-                null
-        } else {
-            val newFolder = File(destFolder.absolutePath + File.separator + folder.name)
-            if (newFolder.mkdir()) {
-                return newFolder
-            }
-            return null
-        }
+        val parentFile = navigateToParentTreeFile(treeUriFile, destFolder.absolutePath)
+        val newFolder = parentFile?.findFile(destFolder.name)?.createDirectory(folder.name)
+        return if (newFolder != null)
+            File(destFolder.absolutePath + File.separator + newFolder.name)
+        else
+            null
     }
 
     private fun navigateToParentTreeFile(treeDocumentFile: DocumentFile?, filePath: String): DocumentFile? {
@@ -244,15 +234,10 @@ class CopyServices : JobIntentService() {
         return file
     }
 
-    private fun fileInSDCard(folder: File): Boolean {
-        externalStoragePath ?: return false
-        return folder.absolutePath.startsWith(externalStoragePath!!)
-    }
-
-    private fun bufferCopy(from: File, to: File, onProgress: (Int, Int, Int, Int, String) -> Unit): Boolean {
+    private fun bufferCopyToSDCard(from: File, to: File, onProgress: (Int, Int) -> Unit): Boolean {
         var progress = 0
 
-        currentCopyItemName = from.name
+        inProgressFileName = from.name
 
         var fis: FileInputStream? = null
         var fos: FileOutputStream? = null
@@ -260,15 +245,9 @@ class CopyServices : JobIntentService() {
             fis = FileInputStream(
                 from.absolutePath
             )
-            fos = if (fileInSDCard(to)) {
-                val parentFile = navigateToParentTreeFile(treeUriFile, to.absolutePath)
-                val file = parentFile?.findFile(to.name)
-                contentResolver.openOutputStream(file?.uri!!) as FileOutputStream
-            } else {
-                FileOutputStream(
-                    to.absolutePath
-                )
-            }
+            val parentFile = navigateToParentTreeFile(treeUriFile, to.absolutePath)
+            val file = parentFile?.findFile(to.name)
+            fos = contentResolver.openOutputStream(file?.uri!!) as FileOutputStream
             var c: Int
             val totalSize = fis.channel.size().toInt()
             val b = ByteArray(1024)
@@ -280,14 +259,10 @@ class CopyServices : JobIntentService() {
                     onProgress.invoke(
                         totalSize,
                         fos.channel.size().toInt(),
-                        doneCount,
-                        leftCount,
-                        currentCopyItemName
                     )
                     progress = 0
                 }
-                if (cancelCopy) {
-
+                if (stop) {
                     return false
                 }
             }
@@ -300,7 +275,7 @@ class CopyServices : JobIntentService() {
         } finally {
             fis?.close()
             fos?.close()
-            onProgress.invoke(100, 100, doneCount, leftCount, currentCopyItemName)
+            onProgress.invoke(100, 100)
         }
     }
 }
