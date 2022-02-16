@@ -1,8 +1,5 @@
 package com.awab.fileexplorer.presenter
 
-import android.net.Uri
-import android.util.Log
-import android.widget.Toast
 import com.awab.fileexplorer.model.utils.*
 import com.awab.fileexplorer.presenter.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
@@ -19,16 +16,17 @@ class InternalStoragePresenter(
     override val storagePath: String
         get() = _storagePath
 
+    override val storageName: String
+        get() = File(storagePath).name
+
+    override var targetesUnAuthorizedSDCardName: String = ""
+
     override lateinit var supPresenter: SupPresenter
 
     override var actionModeOn: Boolean = false
 
     override val view: StorageView
         get() = storageView
-
-    override fun saveTreeUri(treeUri: Uri) {
-        Log.d("TAG", "saveTreeUri: internal saved")
-    }
 
     override fun isAuthorized(): Boolean {
         return allPermissionsGranted(view.context(), INTERNAL_STORAGE_REQUIRED_PERMISSIONS)
@@ -40,29 +38,29 @@ class InternalStoragePresenter(
 
     override fun rename(path: String, newName: String) {
         if (renameFileIO(path, newName)) {
-            Toast.makeText(view.context(), "file renamed successfully", Toast.LENGTH_SHORT).show()
+            view.showToast("file renamed successfully")
 
             view.stopActionMode()
             supPresenter.loadFiles()
         } else
-            Toast.makeText(view.context(), "cant rename this file", Toast.LENGTH_SHORT).show()
+            view.showToast("cant rename this file")
     }
 
     override fun createFolder(path: String) {
         if (createFolderIO(File(path.trim())))
             supPresenter.loadFiles()
         else
-            Toast.makeText(view.context(), "folder was not crated", Toast.LENGTH_SHORT).show()
+            view.showToast("folder was not crated")
     }
 
-    override fun delete() {
+    override fun delete(showMessages:Boolean) {
         view.loadingDialog.show()
         DeleteFromInternalStorageAsyncTask(object : SimpleSuccessAndFailureCallback<Boolean> {
             override fun onSuccess(data: Boolean) {
                 view.loadingDialog.dismiss()
-                if (!data)
+                if (!data && showMessages)
                     view.showToast("some error occur while deleting the files")
-                else
+                else if (data && showMessages)
                     view.showToast("items deleted successfully")
 
                 supPresenter.loadFiles()
@@ -71,14 +69,10 @@ class InternalStoragePresenter(
             // this called when file some files are not deleted
             // so the loading ui will stile going
             override fun onFailure(message: String) {
-                view.showToast(message)
+                if (showMessages)
+                    view.showToast(message)
             }
         }).execute(supPresenter.getSelectedItems())
         view.stopActionMode()
-    }
-
-    //    not really used
-    override fun isValidTreeUri(treeUri: Uri): Boolean {
-        return true
     }
 }

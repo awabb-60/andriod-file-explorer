@@ -25,7 +25,6 @@ import com.awab.fileexplorer.model.types.StorageType
 import com.awab.fileexplorer.model.utils.*
 import com.awab.fileexplorer.model.utils.listeners.BreadcrumbsListener
 import com.awab.fileexplorer.model.utils.transfer_utils.CancelTransferBroadCast
-import com.awab.fileexplorer.model.utils.transfer_utils.TransferBroadCast
 import com.awab.fileexplorer.presenter.*
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 import com.awab.fileexplorer.view.action_mode_callbacks.StorageActionModeCallBack
@@ -316,44 +315,6 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         fragment.show(supportFragmentManager, "Pick Paste Location")
     }
 
-    override fun openCopyProgress(action: String) {
-        val dialogBinding = ProgressDialogLayoutBinding.inflate(layoutInflater)
-        val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
-
-        dialogBinding.tvCancel.setOnClickListener {
-            sendBroadcast(Intent(CancelTransferBroadCast.ACTION))
-            progressDialog?.dismiss()
-            dialog.cancel()
-        }
-
-        dialog.setTitle(action)
-        dialog.setCancelable(false)
-        dialog.setCanceledOnTouchOutside(false)
-        dialog.show()
-
-        progressDialogBinding = dialogBinding
-        progressDialog = dialog
-    }
-
-    override fun updateCopyProgress(p: Int, max: Int, leftDoneText: String, name: String) {
-        val progress = String.format("%.2f", p.div(max.toFloat()).times(100)) + '%'
-        progressDialogBinding?.let {
-            it.apply {
-                progressPercentage.text = progress
-                tvItemsCount.text = leftDoneText
-                tvCopyName.text = name
-                copyProgressBar.max = max
-                copyProgressBar.progress = p
-            }
-            progressDialog?.setView(it.root)
-        }
-    }
-
-    override fun stopCloseCopyScreen() {
-        progressDialog?.cancel()
-        progressDialogBinding = null
-        progressDialog = null
-    }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         if (showMenu)
@@ -450,7 +411,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         //to close the cancel the copying
         finishCopyReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
-                mStoragePresenter.cancelCopy()
+                mStoragePresenter.transferFinished(intent)
             }
         }
 
@@ -461,10 +422,55 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         registerReceiver(finishCopyReceiver, copyFinishFilter)
     }
 
+
+    override fun openProgressScreen(action: String) {
+        val dialogBinding = ProgressDialogLayoutBinding.inflate(layoutInflater)
+        val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
+
+        dialogBinding.tvCancel.setOnClickListener {
+            // cancel the running work of the transfer
+            // this dialog will get dismissed after this activity receive the finish intent
+            sendBroadcast(Intent(CancelTransferBroadCast.ACTION))
+        }
+
+        dialog.setTitle(action)
+        dialog.setCancelable(false)
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.show()
+
+        progressDialogBinding = dialogBinding
+        progressDialog = dialog
+    }
+
+    override fun updateCopyProgress(p: Int, max: Int, leftDoneText: String, name: String) {
+        val progress = String.format("%.2f", p.div(max.toFloat()).times(100)) + '%'
+        progressDialogBinding?.let {
+            it.apply {
+                progressPercentage.text = progress
+                tvItemsCount.text = leftDoneText
+                tvCopyName.text = name
+                copyProgressBar.max = max
+                copyProgressBar.progress = p
+            }
+            progressDialog?.setView(it.root)
+        }
+    }
+
+    override fun closeProgressScreen() {
+        progressDialog?.cancel()
+        progressDialogBinding = null
+        progressDialog = null
+    }
+
     override fun onStop() {
         unregisterReceiver(copyProgressReceiver)
         unregisterReceiver(finishCopyReceiver)
         super.onStop()
+    }
+
+    override fun onDestroy() {
+        sendBroadcast(Intent(CancelTransferBroadCast.ACTION))
+        super.onDestroy()
     }
 
     private fun openSearchFragment() {

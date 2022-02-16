@@ -2,7 +2,6 @@ package com.awab.fileexplorer.presenter.contract
 
 import com.awab.fileexplorer.model.data_models.StorageModel
 import com.awab.fileexplorer.view.contract.HomeView
-import java.io.File
 
 interface HomePresenterContract {
 
@@ -24,5 +23,5 @@ interface HomePresenterContract {
     /**
      * make storage models for the available storages in the device
      */
-    fun makeStoragesModels(): List<StorageModel>
+    fun makeStoragesModels()
 }

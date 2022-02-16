@@ -16,14 +16,11 @@ import java.io.File
 import java.lang.Exception
 
 
-class HomePresenter(private val homeView: HomeView): HomePresenterContract {
+class HomePresenter(override val view: HomeView): HomePresenterContract {
 
     private  val TAG = "HomePresenter"
 
     private val storages = ArrayList<Parcelable>()
-
-    override val view: HomeView
-        get() = homeView
 
     override fun openStorage(it: StorageModel) {
         if (!allPermissionsGranted(view.context(), INTERNAL_STORAGE_REQUIRED_PERMISSIONS)){
@@ -65,7 +62,7 @@ class HomePresenter(private val homeView: HomeView): HomePresenterContract {
         view.openActivity(mediaIntent)
     }
 
-    override fun makeStoragesModels(): List<StorageModel> {
+    override fun makeStoragesModels(){
         val storagesPaths = ContextCompat.getExternalFilesDirs(view.context(), null)
 
         // this only get the storage path of the internal storage and sd Card
@@ -82,14 +79,15 @@ class HomePresenter(private val homeView: HomeView): HomePresenterContract {
 
 //        making the sd card modes
         if (storages.size == 1 )
-            return list
+            return
 
         val sdCardDir = storages[1]
         if (sdCardDir != null)
             makeStorageModel(EXTERNAL_SDCARD_DISPLAY_NAME, sdCardDir, StorageType.SDCARD)?.let { list.add(it) }
 
+        this.storages.clear()
         this.storages.addAll(list)
-        return list
+        view.updateStoragesList(this.storages.toArray(arrayOf<StorageModel>()))
     }
 
     private fun makeStorageModel(name: String, file:File, type: StorageType): StorageModel? {

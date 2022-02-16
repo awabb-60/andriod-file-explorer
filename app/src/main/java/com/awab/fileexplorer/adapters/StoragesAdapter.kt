@@ -1,5 +1,6 @@
 package com.awab.fileexplorer.adapters
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -8,7 +9,7 @@ import com.awab.fileexplorer.databinding.StorageItemBinding
 
 class StoragesAdapter(val onClick:(StorageModel) -> Unit) : RecyclerView.Adapter<StoragesAdapter.ViewHolder>() {
 
-    lateinit var list:List<StorageModel>
+    lateinit var list:Array<StorageModel>
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = StorageItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -22,9 +23,12 @@ class StoragesAdapter(val onClick:(StorageModel) -> Unit) : RecyclerView.Adapter
     override fun getItemCount() = list.size
 
 
-    fun set(list:List<StorageModel>){
+    @SuppressLint("NotifyDataSetChanged")
+    fun set(list: Array<StorageModel>){
         this.list = list
+        notifyDataSetChanged()
     }
+
     inner class ViewHolder(private val binding: StorageItemBinding) : RecyclerView.ViewHolder(binding.root){
 
         init{

@@ -65,7 +65,7 @@ class FilesFragment() : Fragment(), IFileFragmentView {
 
 //        bind this view to the main presenter
         mMainPresenter.bindSupPresenter(mFileFragmentPresenter)
-
+        mFileFragmentPresenter.loadFiles()
     }
 
     override fun onDestroyView() {

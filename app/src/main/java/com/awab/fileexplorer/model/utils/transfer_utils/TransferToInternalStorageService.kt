@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import androidx.core.app.JobIntentService
+import com.awab.fileexplorer.model.data_models.TransferInfo
 import com.awab.fileexplorer.model.types.TransferAction
 import com.awab.fileexplorer.model.utils.*
 import com.awab.fileexplorer.view.contract.StorageView
@@ -12,8 +13,6 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 
 class TransferToInternalStorageService : JobIntentService() {
-    // the gap between progress update
-    private val progressUpdateAfter = 2000
 
     // the function that will send updates to the view
     private val onProgressLam: (max: Int, progress: Int) ->
@@ -80,53 +79,39 @@ class TransferToInternalStorageService : JobIntentService() {
             doneCount = 0
 
             // start transferring
-            if (transferAction == TransferAction.COPY)
-                copy(listFiles, pastFolder)
-            else if (transferAction == TransferAction.MOVE)
-                move(listFiles, pastFolder)
-        }
-
-        // if transfer has not been canceled by the user
-        if (!stop) {
-            val finishCopyIntent = Intent(FINISH_COPY_INTENT)
-            sendBroadcast(finishCopyIntent)
+            if (transferAction != null) {
+                transfer(listFiles,pastFolder, transferAction)
+            }else // intent with no data means nothing happened
+                sendBroadcast(Intent(FINISH_COPY_INTENT))
         }
     }
 
-    private fun copy(files: List<File>, to: File) {
-        files.forEach {
-            if (stop){
+    private fun transfer(files: List<File>, to: File, action: TransferAction) {
+        var allSuccessful = true
+        for (it in files) {
+            if (stop) {
                 Toast.makeText(this, "canceled", Toast.LENGTH_SHORT).show()
-                return
+                allSuccessful = false
+                break
             }
-            if (it.isFile)
-                copyFileToFolder(File(it.path), to)
-            else if (it.isDirectory)
-                copyFolderToFolder(File(it.path), to)
-        }
-    }
-
-    private fun move(files: List<File>, to: File) {
-        files.forEach {
             if (it.isFile) {
-                try {
                     val success = copyFileToFolder(it, to)
-                    if (success) {
-                        delete(it)
+                    if (!success) {
+                        allSuccessful = success
                     }
-                } catch (e: Exception) {
-                }
-            } else if (it.isDirectory)
-                try {
+            } else if (it.isDirectory){
 //            copying the folder and what inside it
                     val success = copyFolderToFolder(it, to)
-                    if (success) {
-//                deleting the folder and what inside it
-                        delete(it)
+                    if (!success) { // deleting the folder and what inside it
+                        allSuccessful = success
                     }
-                } catch (e: Exception) {
                 }
-        }
+            }
+        // the move was successful... finish the Transfer
+        // if allSuccessful was true the intent will tell the main presenter to delete the moved files
+        val info = TransferInfo(allSuccessful,action)
+        val finishIntent = Intent(FINISH_COPY_INTENT).putExtra(TRANSFER_INFO_EXTRA, info)
+        sendBroadcast(finishIntent)
     }
 
     private fun copyFileToFolder(file: File, folder: File): Boolean {
@@ -135,9 +120,13 @@ class TransferToInternalStorageService : JobIntentService() {
         }
 //    if the copying was successful return true
         return try {
-            val newFile = createFile(file, folder) ?: return false
-
+            val newFile = createFile(file, folder)
+            if (newFile == null){
+                Toast.makeText(this, "skipped ${file.name}", Toast.LENGTH_SHORT).show()
+                return false
+            }
             inProgressFileName = file.name
+
             val success = bufferCopyToInternalStorage(file, newFile, onProgressLam)
             doneCount++
             success
@@ -152,8 +141,15 @@ class TransferToInternalStorageService : JobIntentService() {
         }
         try {
 //        creating the new dir in the dest folder
-            val newFolder = createFolder(srcFolder, desFolder) ?: return false
+            val newFolder = createFolder(srcFolder, desFolder)
+            if (newFolder == null){
+                Toast.makeText(this, "skipped ${srcFolder.name}", Toast.LENGTH_SHORT).show()
+                return false
+            }
             doneCount++
+
+            // show that the files is transferred successfully
+            onProgressLam.invoke(100, 100)
 
             // copying the inner files
             srcFolder.listFiles()?.forEach {
@@ -171,13 +167,10 @@ class TransferToInternalStorageService : JobIntentService() {
         }
     }
 
-    private fun checkStorageSize(file: File, folder: File): Boolean {
-        return file.length() < folder.freeSpace
-    }
-
     private fun createFile(file: File, destFolder: File): File? {
 
         val newFile = File(destFolder.absolutePath + File.separator + file.name)
+        // if the file already exists it will get skipped
         if (newFile.createNewFile()) {
             return newFile
         }
@@ -186,6 +179,7 @@ class TransferToInternalStorageService : JobIntentService() {
 
     private fun createFolder(folder: File, destFolder: File): File? {
         val newFolder = File(destFolder.absolutePath + File.separator + folder.name)
+        // if the folder already exists it will get skipped
         if (newFolder.mkdir()) {
             return newFolder
         }
@@ -198,8 +192,7 @@ class TransferToInternalStorageService : JobIntentService() {
     private fun delete(file: File) {
         try {
             file.deleteRecursively()
-        } catch (e: Exception) {
-        }
+        } catch (e: Exception) { }
     }
 
     private fun bufferCopyToInternalStorage(from: File, to: File, onProgress: (Int, Int) -> Unit): Boolean {
@@ -208,6 +201,7 @@ class TransferToInternalStorageService : JobIntentService() {
         var fis: FileInputStream? = null
         var fos: FileOutputStream? = null
         try {
+            // making input and the output stream
             fis = FileInputStream(
                 from.absolutePath
             )

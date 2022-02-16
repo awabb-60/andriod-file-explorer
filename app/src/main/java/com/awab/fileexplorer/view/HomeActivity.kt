@@ -3,24 +3,22 @@ package com.awab.fileexplorer.view
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.awab.fileexplorer.adapters.StoragesAdapter
 import com.awab.fileexplorer.databinding.ActivityHomeBinding
 import com.awab.fileexplorer.model.data_models.StorageModel
-import com.awab.fileexplorer.model.utils.TRANSFER_REQUEST_CODE
 import com.awab.fileexplorer.model.utils.storageAccess
 import com.awab.fileexplorer.presenter.HomePresenter
 import com.awab.fileexplorer.presenter.contract.HomePresenterContract
 import com.awab.fileexplorer.view.contract.HomeView
 
 class HomeActivity : AppCompatActivity(), HomeView {
-    private val TAG = "HomeActivity"
 
     private lateinit var binding: ActivityHomeBinding
     private lateinit var mHomePresenter: HomePresenterContract
+    private lateinit var mStorageAdapter: StoragesAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,20 +27,21 @@ class HomeActivity : AppCompatActivity(), HomeView {
 
         mHomePresenter = HomePresenter(this)
 
+        // ask the user for the storage permissions
         storageAccess(this)
 
-        val mStorageAdapter = StoragesAdapter {
+        // make the storage adapter
+        mStorageAdapter = StoragesAdapter {
             mHomePresenter.openStorage(it)
         }
 
-        binding.rvStorages.adapter = mStorageAdapter.apply {
-            set(getStorages())
-        }
+        binding.rvStorages.adapter = mStorageAdapter
 
         binding.rvStorages.layoutManager = LinearLayoutManager(this)
         binding.rvStorages.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         binding.rvStorages.setHasFixedSize(true)
 
+        // setting click listeners for the media items
         binding.btnMediaImages.setOnClickListener {
             mHomePresenter.mediaItemClicked(it.id)
         }
@@ -55,7 +54,13 @@ class HomeActivity : AppCompatActivity(), HomeView {
         binding.btnMediaDocs.setOnClickListener {
             mHomePresenter.mediaItemClicked(it.id)
         }
-        
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // to update the list at the start of the activity and after navigating back from the storage or media
+        // activities
+        mHomePresenter.makeStoragesModels()
     }
 
     override fun checkForPermissions() {
@@ -70,17 +75,7 @@ class HomeActivity : AppCompatActivity(), HomeView {
         startActivity(intent)
     }
 
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        if (requestCode == TRANSFER_REQUEST_CODE && resultCode == RESULT_OK) {
-//            if (data != null) {
-//                val b = data.getBundleExtra("T_DATA")
-//                Toast.makeText(this, "$b", Toast.LENGTH_SHORT).show()
-//            }
-//        }
-//        super.onActivityResult(requestCode, resultCode, data)
-//    }
-
-    private fun getStorages(): List<StorageModel> {
-        return mHomePresenter.makeStoragesModels()
+    override fun updateStoragesList(storages: Array<StorageModel>) {
+        mStorageAdapter.set(storages)
     }
 }

@@ -118,7 +118,7 @@ interface StorageView {
     /**
      * this open a dialog that will show the copying/ moving progress
      */
-    fun openCopyProgress(action:String)
+    fun openProgressScreen(action:String)
 
     /**
      * this update the progress dialog with the copy/move progress
@@ -128,6 +128,6 @@ interface StorageView {
     /**
      * to cancel any ui that has to do with copying/moving
      */
-    fun stopCloseCopyScreen()
+    fun closeProgressScreen()
 
 }

@@ -17,3 +17,7 @@ fun getTransferContains(selectedList: List<File>?): Int {
     }
     return count
 }
+
+fun checkStorageSize(file: File, folder: File): Boolean {
+    return file.length() < folder.freeSpace
+}

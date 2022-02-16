@@ -9,19 +9,21 @@ import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
+import androidx.documentfile.provider.DocumentFile
 import com.awab.fileexplorer.R
 import com.awab.fileexplorer.databinding.PickViewSettingsLayoutBinding
 import com.awab.fileexplorer.model.RecentFiles
 import com.awab.fileexplorer.model.data_models.FileModel
 import com.awab.fileexplorer.model.data_models.SelectedItemsDetailsModel
 import com.awab.fileexplorer.model.data_models.StorageModel
+import com.awab.fileexplorer.model.data_models.TransferInfo
 import com.awab.fileexplorer.model.types.FileType
 import com.awab.fileexplorer.model.types.MimeType
 import com.awab.fileexplorer.model.types.StorageType
 import com.awab.fileexplorer.model.types.TransferAction
 import com.awab.fileexplorer.model.utils.*
-import com.awab.fileexplorer.model.utils.transfer_utils.TransferToSDCardService
 import com.awab.fileexplorer.model.utils.transfer_utils.TransferBroadCast
+import com.awab.fileexplorer.presenter.SdCardPresenterSAF
 import com.awab.fileexplorer.presenter.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.presenter.threads.SelectedFilesDetailsAsyncTask
 import com.awab.fileexplorer.view.contract.StorageView
@@ -29,6 +31,7 @@ import com.awab.fileexplorer.view.helper_view.CustomDialog
 import com.awab.fileexplorer.view.helper_view.PickPasteLocationDialogFragment
 import java.io.File
 import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * this the presenter class interface
@@ -38,8 +41,20 @@ import java.text.SimpleDateFormat
  */
 interface StoragePresenterContract {
 
-    // the path of the current storage
+    /**
+     *  the path of the current storage
+     */
     val storagePath: String
+
+    /**
+     *  the name of the current storage
+     */
+    val storageName: String
+
+    /**
+     * used to check that uri that was retained for the SAF Picker
+     */
+    var targetesUnAuthorizedSDCardName: String
 
     /**
      * the presenter that control the fragments
@@ -85,7 +100,12 @@ interface StoragePresenterContract {
     /**
      * save the uir for the sd card to the shared preferences for later us
      */
-    fun saveTreeUri(treeUri: Uri)
+    fun saveTreeUri(treeUri: Uri) {
+        val spE = view.context()
+            .getSharedPreferences(SD_CARD_TREE_URI_SP, AppCompatActivity.MODE_PRIVATE).edit()
+        spE.putString(TREE_URI_ + targetesUnAuthorizedSDCardName, treeUri.toString())
+        spE.apply()
+    }
 
     /**
      * request the permission to do write operations to the storage
@@ -95,7 +115,12 @@ interface StoragePresenterContract {
     /**
      * checks if the return uri that the user has selected is for the sd card or not
      */
-    fun isValidTreeUri(treeUri: Uri): Boolean
+    fun isValidTreeUri(treeUri: Uri): Boolean {
+        DocumentFile.fromTreeUri(view.context(), treeUri)?.name?.let { sdCardName ->
+            return sdCardName == targetesUnAuthorizedSDCardName
+        }
+        return false
+    }
 
     /**
      * to check the write permission is granted... if so a dialog will open to continue the presses
@@ -148,8 +173,9 @@ interface StoragePresenterContract {
 
     /**
      * delete all the selected file after the confirmation.
+     * @param showMessages the show toast messages that related to the operation
      */
-    fun delete()
+    fun delete(showMessages:Boolean = true)
 
     /**
      * the "rename" menu item must only be shown when one item is selected
@@ -230,7 +256,7 @@ interface StoragePresenterContract {
 
         if (items.size == 1) {
             val item = items[0]
-            val date = SimpleDateFormat(DATE_FORMAT_PATTERN).format(item.date)
+            val date = SimpleDateFormat(DATE_FORMAT_PATTERN, Locale.US).format(item.date)
             if (item.type == FileType.FILE) {
                 view.showDetails(item.name, date, item.size, item.path)
             } else {
@@ -334,8 +360,22 @@ interface StoragePresenterContract {
     // to copy or move to the sd card or the internal storage, you have to have a folder
     // named (Paste) in location you try to copy to.
     fun transfer(folderLocation: String, storage: StorageModel, action: TransferAction) {
+        // authorizing the current storage
         if (!isAuthorized()) {
             return
+        }
+
+        // if the user is transferring to the st card and its not authorized
+        if (storage.storageType == StorageType.SDCARD) {
+            val helperPresenter = SdCardPresenterSAF(view, storage.path)
+            if (!helperPresenter.isAuthorized()) {
+                view.showToast("authorize the sd card first")
+
+                // set the uri target name
+                targetesUnAuthorizedSDCardName = File(storage.path).name
+                helperPresenter.requestPermission()
+                return
+            }
         }
 
         val selectedItem = supPresenter.getSelectedItems()
@@ -343,7 +383,7 @@ interface StoragePresenterContract {
             return
 
         val listPath = selectedItem.map { it.path }
-        view.openCopyProgress(action.name)
+        view.openProgressScreen(action.name)
 
         val intent = when (storage.storageType) {
             StorageType.INTERNAL -> {
@@ -362,6 +402,7 @@ interface StoragePresenterContract {
                     putExtra(PASTE_LOCATION_PATH_EXTRA, folderLocation)
 
                     // information to write to the sd card : tree uri
+
                     putExtra(TREE_URI_FOR_TRANSFER_EXTRA, getTreeUri(view.context(), File(storage.path).name))
 
                     putExtra(EXTERNAL_STORAGE_PATH_EXTRA, storagePath)
@@ -391,12 +432,24 @@ interface StoragePresenterContract {
         return sp.getString(TREE_URI_ + storageName, "")!!.toUri()
     }
 
-    fun cancelCopy() {
-        TransferToSDCardService.cancelWork()
-        view.stopCloseCopyScreen()
-        stopActionMode()
-        supPresenter.loadFiles()
-        Toast.makeText(view.context(), "copy done", Toast.LENGTH_SHORT).show()
+    fun transferFinished(intent: Intent?) {
+        view.closeProgressScreen()
+        // if the transfer action was move and the all files move successfully
+        val info = intent?.getParcelableExtra<TransferInfo>(TRANSFER_INFO_EXTRA)
+
+        info?:return
+
+        if (info.action == TransferAction.MOVE && info.wasSuccessful) {
+            // deleting the moved files
+            delete(false)
+            view.showToast("Files Moved")
+        } else if (info.action == TransferAction.COPY && info.wasSuccessful) {
+            stopActionMode()
+            supPresenter.loadFiles()
+            view.showToast("Files Coped")
+        }
+
+
     }
 
     /**

@@ -1,7 +1,6 @@
 package com.awab.fileexplorer.presenter
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -32,7 +31,9 @@ class SdCardPresenterSAF(
         get() = _storagePath
 
     // the name of the sd card
-    private val storageName: String = File(storagePath).name
+    override val storageName: String = File(storagePath).name
+
+    override var targetesUnAuthorizedSDCardName: String = storageName
 
     override lateinit var supPresenter: SupPresenter
 
@@ -99,7 +100,7 @@ class SdCardPresenterSAF(
         }
     }
 
-    override fun delete() {
+    override fun delete(showMessages: Boolean) {
         try {
             val selectedItems = supPresenter.getSelectedItems()
             val sdCardDocumentFile = getTreeUriFile() ?: return
@@ -114,9 +115,9 @@ class SdCardPresenterSAF(
             DeleteFromSdCardAsyncTask(parentFolder, object : SimpleSuccessAndFailureCallback<Boolean> {
                 override fun onSuccess(data: Boolean) {
                     view.loadingDialog.dismiss()
-                    if (!data)
+                    if (!data && showMessages)
                         view.showToast("some error occur while deleting the files")
-                    else
+                    else if (data && showMessages)
                         view.showToast("items successfully deleted")
 
                     supPresenter.loadFiles()
@@ -125,13 +126,16 @@ class SdCardPresenterSAF(
                 // this called when file some files are not deleted
                 // so the loading ui will stile going
                 override fun onFailure(message: String) {
-                    view.showToast(message)
+                    if (showMessages)
+                        view.showToast(message)
                 }
             }).execute(selectedItems)
 
             view.stopActionMode()
         } catch (e: Exception) {
-            Toast.makeText(view.context(), "error deleting files", Toast.LENGTH_SHORT).show()
+            if (showMessages)
+                if(showMessages)
+                Toast.makeText(view.context(), "error deleting files", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -146,12 +150,6 @@ class SdCardPresenterSAF(
         view.openAuthorizationPicker(intent, PICKER_REQUEST_CODE)
     }
 
-    override fun isValidTreeUri(treeUri: Uri): Boolean {
-        DocumentFile.fromTreeUri(view.context(), treeUri)?.name?.let { sdCardName ->
-            return sdCardName == storageName
-        }
-        return false
-    }
 
     private fun sdCardAuthorized(): Boolean {
         val sp = view.context()
@@ -168,12 +166,5 @@ class SdCardPresenterSAF(
             true
         } else
             false
-    }
-
-    override fun saveTreeUri(treeUri: Uri) {
-        val spE = view.context()
-            .getSharedPreferences(SD_CARD_TREE_URI_SP, AppCompatActivity.MODE_PRIVATE).edit()
-        spE.putString(TREE_URI_ + storageName, treeUri.toString())
-        spE.apply()
     }
 }

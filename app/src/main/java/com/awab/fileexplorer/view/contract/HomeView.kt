@@ -2,6 +2,7 @@ package com.awab.fileexplorer.view.contract
 
 import android.content.Context
 import android.content.Intent
+import com.awab.fileexplorer.model.data_models.StorageModel
 
 interface HomeView {
 
@@ -19,4 +20,9 @@ interface HomeView {
      * asks the user for permissions to use the app
      */
     fun checkForPermissions()
+
+    /**
+     * put and update the storages items
+     */
+    fun updateStoragesList(storages: Array<StorageModel>)
 }
