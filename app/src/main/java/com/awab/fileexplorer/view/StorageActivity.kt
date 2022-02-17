@@ -416,7 +416,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         }
 
         val copyProgressFilter = IntentFilter(StorageView.ACTION_PROGRESS_UPDATE)
-        val copyFinishFilter = IntentFilter(FINISH_COPY_INTENT)
+        val copyFinishFilter = IntentFilter(StorageView.ACTION_FINISH_TRANSFER)
 
         registerReceiver(copyProgressReceiver, copyProgressFilter)
         registerReceiver(finishCopyReceiver, copyFinishFilter)

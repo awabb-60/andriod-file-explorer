@@ -4,14 +4,14 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AlertDialog
 import com.awab.fileexplorer.databinding.PickViewSettingsLayoutBinding
-import com.awab.fileexplorer.model.data_models.FileModel
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 import com.awab.fileexplorer.view.helper_view.PickPasteLocationDialogFragment
 
 interface StorageView {
 
     companion object{
-        val ACTION_PROGRESS_UPDATE = "com.awab.fileexplorer.ACTION_PROGRESS_UPDATE"
+        const val ACTION_PROGRESS_UPDATE = "com.awab.fileexplorer.ACTION_PROGRESS_UPDATE"
+        const val ACTION_FINISH_TRANSFER = "com.awab.fileexplorer.ACTION_FINISH_TRANSFER"
     }
     /**
      * get the presenter that control this view

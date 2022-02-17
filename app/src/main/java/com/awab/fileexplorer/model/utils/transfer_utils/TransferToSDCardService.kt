@@ -6,41 +6,13 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.core.app.JobIntentService
 import androidx.documentfile.provider.DocumentFile
-import com.awab.fileexplorer.model.data_models.TransferInfo
 import com.awab.fileexplorer.model.types.TransferAction
 import com.awab.fileexplorer.model.utils.*
 import com.awab.fileexplorer.view.contract.StorageView
 import java.io.File
-import java.io.FileInputStream
 import java.io.FileOutputStream
 
-class TransferToSDCardService : JobIntentService() {
-
-    private val onProgressLam: (max: Int, progress: Int) ->
-    Unit = { max, p ->
-        val progressIntent = Intent(StorageView.ACTION_PROGRESS_UPDATE).apply {
-            putExtra(MAX_PROGRESS_EXTRA, max)
-            putExtra(PROGRESS_EXTRA, p)
-            putExtra(DONE_AND_LEFT_EXTRA, "$doneCount of $totalCount")
-            putExtra(CURRENT_COPY_ITEM_NAME_EXTRA, inProgressFileName)
-        }
-        sendBroadcast(progressIntent)
-    }
-
-    /**
-     * the total number of files
-     */
-    private var totalCount = 0
-
-    /**
-     * the number of files that has been transferred
-     */
-    private var doneCount = 0
-
-    /**
-     * the current file getting transferred
-     */
-    private var inProgressFileName = ""
+class TransferToSDCardService : JobIntentService(), TransferService {
 
     /**
      * the uri that will get used to write to the sd card
@@ -50,19 +22,24 @@ class TransferToSDCardService : JobIntentService() {
     companion object {
 
         fun startWork(context: Context, intent: Intent) {
-            stop = false
+            stopWork = false
             enqueueWork(context, TransferToSDCardService::class.java, 22, intent)
         }
 
         /**
          * used to stop the transfer work
          */
-        var stop = false
+        var stopWork = false
 
         fun cancelWork() {
-            stop = true
+            stopWork = true
         }
     }
+
+
+    override val stop: Boolean
+        get() = stopWork
+
 
     override fun onHandleWork(intent: Intent) {
         // getting the tree uri
@@ -85,13 +62,9 @@ class TransferToSDCardService : JobIntentService() {
             // turning the paths into files
             val listFiles = list.map { File(it) }
 
-            // count all the files and folders in the list
-            totalCount = getTransferContains(listFiles)
-            doneCount = 0
-
             // start transferring
             if (transferAction != null) {
-                transfer(listFiles, pastFolder,transferAction)
+                TransferWorker(this, listFiles, pastFolder, transferAction).start()
             }
         }
     }
@@ -101,166 +74,53 @@ class TransferToSDCardService : JobIntentService() {
         super.onDestroy()
     }
 
-    private fun transfer(files: List<File>, to: File, action: TransferAction) {
-        var allSuccessful = true
-        for (it in files) {
-            if (TransferToInternalStorageService.stop) {
-                Toast.makeText(this, "canceled", Toast.LENGTH_SHORT).show()
-                allSuccessful = false
-                break
-            }
-            if (it.isFile) {
-                val success = copyFileToFolder(it, to)
-                if (!success) {
-                    allSuccessful = success
-                }
-            } else if (it.isDirectory){
-//            copying the folder and what inside it
-                val success = copyFolderToFolder(it, to)
-                if (!success) { // deleting the folder and what inside it
-                    allSuccessful = success
-                }
-            }
-        }
-        // the move was successful... finish the Transfer
-        // if allSuccessful was true the intent will tell the main presenter to delete the moved files
-        val info = TransferInfo(allSuccessful,action)
-        val finishIntent = Intent(FINISH_COPY_INTENT).putExtra(TRANSFER_INFO_EXTRA, info)
-        sendBroadcast(finishIntent)
+    override fun onProgressUpdate(intent: Intent) {
+        sendBroadcast(intent.apply { action = StorageView.ACTION_PROGRESS_UPDATE })
     }
 
-    private fun delete(file: File) {
+    override fun onFinish(intent: Intent) {
+        sendBroadcast(intent.apply { action = StorageView.ACTION_FINISH_TRANSFER })
+    }
+
+    override fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun createFile(newFile: File, destFolder: File): File? {
+        val parentFile = navigateToTreeFile(treeUriFile!!, destFolder.absolutePath)
+
+        // if the file already exists it will get skipped
+        if (parentFile?.findFile(newFile.name) != null)
+            return null
+        val createdFile = parentFile?.createFile(newFile.extension, newFile.name)
+
+        return if (createdFile != null)
+            File(destFolder.absolutePath + File.separator + createdFile.name)
+        else
+            null
+    }
+
+    override fun createFolder(newFolder: File, destFolder: File): File? {
+        val parentFile = navigateToTreeFile(treeUriFile!!, destFolder.absolutePath)
+
+        // if the folder already exists it will get skipped
+        if (parentFile?.findFile(newFolder.name) != null)
+            return null
+
+        val createdFolder = parentFile?.createDirectory(newFolder.name)
+        return if (createdFolder != null)
+            File(destFolder.absolutePath + File.separator + createdFolder.name)
+        else
+            null
+    }
+
+    override fun delete(file: File) {
         val targetedFile = navigateToTreeFile(treeUriFile!!, file.absolutePath)
         targetedFile?.delete()
     }
 
-    private fun copyFileToFolder(file: File, folder: File): Boolean {
-        if (!folder.isDirectory && checkStorageSize(file, folder)) {
-            return false
-        }
-//    if the copying was successful return true
-        return try {
-            val newFile = createFile(file, folder)
-            if (newFile == null){
-                Toast.makeText(this, "skipped ${file.name}", Toast.LENGTH_SHORT).show()
-            return false
-            }
-            val success = bufferCopyToSDCard(file, newFile, onProgressLam)
-            doneCount++
-            success
-        } catch (e: Exception) {
-            false
-        }
-    }
-
-    private fun copyFolderToFolder(srcFolder: File, desFolder: File): Boolean {
-        if (!srcFolder.isDirectory || !desFolder.isDirectory) {
-            return false
-        }
-        try {
-//        creating the new dir in the dest folder
-            val newFolder = createFolder(srcFolder, desFolder)
-            if (newFolder == null){
-                Toast.makeText(this, "skipped ${srcFolder.name}", Toast.LENGTH_SHORT).show()
-                return false
-            }
-            doneCount++
-
-            // show that the files is transferred successfully
-            onProgressLam.invoke(100, 100)
-
-            //    copying the inner files
-            srcFolder.listFiles()?.forEach {
-//            copying the files
-                if (it.isFile)
-                    copyFileToFolder(it, newFolder)
-//            copying the folder and what inside it
-                else
-                    copyFolderToFolder(it, newFolder)
-            }
-//        coping was successful
-            return true
-        } catch (E: Exception) {
-            return false
-        }
-    }
-
-    private fun createFile(file: File, destFolder: File): File? {
-        val parentFile = navigateToTreeFile(treeUriFile!!, destFolder.absolutePath)
-
-        // if the file already exists it will get skipped
-        if (parentFile?.findFile(file.name) != null)
-            return null
-        val newFile = parentFile?.createFile(file.extension, file.name)
-
-        return if (newFile != null)
-            File(destFolder.absolutePath + File.separator + file.name)
-        else
-            null
-    }
-
-    private fun createFolder(folder: File, destFolder: File): File? {
-        val parentFile = navigateToTreeFile(treeUriFile!!, destFolder.absolutePath)
-
-        // if the folder already exists it will get skipped
-        if (parentFile?.findFile(folder.name) != null)
-            return null
-
-        val newFolder = parentFile?.createDirectory(folder.name)
-        return if (newFolder != null)
-            File(destFolder.absolutePath + File.separator + newFolder.name)
-        else
-            null
-    }
-
-    private fun bufferCopyToSDCard(from: File, to: File, onProgress: (Int, Int) -> Unit): Boolean {
-        var progress = 0
-
-        inProgressFileName = from.name
-
-        var fis: FileInputStream? = null
-        var fos: FileOutputStream? = null
-        try {
-            fis = FileInputStream(
-                from.absolutePath
-            )
-
-            val file = navigateToTreeFile(treeUriFile!!, to.absolutePath)
-            fos = contentResolver.openOutputStream(file?.uri!!) as FileOutputStream
-
-            var c: Int
-            val totalSize = fis.channel.size().toInt()
-            val b = ByteArray(1024)
-
-            // to show the start of the progress
-            onProgress.invoke(
-                totalSize,
-                fos.channel.size().toInt(),
-            )
-            while (fis.read(b).also { c = it } != -1) {
-                fos.write(b, 0, c)
-                progress++
-                if (progress == progressUpdateAfter) {
-                    onProgress.invoke(
-                        totalSize,
-                        fos.channel.size().toInt(),
-                    )
-                    progress = 0
-                }
-                if (stop) {
-                    // delete the unfinished file
-                    delete(to)
-                    error("Canceled")
-                }
-            }
-            return true
-        } catch (e: Exception) {
-            fos?.flush()
-            return false
-        } finally {
-            fis?.close()
-            fos?.close()
-            onProgress.invoke(100, 100)
-        }
+    override fun getOutputStream(file: File): FileOutputStream {
+        val documentFile = navigateToTreeFile(treeUriFile!!, file.absolutePath)!!
+        return contentResolver.openOutputStream(documentFile.uri) as FileOutputStream
     }
 }

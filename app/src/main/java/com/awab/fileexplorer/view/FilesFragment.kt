@@ -19,7 +19,7 @@ import com.awab.fileexplorer.view.contract.IFileFragmentView
 import com.awab.fileexplorer.view.contract.StorageView
 import java.io.File
 
-class FilesFragment() : Fragment(), IFileFragmentView {
+class FilesFragment : Fragment(), IFileFragmentView {
     private val TAG = "FilesFragment"
 
     private var _adapter: FilesAdapter? = null
