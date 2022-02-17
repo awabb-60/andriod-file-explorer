@@ -3,7 +3,6 @@ package com.awab.fileexplorer.model.utils.transfer_utils
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.widget.Toast
 import androidx.core.app.JobIntentService
 import androidx.documentfile.provider.DocumentFile
 import com.awab.fileexplorer.model.types.TransferAction
@@ -80,10 +79,6 @@ class TransferToSDCardService : JobIntentService(), TransferService {
 
     override fun onFinish(intent: Intent) {
         sendBroadcast(intent.apply { action = StorageView.ACTION_FINISH_TRANSFER })
-    }
-
-    override fun showToast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     override fun createFile(newFile: File, destFolder: File): File? {

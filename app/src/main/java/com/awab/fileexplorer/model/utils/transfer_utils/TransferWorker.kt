@@ -11,7 +11,7 @@ import java.io.FileOutputStream
 class TransferWorker(
     val service: TransferService,
     val listFiles: List<File>,
-    private val pastFolder: File,
+    val pastFolder: File,
     private val transferAction: TransferAction
 ) {
 
@@ -33,6 +33,8 @@ class TransferWorker(
     private val stop: Boolean
         get() = service.stop
 
+    private val messages = ArrayList<String>()
+
     fun start() {
         // count all the files and folders in the list
         totalCount = getTransferContains(listFiles)
@@ -47,7 +49,7 @@ class TransferWorker(
         var allSuccessful = true
         for (it in files) {
             if (stop) {
-                service.showToast("Canceled")
+                messages.add("Canceled")
                 allSuccessful = false
                 break
             }
@@ -66,7 +68,7 @@ class TransferWorker(
         }
         // the move was successful... finish the Transfer
         // if allSuccessful was true the intent will tell the main presenter to delete the moved files
-        val info = TransferInfo(allSuccessful, action)
+        val info = TransferInfo(allSuccessful, messages, action)
         val finishIntent = Intent().putExtra(TRANSFER_INFO_EXTRA, info)
         service.onFinish(finishIntent)
     }
@@ -79,7 +81,7 @@ class TransferWorker(
         return try {
             val newFile = service.createFile(file, folder)
             if (newFile == null) {
-                service.showToast("skipped ${file.name}")
+                messages.add("skipped ${file.name}")
                 return false
             }
             val success = bufferCopy(file, newFile)
@@ -98,7 +100,7 @@ class TransferWorker(
 //        creating the new dir in the dest folder
             val newFolder = service.createFolder(srcFolder, desFolder)
             if (newFolder == null) {
-                service.showToast("skipped ${srcFolder.name}")
+                messages.add("skipped ${srcFolder.name}")
                 return false
             }
             doneCount++

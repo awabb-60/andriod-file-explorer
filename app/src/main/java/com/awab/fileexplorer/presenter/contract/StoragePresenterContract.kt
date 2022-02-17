@@ -449,7 +449,10 @@ interface StoragePresenterContract {
             view.showToast("Files Coped")
         }
 
-
+        // show the transfer messages
+        info.messages.forEach {
+            view.showToast(it)
+        }
     }
 
     /**

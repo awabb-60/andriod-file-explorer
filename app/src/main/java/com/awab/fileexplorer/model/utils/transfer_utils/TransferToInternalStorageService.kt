@@ -2,7 +2,6 @@ package com.awab.fileexplorer.model.utils.transfer_utils
 
 import android.content.Context
 import android.content.Intent
-import android.widget.Toast
 import androidx.core.app.JobIntentService
 import com.awab.fileexplorer.model.types.TransferAction
 import com.awab.fileexplorer.model.utils.PASTE_LOCATION_PATH_EXTRA
@@ -64,10 +63,6 @@ class TransferToInternalStorageService : JobIntentService(), TransferService {
 
     override fun onFinish(intent: Intent) {
         sendBroadcast(intent.apply { action = StorageView.ACTION_FINISH_TRANSFER })
-    }
-
-    override fun showToast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     override fun createFile(newFile: File, destFolder: File): File? {

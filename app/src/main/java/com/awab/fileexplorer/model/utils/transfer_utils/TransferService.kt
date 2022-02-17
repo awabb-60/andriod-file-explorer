@@ -15,8 +15,6 @@ interface TransferService {
 
     fun onFinish(intent: Intent)
 
-    fun showToast(message: String)
-
     fun createFile(newFile: File, destFolder: File): File?
 
     fun createFolder(newFolder: File, destFolder: File): File?
