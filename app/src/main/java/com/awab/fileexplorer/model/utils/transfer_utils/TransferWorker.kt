@@ -9,9 +9,9 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 
 class TransferWorker(
-    val service: TransferService,
-    val listFiles: List<File>,
-    val pastFolder: File,
+    private val service: TransferService,
+    private val listFiles: List<File>,
+    private val pastFolder: File,
     private val transferAction: TransferAction
 ) {
 

@@ -5,8 +5,9 @@
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="28"/>
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
@@ -18,13 +19,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FileExplorer">
         <activity
-            android:name=".view.MediaActivity"
-            android:exported="true"
-            android:label="@string/title_activity_media"
-            android:theme="@style/Theme.FileExplorer.NoActionBar" />
-        <activity
             android:name=".view.HomeActivity"
-            android:exported="true">
+            android:exported="true"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -33,7 +30,15 @@
         </activity>
         <activity
             android:name=".view.StorageActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".view.MediaActivity"
+            android:exported="true"
+            android:label="@string/title_activity_media"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.FileExplorer.NoActionBar" />
 
         <service
             android:name=".model.utils.transfer_utils.TransferToSDCardService"

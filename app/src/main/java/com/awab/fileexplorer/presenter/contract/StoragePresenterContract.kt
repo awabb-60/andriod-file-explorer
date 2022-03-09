@@ -54,7 +54,7 @@ interface StoragePresenterContract {
     /**
      * used to check that uri that was retained for the SAF Picker
      */
-    var targetesUnAuthorizedSDCardName: String
+    var targetedUnAuthorizedSDCardName: String
 
     /**
      * the presenter that control the fragments
@@ -103,7 +103,7 @@ interface StoragePresenterContract {
     fun saveTreeUri(treeUri: Uri) {
         val spE = view.context()
             .getSharedPreferences(SD_CARD_TREE_URI_SP, AppCompatActivity.MODE_PRIVATE).edit()
-        spE.putString(TREE_URI_ + targetesUnAuthorizedSDCardName, treeUri.toString())
+        spE.putString(TREE_URI_ + targetedUnAuthorizedSDCardName, treeUri.toString())
         spE.apply()
     }
 
@@ -117,7 +117,7 @@ interface StoragePresenterContract {
      */
     fun isValidTreeUri(treeUri: Uri): Boolean {
         DocumentFile.fromTreeUri(view.context(), treeUri)?.name?.let { sdCardName ->
-            return sdCardName == targetesUnAuthorizedSDCardName
+            return sdCardName == targetedUnAuthorizedSDCardName
         }
         return false
     }
@@ -286,7 +286,7 @@ interface StoragePresenterContract {
      * this will get called when a file item is click in the list
      */
     fun onFileClicked(file: FileModel) {
-//        selecting unselecting the item
+        // selecting unselecting the item
         if (actionModeOn) {
             supPresenter.selectOrUnSelectItem(file)
             view.updateActionMode()
@@ -372,7 +372,7 @@ interface StoragePresenterContract {
                 view.showToast("authorize the sd card first")
 
                 // set the uri target name
-                targetesUnAuthorizedSDCardName = File(storage.path).name
+                targetedUnAuthorizedSDCardName = File(storage.path).name
                 helperPresenter.requestPermission()
                 return
             }

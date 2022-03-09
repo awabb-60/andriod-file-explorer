@@ -8,6 +8,7 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import com.awab.fileexplorer.R
 import com.awab.fileexplorer.databinding.FileItemBinding
+import com.awab.fileexplorer.model.data_models.AlbumCoverModelData
 import com.awab.fileexplorer.model.data_models.AppIconModelData
 import com.awab.fileexplorer.model.data_models.FileModel
 import com.awab.fileexplorer.model.data_models.MediaItemModel
@@ -57,7 +58,13 @@ fun bindFileItem(context: Context, item: FileModel, binding:FileItemBinding, mod
                     .into(binding.ivFileImage)
             }
 
-            MimeType.AUDIO -> binding.ivFileImage.setImageResource(R.drawable.ic_default_audio_file)
+            MimeType.AUDIO -> {
+                val albumCoverModelData = AlbumCoverModelData(item.name, File(item.path).isFile)
+                Glide.with(context)
+                    .load(albumCoverModelData)
+                    .placeholder(R.drawable.ic_default_audio_file)
+                    .into(binding.ivFileImage)
+            }
 
             MimeType.TEXT -> binding.ivFileImage.setImageResource(R.drawable.ic_default_text_file)
 
@@ -97,6 +104,7 @@ fun bindFileItem(context: Context, item: MediaItemModel, binding:FileItemBinding
                 .placeholder(R.drawable.ic_default_image_file)
                 .into(binding.ivFileImage)
         }
+
         MimeType.VIDEO -> {
             Glide
                 .with(context)
@@ -104,22 +112,20 @@ fun bindFileItem(context: Context, item: MediaItemModel, binding:FileItemBinding
                 .placeholder(R.drawable.ic_default_video_file)
                 .into(binding.ivFileImage)
         }
+
         MimeType.AUDIO -> {
-            Glide
-                .with(context)
-                .load(item.uri)
+            val albumCoverModelData = AlbumCoverModelData(item.name, true)
+            Glide.with(context)
+                .load(albumCoverModelData)
                 .placeholder(R.drawable.ic_default_audio_file)
                 .into(binding.ivFileImage)
         }
-        MimeType.PDF -> {
-            binding.ivFileImage.setImageResource(R.drawable.ic_default_pdf_file)
-        }
-        MimeType.HTML -> {
-            binding.ivFileImage.setImageResource(R.drawable.ic_default_html_file)
-        }
-        MimeType.TEXT -> {
-            binding.ivFileImage.setImageResource(R.drawable.ic_default_text_file)
-        }
+
+        MimeType.PDF -> binding.ivFileImage.setImageResource(R.drawable.ic_default_pdf_file)
+
+        MimeType.HTML -> binding.ivFileImage.setImageResource(R.drawable.ic_default_html_file)
+
+        MimeType.TEXT -> binding.ivFileImage.setImageResource(R.drawable.ic_default_text_file)
         else -> {
         }
     }

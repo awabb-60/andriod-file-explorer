@@ -315,7 +315,6 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         fragment.show(supportFragmentManager, "Pick Paste Location")
     }
 
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         if (showMenu)
             menuInflater.inflate(R.menu.main_menu, menu)
@@ -362,11 +361,6 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
                         treeUri,
                         Intent.FLAG_GRANT_READ_URI_PERMISSION and Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                     )
-//
-//                    contentResolver.takePersistableUriPermission(
-//                        treeUri,
-//                        Intent.FLAG_GRANT_READ_URI_PERMISSION and Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-//                    )
                 }
                 Toast.makeText(this, "authorization successful !", Toast.LENGTH_SHORT).show()
 
@@ -421,7 +415,6 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         registerReceiver(copyProgressReceiver, copyProgressFilter)
         registerReceiver(finishCopyReceiver, copyFinishFilter)
     }
-
 
     override fun openProgressScreen(action: String) {
         val dialogBinding = ProgressDialogLayoutBinding.inflate(layoutInflater)

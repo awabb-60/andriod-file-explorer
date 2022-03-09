@@ -1,4 +1,4 @@
-package com.awab.fileexplorer.model.utils.glide_custom_model
+package com.awab.fileexplorer.model.utils.glide_custom_model.app_icon
 
 import android.content.Context
 import android.graphics.drawable.Drawable
@@ -7,7 +7,6 @@ import com.awab.fileexplorer.model.utils.getApkIcon
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.data.DataFetcher
-import java.lang.Exception
 
 // this where the data will get loaded
 class AppIconDataFetcher(val context: Context, private val model: AppIconModelData): DataFetcher<Drawable> {

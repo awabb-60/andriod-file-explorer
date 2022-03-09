@@ -33,7 +33,7 @@ class SdCardPresenterSAF(
     // the name of the sd card
     override val storageName: String = File(storagePath).name
 
-    override var targetesUnAuthorizedSDCardName: String = storageName
+    override var targetedUnAuthorizedSDCardName: String = storageName
 
     override lateinit var supPresenter: SupPresenter
 
@@ -85,7 +85,8 @@ class SdCardPresenterSAF(
             val sdCardDocumentFile = getTreeUriFile() ?: return
 
 //        navigating to the parent
-            val parentFolder = navigateToTreeFile(sdCardDocumentFile, File(path).parent)
+            val folder = File(path).parent ?: return
+            val parentFolder = navigateToTreeFile(sdCardDocumentFile, folder)
 
 //        creating the new directory and refreshing
             if (parentFolder != null) {
@@ -106,7 +107,8 @@ class SdCardPresenterSAF(
             val sdCardDocumentFile = getTreeUriFile() ?: return
 
             // the parent folder that contains the files that will get deleted
-            val parentFolder = navigateToTreeFile(sdCardDocumentFile, File(selectedItems[0].path).parent)
+            val folder = File(selectedItems[0].path).parent ?: return
+            val parentFolder = navigateToTreeFile(sdCardDocumentFile, folder)
             if (selectedItems.isEmpty() || parentFolder == null)
                 return
 

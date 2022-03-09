@@ -19,7 +19,7 @@ class InternalStoragePresenter(
     override val storageName: String
         get() = File(storagePath).name
 
-    override var targetesUnAuthorizedSDCardName: String = ""
+    override var targetedUnAuthorizedSDCardName: String = ""
 
     override lateinit var supPresenter: SupPresenter
 
