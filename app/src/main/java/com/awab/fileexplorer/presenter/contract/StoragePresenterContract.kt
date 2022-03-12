@@ -1,34 +1,34 @@
 package com.awab.fileexplorer.presenter.contract
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Parcelable
 import android.view.LayoutInflater
 import android.widget.RadioGroup
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import com.awab.fileexplorer.R
 import com.awab.fileexplorer.databinding.PickViewSettingsLayoutBinding
 import com.awab.fileexplorer.model.RecentFiles
-import com.awab.fileexplorer.model.data_models.FileModel
-import com.awab.fileexplorer.model.data_models.SelectedItemsDetailsModel
-import com.awab.fileexplorer.model.data_models.StorageModel
-import com.awab.fileexplorer.model.data_models.TransferInfo
-import com.awab.fileexplorer.model.types.FileType
-import com.awab.fileexplorer.model.types.MimeType
-import com.awab.fileexplorer.model.types.StorageType
-import com.awab.fileexplorer.model.types.TransferAction
-import com.awab.fileexplorer.model.utils.*
-import com.awab.fileexplorer.model.utils.transfer_utils.TransferBroadCast
+import com.awab.fileexplorer.model.contrancts.StorageModel
+import com.awab.fileexplorer.model.utils.getFolderSizeBytes
+import com.awab.fileexplorer.model.utils.getSize
 import com.awab.fileexplorer.presenter.SdCardPresenterSAF
 import com.awab.fileexplorer.presenter.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.presenter.threads.SelectedFilesDetailsAsyncTask
+import com.awab.fileexplorer.utils.*
+import com.awab.fileexplorer.utils.data.data_models.FileDataModel
+import com.awab.fileexplorer.utils.data.data_models.SelectedItemsDetailsDataModel
+import com.awab.fileexplorer.utils.data.data_models.StorageDataModel
+import com.awab.fileexplorer.utils.data.data_models.TransferInfoDataModel
+import com.awab.fileexplorer.utils.data.types.FileType
+import com.awab.fileexplorer.utils.data.types.MimeType
+import com.awab.fileexplorer.utils.data.types.StorageType
+import com.awab.fileexplorer.utils.data.types.TransferAction
+import com.awab.fileexplorer.utils.transfer_utils.TransferBroadCast
 import com.awab.fileexplorer.view.contract.StorageView
-import com.awab.fileexplorer.view.helper_view.CustomDialog
-import com.awab.fileexplorer.view.helper_view.PickPasteLocationDialogFragment
+import com.awab.fileexplorer.view.custom_views.CustomDialog
+import com.awab.fileexplorer.view.custom_views.PickPasteLocationDialogFragment
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -61,16 +61,22 @@ interface StoragePresenterContract {
      */
     var supPresenter: SupPresenter
 
+
     /**
      * this indicates when tha action mode is active... so the view show the action mode ui
      */
     var actionModeOn: Boolean
 
     /**
-     * the current view that is linked with this presenter
+     * the current view that is linked to this presenter
      * the presenter will update this view
      */
     val view: StorageView
+
+    /**
+     * the model that will handle all the data logic
+     */
+    val model: StorageModel
 
     /**
      * this method bind thr supPresenter to the main presenter
@@ -101,10 +107,7 @@ interface StoragePresenterContract {
      * save the uir for the sd card to the shared preferences for later us
      */
     fun saveTreeUri(treeUri: Uri) {
-        val spE = view.context()
-            .getSharedPreferences(SD_CARD_TREE_URI_SP, AppCompatActivity.MODE_PRIVATE).edit()
-        spE.putString(TREE_URI_ + targetedUnAuthorizedSDCardName, treeUri.toString())
-        spE.apply()
+        model.saveTreeUri(treeUri, targetedUnAuthorizedSDCardName)
     }
 
     /**
@@ -267,9 +270,9 @@ interface StoragePresenterContract {
         } else {
             // loading large files on a background thread
             view.loadingDialog.show()
-            SelectedFilesDetailsAsyncTask(viewHiddenFilesSettings(),
-                object : SimpleSuccessAndFailureCallback<SelectedItemsDetailsModel> {
-                    override fun onSuccess(data: SelectedItemsDetailsModel) {
+            SelectedFilesDetailsAsyncTask(model.viewHiddenFilesSettings(),
+                object : SimpleSuccessAndFailureCallback<SelectedItemsDetailsDataModel> {
+                    override fun onSuccess(data: SelectedItemsDetailsDataModel) {
                         view.showDetails(data.contains, data.totalSize)
                         view.loadingDialog.dismiss()
                     }
@@ -285,7 +288,7 @@ interface StoragePresenterContract {
     /**
      * this will get called when a file item is click in the list
      */
-    fun onFileClicked(file: FileModel) {
+    fun onFileClicked(file: FileDataModel) {
         // selecting unselecting the item
         if (actionModeOn) {
             supPresenter.selectOrUnSelectItem(file)
@@ -309,7 +312,7 @@ interface StoragePresenterContract {
     /**
      * this will get called when a file item is long clicked in the list
      */
-    fun onFileLongClicked(file: FileModel) {
+    fun onFileLongClicked(file: FileDataModel) {
         // long click a selected item do nothing
         if (file.selected)
             return
@@ -330,7 +333,7 @@ interface StoragePresenterContract {
      * @param file the that will be open or viewed
      * @return an intent with ACTION_VIEW and has the data and type of the given file
      */
-    fun getOpenFileIntent(file: FileModel): Intent {
+    fun getOpenFileIntent(file: FileDataModel): Intent {
         RecentFiles.recentFilesList.add(file.path)
         if (file.mimeType == MimeType.APPLICATION) {
             return Intent(Intent.ACTION_VIEW).apply {
@@ -344,11 +347,11 @@ interface StoragePresenterContract {
     }
 
     fun pickTransferLocation(transferAction: TransferAction) {
-        val storagesList = view.intent().getParcelableArrayListExtra<StorageModel>(STORAGES_LIST_EXTRA)
+        val storagesList = view.intent().getParcelableArrayListExtra<StorageDataModel>(STORAGES_LIST_EXTRA)
 
         storagesList?.let {
             val pickLocationFragment = PickPasteLocationDialogFragment.newInstance(
-                it.toArray(arrayOf<StorageModel>()),
+                it.toArray(arrayOf<StorageDataModel>()),
                 transferAction
             )
 
@@ -359,7 +362,7 @@ interface StoragePresenterContract {
 
     // to copy or move to the sd card or the internal storage, you have to have a folder
     // named (Paste) in location you try to copy to.
-    fun transfer(folderLocation: String, storage: StorageModel, action: TransferAction) {
+    fun transfer(folderLocation: String, storage: StorageDataModel, action: TransferAction) {
         // authorizing the current storage
         if (!isAuthorized()) {
             return
@@ -403,7 +406,7 @@ interface StoragePresenterContract {
 
                     // information to write to the sd card : tree uri
 
-                    putExtra(TREE_URI_FOR_TRANSFER_EXTRA, getTreeUri(view.context(), File(storage.path).name))
+                    putExtra(TREE_URI_FOR_TRANSFER_EXTRA, model.getTreeUri(File(storage.path).name))
 
                     putExtra(EXTERNAL_STORAGE_PATH_EXTRA, storagePath)
                 }
@@ -420,22 +423,10 @@ interface StoragePresenterContract {
         view.context().sendBroadcast(intent)
     }
 
-    /**
-     * it will load the saved tree uri of the sd card from the shared preferences
-     * @return the tree uri of the sd card
-     */
-    fun getTreeUri(context: Context, storageName: String): Uri {
-        val sp = context.getSharedPreferences(
-            SD_CARD_TREE_URI_SP,
-            AppCompatActivity.MODE_PRIVATE
-        )
-        return sp.getString(TREE_URI_ + storageName, "")!!.toUri()
-    }
-
     fun transferFinished(intent: Intent?) {
         view.closeProgressScreen()
         // if the transfer action was move and the all files move successfully
-        val info = intent?.getParcelableExtra<TransferInfo>(TRANSFER_INFO_EXTRA)
+        val info = intent?.getParcelableExtra<TransferInfoDataModel>(TRANSFER_INFO_EXTRA)
 
         info?:return
 
@@ -459,9 +450,9 @@ interface StoragePresenterContract {
      * it will show a screen for the user to edit the view settings
      */
     fun pickViewSettings() {
-        val viewSortBy = viewSortBySettings()
-        val viewSortOrder = viewSortOrderSettings()
-        val showHiddenFiles = viewHiddenFilesSettings()
+        val viewSortBy = model.viewSortBySettings()
+        val viewSortOrder = model.viewSortOrderSettings()
+        val showHiddenFiles = model.viewHiddenFilesSettings()
 
         val dialogBinding = PickViewSettingsLayoutBinding.inflate(LayoutInflater.from(view.context()))
         val rgSortingBy: RadioGroup = dialogBinding.rgViewType
@@ -488,50 +479,13 @@ interface StoragePresenterContract {
     }
 
     /**
-     * it will return the saved sort argument
-     * @return the a string that represent the sort argument
-     */
-    fun viewSortBySettings(): String? {
-        val sp =
-            view.context().getSharedPreferences(VIEW_SETTINGS_SHARED_PREFERENCES, AppCompatActivity.MODE_PRIVATE)
-        return sp.getString(SHARED_PREFERENCES_SORTING_BY, DEFAULT_SORTING_ARGUMENT)
-    }
-
-    /**
-     * it will return the saved sort order
-     * @return the a string that represent the sort order
-     */
-    fun viewSortOrderSettings(): String? {
-        val sp =
-            view.context().getSharedPreferences(VIEW_SETTINGS_SHARED_PREFERENCES, AppCompatActivity.MODE_PRIVATE)
-        return sp.getString(SHARED_PREFERENCES_SORTING_ORDER, DEFAULT_SORTING_ORDER)
-    }
-
-    /**
-     * it will return the saved setting for showing the hidden file
-     * @return true to show the hidden file, false otherwise
-     */
-    fun viewHiddenFilesSettings(): Boolean {
-        val sp =
-            view.context().getSharedPreferences(VIEW_SETTINGS_SHARED_PREFERENCES, AppCompatActivity.MODE_PRIVATE)
-        return sp.getBoolean(SHARED_PREFERENCES_SHOW_HIDDEN_FILES, DEFAULT_SHOW_HIDDEN_FILES)
-    }
-
-    /**
      * save the view settings to the shared preferences.
      * @param sortBy the sort argument.
      * @param order the sort order.
      * @param showHiddenFiles the hidden files visibility.
      */
     fun saveViewingSettings(sortBy: String, order: String, showHiddenFiles: Boolean) {
-        val sharedPreferencesEditor = view.context().getSharedPreferences(
-            VIEW_SETTINGS_SHARED_PREFERENCES,
-            AppCompatActivity.MODE_PRIVATE
-        ).edit()
-        sharedPreferencesEditor.putString(SHARED_PREFERENCES_SORTING_BY, sortBy)
-        sharedPreferencesEditor.putString(SHARED_PREFERENCES_SORTING_ORDER, order)
-        sharedPreferencesEditor.putBoolean(SHARED_PREFERENCES_SHOW_HIDDEN_FILES, showHiddenFiles)
-        sharedPreferencesEditor.apply()
+        model.saveViewingSettings(sortBy, order, showHiddenFiles)
     }
 
     /**
@@ -547,19 +501,4 @@ interface StoragePresenterContract {
             Intent.createChooser(intent, view.context().getString(R.string.open_with_chooser_title))
         view.openFile(chooserIntent)
     }
-
-
-//    fun getTransferResult(): Intent {
-//        val items  = supPresenter.getSelectedItems()
-//        val type = COPY
-//        val l = ArrayList<String>()
-//
-//        items.forEach { l.add(it.path) }
-//        val bundle = Bundle().apply {
-//            putStringArrayList("T_ITEMS",l)
-//            putString("T_T",type)
-//        }
-//
-//        return Intent().putExtra("T_DATA", bundle)
-//    }
 }

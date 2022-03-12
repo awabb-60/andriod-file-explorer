@@ -1,6 +1,6 @@
 package com.awab.fileexplorer.presenter.contract
 
-import com.awab.fileexplorer.model.data_models.FileModel
+import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 import com.awab.fileexplorer.view.contract.ISearchFragmentView
 
 interface SearchPresenterContract:SupPresenter {
@@ -13,7 +13,7 @@ interface SearchPresenterContract:SupPresenter {
     /**
      * the files list that where the search or the filtering will happen
      */
-    var searchList:List<FileModel>
+    var searchList:List<FileDataModel>
 
     override val mainMenuState: Boolean
         get() = false
@@ -28,5 +28,5 @@ interface SearchPresenterContract:SupPresenter {
      * this get called after the query of the search list to update the view
      * and be ready to receive search text
      */
-    fun isReady(list:List<FileModel>)
+    fun isReady(list:List<FileDataModel>)
 }

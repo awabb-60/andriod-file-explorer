@@ -13,7 +13,7 @@
         android:hint="@string/name"
         android:maxLines="1" />
 
-    <com.awab.fileexplorer.view.helper_view.DialogButtonsLayout
+    <com.awab.fileexplorer.view.custom_views.DialogButtonsLayout
         android:id="@+id/buttons_layout"
         style="@style/dialogButtons"
         android:layout_width="match_parent"

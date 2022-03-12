@@ -1,18 +1,19 @@
 package com.awab.fileexplorer.presenter
 
 import android.content.Context
-import com.awab.fileexplorer.model.data_models.FileModel
+import com.awab.fileexplorer.model.utils.makeFilesList
 import com.awab.fileexplorer.presenter.contract.FilesListPresenterContract
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
-import com.awab.fileexplorer.model.utils.*
+import com.awab.fileexplorer.utils.*
+import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 import com.awab.fileexplorer.view.contract.IFileFragmentView
 import java.io.File
 
 class FilePresenter(
     override val view: IFileFragmentView,
-    private val folder:File,
+    private val folder: File,
     private val mStoragePresenter: StoragePresenterContract
-): FilesListPresenterContract {
+) : FilesListPresenterContract {
 
     override val mainStoragePresenter: StoragePresenterContract
         get() = mStoragePresenter
@@ -25,20 +26,21 @@ class FilePresenter(
         val sp = view.context().getSharedPreferences(VIEW_SETTINGS_SHARED_PREFERENCES, Context.MODE_PRIVATE)
         val sortBy = sp.getString(SHARED_PREFERENCES_SORTING_BY, SORTING_BY_NAME)!!
         val order = sp.getString(SHARED_PREFERENCES_SORTING_ORDER, SORTING_ORDER_DEC)!!
-        val showHiddenFiles = sp.getBoolean(SHARED_PREFERENCES_SHOW_HIDDEN_FILES,false)
-        val list = makeFilesList(folder, sortingBy = sortBy, sortingOrder = order, showHidingFiles = showHiddenFiles)
+        val showHiddenFiles = sp.getBoolean(SHARED_PREFERENCES_SHOW_HIDDEN_FILES, false)
+        val list =
+            makeFilesList(folder, sortingBy = sortBy, sortingOrder = order, showHidingFiles = showHiddenFiles)
         view.updateList(list)
     }
 
-    override fun onFileClick(file: FileModel) {
+    override fun onFileClick(file: FileDataModel) {
         mainStoragePresenter.onFileClicked(file)
     }
 
-    override fun onFileLongClick(file: FileModel) {
+    override fun onFileLongClick(file: FileDataModel) {
         mainStoragePresenter.onFileLongClicked(file)
     }
 
-    override fun selectOrUnSelectItem(file: FileModel) {
+    override fun selectOrUnSelectItem(file: FileDataModel) {
         view.selectOrUnSelectItem(file)
     }
 
@@ -46,7 +48,7 @@ class FilePresenter(
         view.selectAll()
     }
 
-    override fun getSelectedItems():List<FileModel> {
+    override fun getSelectedItems(): List<FileDataModel> {
         return view.getSelectedItems()
     }
 

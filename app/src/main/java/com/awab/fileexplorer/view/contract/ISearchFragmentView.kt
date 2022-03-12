@@ -1,7 +1,7 @@
 package com.awab.fileexplorer.view.contract
 
 import android.content.Context
-import com.awab.fileexplorer.model.data_models.FileModel
+import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 
 interface ISearchFragmentView {
 
@@ -9,7 +9,7 @@ interface ISearchFragmentView {
 
     fun isReady()
 
-    fun showSearchList(list:List<FileModel>, searchText:String)
+    fun showSearchList(list:List<FileDataModel>, searchText:String)
 
     fun searchResultEmpty()
 
@@ -17,11 +17,11 @@ interface ISearchFragmentView {
 
     fun removeInputMethod()
 
-    fun selectOrUnSelect(file: FileModel)
+    fun selectOrUnSelect(file: FileDataModel)
 
     fun selectAll()
 
-    fun getSelectedItems(): List<FileModel>
+    fun getSelectedItems(): List<FileDataModel>
 
     fun stopActionMode()
 

@@ -1,10 +1,10 @@
 package com.awab.fileexplorer.view.callbacks
 
-import com.awab.fileexplorer.model.data_models.MediaItemModel
+import com.awab.fileexplorer.utils.data.data_models.MediaItemDataModel
 
 interface LoadMediaCallback {
 
-    fun onSuccess(list:List<MediaItemModel>)
+    fun onSuccess(list:List<MediaItemDataModel>)
 
     fun onFailure(message:String)
 

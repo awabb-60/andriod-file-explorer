@@ -11,13 +11,13 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.awab.fileexplorer.R
-import com.awab.fileexplorer.adapters.SearchAdapter
 import com.awab.fileexplorer.databinding.FragmentSearchBinding
-import com.awab.fileexplorer.model.data_models.FileModel
-import com.awab.fileexplorer.model.utils.SEARCH_STORAGE_PATH_ARGS
 import com.awab.fileexplorer.presenter.SearchFragmentPresenter
 import com.awab.fileexplorer.presenter.contract.SearchPresenterContract
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
+import com.awab.fileexplorer.utils.SEARCH_STORAGE_PATH_ARGS
+import com.awab.fileexplorer.utils.adapters.SearchAdapter
+import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 import com.awab.fileexplorer.view.contract.ISearchFragmentView
 import com.awab.fileexplorer.view.contract.StorageView
 
@@ -119,7 +119,7 @@ class SearchFragment : Fragment(), ISearchFragmentView {
         binding.searchListLayout.visibility = View.GONE
     }
 
-    override fun showSearchList(list: List<FileModel>, searchText: String) {
+    override fun showSearchList(list: List<FileDataModel>, searchText: String) {
         adapter.setItemsList(list, searchText)
         binding.searchListLayout.visibility = View.VISIBLE
         binding.tvSearchResultsSize.text = "found <${list.size}>"
@@ -145,7 +145,7 @@ class SearchFragment : Fragment(), ISearchFragmentView {
         imm.hideSoftInputFromWindow(binding.root.windowToken, 0)
     }
 
-    override fun selectOrUnSelect(file: FileModel) {
+    override fun selectOrUnSelect(file: FileDataModel) {
         adapter.selectOrUnSelect(file)
     }
 
@@ -153,7 +153,7 @@ class SearchFragment : Fragment(), ISearchFragmentView {
         adapter.selectAll()
     }
 
-    override fun getSelectedItems(): List<FileModel> {
+    override fun getSelectedItems(): List<FileDataModel> {
         return adapter.getSelectedItems()
     }
 

@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
-    <com.awab.fileexplorer.view.helper_view.DialogButtonsLayout
+    <com.awab.fileexplorer.view.custom_views.DialogButtonsLayout
         android:id="@+id/buttonsLayout"
         android:layout_width="match_parent"
         style="@style/dialogButtons"

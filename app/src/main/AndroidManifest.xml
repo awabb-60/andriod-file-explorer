@@ -41,15 +41,15 @@
             android:theme="@style/Theme.FileExplorer.NoActionBar" />
 
         <service
-            android:name=".model.utils.transfer_utils.TransferToSDCardService"
+            android:name="com.awab.fileexplorer.utils.transfer_utils.TransferToSDCardService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <service
-            android:name=".model.utils.transfer_utils.TransferToInternalStorageService"
+            android:name="com.awab.fileexplorer.utils.transfer_utils.TransferToInternalStorageService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <receiver
-            android:name=".model.utils.transfer_utils.TransferBroadCast"
+            android:name="com.awab.fileexplorer.utils.transfer_utils.TransferBroadCast"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.awab.fileexplorer.ACTION_TRANSFER" />
@@ -57,7 +57,7 @@
         </receiver>
 
         <receiver
-            android:name=".model.utils.transfer_utils.CancelTransferBroadCast"
+            android:name="com.awab.fileexplorer.utils.transfer_utils.CancelTransferBroadCast"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.awab.fileexplorer.ACTION_CANCEL" />

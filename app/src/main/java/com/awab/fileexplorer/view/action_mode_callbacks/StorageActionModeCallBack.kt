@@ -4,8 +4,8 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
 import com.awab.fileexplorer.R
-import com.awab.fileexplorer.model.types.TransferAction
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
+import com.awab.fileexplorer.utils.data.types.TransferAction
 
 class StorageActionModeCallBack(private val presenterContract: StoragePresenterContract):ActionMode.Callback{
     override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {

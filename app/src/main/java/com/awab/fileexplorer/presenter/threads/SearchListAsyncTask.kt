@@ -3,20 +3,20 @@ package com.awab.fileexplorer.presenter.threads
 import android.content.ContentResolver
 import android.os.AsyncTask
 import android.provider.MediaStore
-import com.awab.fileexplorer.model.data_models.FileModel
 import com.awab.fileexplorer.model.utils.makeFileModels
 import com.awab.fileexplorer.presenter.callbacks.SimpleSuccessAndFailureCallback
+import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 import java.io.File
 
 
 class SearchListAsyncTask(
     private val folderPath: String,
     private val contentResolver: ContentResolver,
-    private val callback: SimpleSuccessAndFailureCallback<List<FileModel>>
+    private val callback: SimpleSuccessAndFailureCallback<List<FileDataModel>>
 ) :
-    AsyncTask<Unit, Unit, List<FileModel>>() {
+    AsyncTask<Unit, Unit, List<FileDataModel>>() {
 
-    override fun doInBackground(vararg params: Unit?): List<FileModel> {
+    override fun doInBackground(vararg params: Unit?): List<FileDataModel> {
 //            val folder = File(folderPath)
 //            val allFiles = getInnerFiles(folder, false)
         return try {
@@ -42,7 +42,7 @@ class SearchListAsyncTask(
         }
     }
 
-    override fun onPostExecute(result: List<FileModel>) {
+    override fun onPostExecute(result: List<FileDataModel>) {
         if (result.isEmpty())
             callback.onFailure("unable to load files for search")
         else

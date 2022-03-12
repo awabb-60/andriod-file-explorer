@@ -4,16 +4,16 @@ import android.content.Intent
 import android.os.Parcelable
 import androidx.core.content.ContextCompat
 import com.awab.fileexplorer.R
-import com.awab.fileexplorer.model.data_models.StorageModel
-import com.awab.fileexplorer.model.types.MediaCategory
-import com.awab.fileexplorer.model.types.StorageType
+import com.awab.fileexplorer.model.utils.getSize
 import com.awab.fileexplorer.presenter.contract.HomePresenterContract
-import com.awab.fileexplorer.model.utils.*
+import com.awab.fileexplorer.utils.*
+import com.awab.fileexplorer.utils.data.data_models.StorageDataModel
+import com.awab.fileexplorer.utils.data.types.MediaCategory
+import com.awab.fileexplorer.utils.data.types.StorageType
 import com.awab.fileexplorer.view.MediaActivity
-import com.awab.fileexplorer.view.contract.HomeView
 import com.awab.fileexplorer.view.StorageActivity
+import com.awab.fileexplorer.view.contract.HomeView
 import java.io.File
-import java.lang.Exception
 
 
 class HomePresenter(override val view: HomeView): HomePresenterContract {
@@ -22,7 +22,7 @@ class HomePresenter(override val view: HomeView): HomePresenterContract {
 
     private val storages = ArrayList<Parcelable>()
 
-    override fun openStorage(it: StorageModel) {
+    override fun openStorage(it: StorageDataModel) {
         if (!allPermissionsGranted(view.context(), INTERNAL_STORAGE_REQUIRED_PERMISSIONS)){
             view.checkForPermissions()
             return
@@ -70,7 +70,7 @@ class HomePresenter(override val view: HomeView): HomePresenterContract {
             it?.parentFile?.parentFile?.parentFile?.parentFile
         }
 
-        val list = mutableListOf<StorageModel>()
+        val list = mutableListOf<StorageDataModel>()
 
         // the internal storage will be at the first
         val internalDir = storages[0]
@@ -87,15 +87,15 @@ class HomePresenter(override val view: HomeView): HomePresenterContract {
 
         this.storages.clear()
         this.storages.addAll(list)
-        view.updateStoragesList(this.storages.toArray(arrayOf<StorageModel>()))
+        view.updateStoragesList(this.storages.toArray(arrayOf<StorageDataModel>()))
     }
 
-    private fun makeStorageModel(name: String, file:File, type: StorageType): StorageModel? {
+    private fun makeStorageModel(name: String, file:File, type: StorageType): StorageDataModel? {
         return try {
             val freeSize = getSize(file.freeSpace)
             val totalSize = getSize(file.totalSpace)
             val displaySize = "$freeSize free of $totalSize"
-             StorageModel(name = name,
+             StorageDataModel(name = name,
                 size = displaySize,
                 freeSizeBytes = file.freeSpace,
                 totalSizeBytes = file.totalSpace,

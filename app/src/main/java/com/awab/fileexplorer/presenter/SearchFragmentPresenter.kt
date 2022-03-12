@@ -2,14 +2,14 @@ package com.awab.fileexplorer.presenter
 
 import android.content.Context.MODE_PRIVATE
 import android.widget.Toast
-import com.awab.fileexplorer.model.data_models.FileModel
-import com.awab.fileexplorer.model.utils.SHARED_PREFERENCES_SHOW_HIDDEN_FILES
-import com.awab.fileexplorer.model.utils.VIEW_SETTINGS_SHARED_PREFERENCES
 import com.awab.fileexplorer.model.utils.getSearchResults
 import com.awab.fileexplorer.presenter.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.presenter.contract.SearchPresenterContract
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 import com.awab.fileexplorer.presenter.threads.SearchListAsyncTask
+import com.awab.fileexplorer.utils.SHARED_PREFERENCES_SHOW_HIDDEN_FILES
+import com.awab.fileexplorer.utils.VIEW_SETTINGS_SHARED_PREFERENCES
+import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 import com.awab.fileexplorer.view.contract.ISearchFragmentView
 
 class SearchFragmentPresenter(
@@ -21,7 +21,7 @@ class SearchFragmentPresenter(
     override val mainStoragePresenter: StoragePresenterContract
         get() = mStoragePresenter
 
-    override var searchList: List<FileModel> = listOf()
+    override var searchList: List<FileDataModel> = listOf()
 
     override fun onTextChanged(text: String) {
         if (text.isBlank())
@@ -32,7 +32,7 @@ class SearchFragmentPresenter(
         }
     }
 
-    private fun updateViewList(list: List<FileModel>, text: String) {
+    private fun updateViewList(list: List<FileDataModel>, text: String) {
         if (list.isEmpty())
             view.searchResultEmpty()
         else
@@ -44,7 +44,7 @@ class SearchFragmentPresenter(
         return sp.getBoolean(SHARED_PREFERENCES_SHOW_HIDDEN_FILES, false)
     }
 
-    override fun isReady(list: List<FileModel>) {
+    override fun isReady(list: List<FileDataModel>) {
         searchList = if (!showHiddenFiles()) // filtering the hidden files
             list.filter { !it.name.startsWith('.') }
         else
@@ -55,8 +55,8 @@ class SearchFragmentPresenter(
     override fun loadFiles() {
         if (searchList.isEmpty())
             SearchListAsyncTask(folderPath, view.context().contentResolver,
-                object : SimpleSuccessAndFailureCallback<List<FileModel>> {
-                    override fun onSuccess(data: List<FileModel>) {
+                object : SimpleSuccessAndFailureCallback<List<FileDataModel>> {
+                    override fun onSuccess(data: List<FileDataModel>) {
                         isReady(data)
                     }
 
@@ -70,16 +70,16 @@ class SearchFragmentPresenter(
             isReady(searchList)
     }
 
-    override fun onFileClick(file: FileModel) {
+    override fun onFileClick(file: FileDataModel) {
         view.removeInputMethod()
         mainStoragePresenter.onFileClicked(file)
     }
 
-    override fun onFileLongClick(file: FileModel) {
+    override fun onFileLongClick(file: FileDataModel) {
         mainStoragePresenter.onFileLongClicked(file)
     }
 
-    override fun selectOrUnSelectItem(file: FileModel) {
+    override fun selectOrUnSelectItem(file: FileDataModel) {
         view.selectOrUnSelect(file)
     }
 
@@ -87,7 +87,7 @@ class SearchFragmentPresenter(
         view.selectAll()
     }
 
-    override fun getSelectedItems(): List<FileModel> {
+    override fun getSelectedItems(): List<FileDataModel> {
         return view.getSelectedItems()
     }
 

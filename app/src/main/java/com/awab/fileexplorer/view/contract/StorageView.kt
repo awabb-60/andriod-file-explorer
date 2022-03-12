@@ -5,7 +5,7 @@ import android.content.Intent
 import androidx.appcompat.app.AlertDialog
 import com.awab.fileexplorer.databinding.PickViewSettingsLayoutBinding
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
-import com.awab.fileexplorer.view.helper_view.PickPasteLocationDialogFragment
+import com.awab.fileexplorer.view.custom_views.PickPasteLocationDialogFragment
 
 interface StorageView {
 

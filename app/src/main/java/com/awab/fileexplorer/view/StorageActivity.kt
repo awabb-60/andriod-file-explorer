@@ -18,19 +18,20 @@ import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_FADE
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.awab.fileexplorer.*
-import com.awab.fileexplorer.adapters.BreadcrumbsAdapter
 import com.awab.fileexplorer.databinding.*
-import com.awab.fileexplorer.model.data_models.BreadcrumbsModel
-import com.awab.fileexplorer.model.types.StorageType
 import com.awab.fileexplorer.model.utils.*
-import com.awab.fileexplorer.model.utils.listeners.BreadcrumbsListener
-import com.awab.fileexplorer.model.utils.transfer_utils.CancelTransferBroadCast
 import com.awab.fileexplorer.presenter.*
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
+import com.awab.fileexplorer.utils.*
+import com.awab.fileexplorer.utils.adapters.BreadcrumbsAdapter
+import com.awab.fileexplorer.utils.data.data_models.BreadcrumbsDataModel
+import com.awab.fileexplorer.utils.data.types.StorageType
+import com.awab.fileexplorer.utils.listeners.BreadcrumbsListener
+import com.awab.fileexplorer.utils.transfer_utils.CancelTransferBroadCast
 import com.awab.fileexplorer.view.action_mode_callbacks.StorageActionModeCallBack
 import com.awab.fileexplorer.view.contract.StorageView
-import com.awab.fileexplorer.view.helper_view.CustomDialog
-import com.awab.fileexplorer.view.helper_view.PickPasteLocationDialogFragment
+import com.awab.fileexplorer.view.custom_views.CustomDialog
+import com.awab.fileexplorer.view.custom_views.PickPasteLocationDialogFragment
 
 class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
     private val TAG = "StorageActivity"
@@ -163,7 +164,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
             .setTransition(TRANSIT_FRAGMENT_FADE)
             .addToBackStack(path)
             .commit()
-        breadcrumbsAdapter.add(BreadcrumbsModel(name, path))
+        breadcrumbsAdapter.add(BreadcrumbsDataModel(name, path))
 //        to scroll the adapter to the last breadcrumbs item
         binding.rvBreadcrumbs.smoothScrollToPosition(breadcrumbsAdapter.list.count() - 1)
     }
@@ -321,7 +322,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         return true
     }
 
-    override fun onBreadcrumbsItemClicked(item: BreadcrumbsModel) {
+    override fun onBreadcrumbsItemClicked(item: BreadcrumbsDataModel) {
 //        navigating back to the fragment of the clicked breadcrumbs item
         mStoragePresenter.stopActionMode()
         supportFragmentManager.popBackStack(item.path, 0)

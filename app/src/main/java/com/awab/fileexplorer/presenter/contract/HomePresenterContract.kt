@@ -1,6 +1,6 @@
 package com.awab.fileexplorer.presenter.contract
 
-import com.awab.fileexplorer.model.data_models.StorageModel
+import com.awab.fileexplorer.utils.data.data_models.StorageDataModel
 import com.awab.fileexplorer.view.contract.HomeView
 
 interface HomePresenterContract {
@@ -13,7 +13,7 @@ interface HomePresenterContract {
     /**
      * open the storage in a new activity
      */
-    fun openStorage(it: StorageModel)
+    fun openStorage(it: StorageDataModel)
 
     /**
      * callback when a media item is clicked

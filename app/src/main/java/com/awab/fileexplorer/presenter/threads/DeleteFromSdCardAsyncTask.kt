@@ -2,8 +2,8 @@ package com.awab.fileexplorer.presenter.threads
 
 import android.os.AsyncTask
 import androidx.documentfile.provider.DocumentFile
-import com.awab.fileexplorer.model.data_models.FileModel
 import com.awab.fileexplorer.presenter.callbacks.SimpleSuccessAndFailureCallback
+import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 
 /**
  * this handle the deletion of any file or folder in the sd card and the devices that has to us
@@ -12,9 +12,9 @@ import com.awab.fileexplorer.presenter.callbacks.SimpleSuccessAndFailureCallback
 class DeleteFromSdCardAsyncTask(
     private val parentFolder: DocumentFile,
     private val callback: SimpleSuccessAndFailureCallback<Boolean>
-) : AsyncTask<List<FileModel>, String, Boolean>() {
+) : AsyncTask<List<FileDataModel>, String, Boolean>() {
 
-    override fun doInBackground(vararg params: List<FileModel>?): Boolean {
+    override fun doInBackground(vararg params: List<FileDataModel>?): Boolean {
         var allFilesDeleted = true
         val targetedFiles = params[0]
 

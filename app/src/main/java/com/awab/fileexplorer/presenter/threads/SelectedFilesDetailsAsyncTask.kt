@@ -1,29 +1,25 @@
 package com.awab.fileexplorer.presenter.threads
 
 import android.os.AsyncTask
-import android.util.Log
-import com.awab.fileexplorer.model.data_models.FileModel
-import com.awab.fileexplorer.model.data_models.MediaItemModel
-import com.awab.fileexplorer.model.data_models.SelectedItemsDetailsModel
 import com.awab.fileexplorer.model.utils.getContains
-import com.awab.fileexplorer.model.utils.getSize
 import com.awab.fileexplorer.model.utils.getTotalSize
 import com.awab.fileexplorer.presenter.callbacks.SimpleSuccessAndFailureCallback
-import java.io.File
+import com.awab.fileexplorer.utils.data.data_models.FileDataModel
+import com.awab.fileexplorer.utils.data.data_models.SelectedItemsDetailsDataModel
 
 /**
  * this gets all the selected items data from the media items
  */
-class SelectedFilesDetailsAsyncTask(val countHiddenFiles:Boolean, private val callBack: SimpleSuccessAndFailureCallback<SelectedItemsDetailsModel>) :
-    AsyncTask<List<FileModel>, Unit, SelectedItemsDetailsModel>() {
+class SelectedFilesDetailsAsyncTask(val countHiddenFiles:Boolean, private val callBack: SimpleSuccessAndFailureCallback<SelectedItemsDetailsDataModel>) :
+    AsyncTask<List<FileDataModel>, Unit, SelectedItemsDetailsDataModel>() {
 
-    override fun doInBackground(vararg params:List<FileModel>): SelectedItemsDetailsModel {
+    override fun doInBackground(vararg params:List<FileDataModel>): SelectedItemsDetailsDataModel {
         // getting details for the selected items
         val list = params[0]
-        return SelectedItemsDetailsModel(getTotalSize(list), getContains(list, countHiddenFiles))
+        return SelectedItemsDetailsDataModel(getTotalSize(list), getContains(list, countHiddenFiles))
     }
 
-    override fun onPostExecute(result: SelectedItemsDetailsModel?) {
+    override fun onPostExecute(result: SelectedItemsDetailsDataModel?) {
         if (result != null)
             callBack.onSuccess(result)
         else

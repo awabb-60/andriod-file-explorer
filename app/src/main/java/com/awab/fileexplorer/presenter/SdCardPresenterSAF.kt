@@ -6,14 +6,15 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.documentfile.provider.DocumentFile
-import com.awab.fileexplorer.model.utils.PICKER_REQUEST_CODE
-import com.awab.fileexplorer.model.utils.SD_CARD_TREE_URI_SP
-import com.awab.fileexplorer.model.utils.TREE_URI_
+import com.awab.fileexplorer.model.MainStorageModel
 import com.awab.fileexplorer.model.utils.navigateToTreeFile
 import com.awab.fileexplorer.presenter.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 import com.awab.fileexplorer.presenter.contract.SupPresenter
 import com.awab.fileexplorer.presenter.threads.DeleteFromSdCardAsyncTask
+import com.awab.fileexplorer.utils.PICKER_REQUEST_CODE
+import com.awab.fileexplorer.utils.SD_CARD_TREE_URI_SP
+import com.awab.fileexplorer.utils.TREE_URI_
 import com.awab.fileexplorer.view.contract.StorageView
 import java.io.File
 
@@ -25,7 +26,6 @@ class SdCardPresenterSAF(
     private val storageView: StorageView,
     private val _storagePath: String
 ) : StoragePresenterContract {
-
 
     override val storagePath: String
         get() = _storagePath
@@ -41,6 +41,8 @@ class SdCardPresenterSAF(
 
     override val view: StorageView
         get() = storageView
+
+    override val model = MainStorageModel(view.context())
 
     override fun isAuthorized(): Boolean {
         return sdCardAuthorized()
@@ -142,7 +144,7 @@ class SdCardPresenterSAF(
     }
 
     private fun getTreeUriFile(): DocumentFile? {
-        return DocumentFile.fromTreeUri(view.context(), getTreeUri(view.context(), storageName))
+        return DocumentFile.fromTreeUri(view.context(), model.getTreeUri(storageName))
     }
 
     @RequiresApi(19)
@@ -159,7 +161,7 @@ class SdCardPresenterSAF(
 
         return if (sp.contains(TREE_URI_ + storageName)) {
             // updating the permission
-            val uri = getTreeUri(view.context(), storageName)
+            val uri = model.getTreeUri(storageName)
             view.context().grantUriPermission(
                 view.context().packageName,
                 uri,

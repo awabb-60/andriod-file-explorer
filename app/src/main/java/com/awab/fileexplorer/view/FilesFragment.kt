@@ -8,13 +8,13 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.awab.fileexplorer.adapters.FilesAdapter
 import com.awab.fileexplorer.databinding.FragmentFileBinding
-import com.awab.fileexplorer.model.data_models.FileModel
-import com.awab.fileexplorer.model.utils.FILE_PATH_ARGS
 import com.awab.fileexplorer.presenter.FilePresenter
 import com.awab.fileexplorer.presenter.contract.FilesListPresenterContract
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
+import com.awab.fileexplorer.utils.FILE_PATH_ARGS
+import com.awab.fileexplorer.utils.adapters.FilesAdapter
+import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 import com.awab.fileexplorer.view.contract.IFileFragmentView
 import com.awab.fileexplorer.view.contract.StorageView
 import java.io.File
@@ -74,7 +74,7 @@ class FilesFragment : Fragment(), IFileFragmentView {
         _adapter = null
     }
 
-    override fun selectOrUnSelectItem(file: FileModel) {
+    override fun selectOrUnSelectItem(file: FileDataModel) {
         adapter.selectOrUnSelect(file)
     }
 
@@ -89,17 +89,17 @@ class FilesFragment : Fragment(), IFileFragmentView {
 
     override fun context() = requireContext()
 
-    override fun updateList(list: List<FileModel>) {
+    override fun updateList(list: List<FileDataModel>) {
         updateFilesList(list)
     }
 
-    private fun updateFilesList(list: List<FileModel>) {
+    private fun updateFilesList(list: List<FileDataModel>) {
         adapter.submitList(list)
 //        hiding the rv to show the empty file indicator
         binding.rvFilesList.visibility = if (list.isEmpty()) View.GONE else View.VISIBLE
     }
 
-    override fun getSelectedItems(): List<FileModel> {
+    override fun getSelectedItems(): List<FileDataModel> {
         return adapter.getSelectedItems()
     }
 

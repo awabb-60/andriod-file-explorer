@@ -13,15 +13,15 @@ import androidx.appcompat.view.ActionMode
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.awab.fileexplorer.R
-import com.awab.fileexplorer.adapters.MediaAdapter
 import com.awab.fileexplorer.databinding.ActivityMediaBinding
 import com.awab.fileexplorer.databinding.ItemDetailsLayoutBinding
 import com.awab.fileexplorer.databinding.ItemsDetailsLayoutBinding
 import com.awab.fileexplorer.presenter.MediaPresenter
 import com.awab.fileexplorer.presenter.contract.MediaPresenterContract
+import com.awab.fileexplorer.utils.adapters.MediaAdapter
 import com.awab.fileexplorer.view.action_mode_callbacks.MediaActionModeCallback
 import com.awab.fileexplorer.view.contract.MediaView
-import com.awab.fileexplorer.view.helper_view.CustomDialog
+import com.awab.fileexplorer.view.custom_views.CustomDialog
 
 class MediaActivity : AppCompatActivity(), MediaView, SearchView.OnQueryTextListener, SearchView.OnCloseListener {
 

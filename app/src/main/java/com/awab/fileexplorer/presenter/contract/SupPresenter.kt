@@ -1,6 +1,6 @@
 package com.awab.fileexplorer.presenter.contract
 
-import com.awab.fileexplorer.model.data_models.FileModel
+import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 
 /**
  * this is the presenter tha control any sup fragment view
@@ -32,19 +32,19 @@ interface SupPresenter {
     /**
      * call back when a file item is clicked in the supPresenter view
      */
-    fun onFileClick(file: FileModel)
+    fun onFileClick(file: FileDataModel)
 
 
     /**
      * call back when a file item is long clicked in the supPresenter view
      */
-    fun onFileLongClick(file: FileModel)
+    fun onFileLongClick(file: FileDataModel)
 
     /**
      * to select the item if the item is unselected or
      * to unselect the item if the item is selected
      */
-    fun selectOrUnSelectItem(file: FileModel)
+    fun selectOrUnSelectItem(file: FileDataModel)
 
     /**
      * select all the items in the supPresenter view
@@ -54,7 +54,7 @@ interface SupPresenter {
     /**
      * return all the selected items in the supPresenter view
      */
-    fun getSelectedItems():List<FileModel>
+    fun getSelectedItems():List<FileDataModel>
 
     /**
      * return the number of selected items

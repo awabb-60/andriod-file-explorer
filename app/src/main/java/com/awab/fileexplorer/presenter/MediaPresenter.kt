@@ -8,16 +8,18 @@ import android.widget.Toast
 import androidx.core.net.toUri
 import com.awab.fileexplorer.R
 import com.awab.fileexplorer.model.RecentFiles
-import com.awab.fileexplorer.model.data_models.MediaItemModel
-import com.awab.fileexplorer.model.data_models.SelectedItemsDetailsModel
-import com.awab.fileexplorer.model.types.MediaCategory
-import com.awab.fileexplorer.model.types.MimeType
-import com.awab.fileexplorer.model.utils.*
+import com.awab.fileexplorer.model.utils.getMime
+import com.awab.fileexplorer.model.utils.getSize
 import com.awab.fileexplorer.presenter.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.presenter.contract.MediaPresenterContract
-import com.awab.fileexplorer.presenter.threads.SelectedMediaDetailsAsyncTask
-import com.awab.fileexplorer.view.contract.MediaView
 import com.awab.fileexplorer.presenter.threads.MediaLoaderAsyncTask
+import com.awab.fileexplorer.presenter.threads.SelectedMediaDetailsAsyncTask
+import com.awab.fileexplorer.utils.*
+import com.awab.fileexplorer.utils.data.data_models.MediaItemDataModel
+import com.awab.fileexplorer.utils.data.data_models.SelectedItemsDetailsDataModel
+import com.awab.fileexplorer.utils.data.types.MediaCategory
+import com.awab.fileexplorer.utils.data.types.MimeType
+import com.awab.fileexplorer.view.contract.MediaView
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -25,7 +27,7 @@ import java.util.*
 class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
     private val TAG = "MediaPresenter"
 
-    var mediaItemsList = listOf<MediaItemModel>()
+    var mediaItemsList = listOf<MediaItemDataModel>()
 
     override var actionModeOn: Boolean = false
 
@@ -65,7 +67,7 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
         }
     }
 
-    override fun getOpenFileIntent(file: MediaItemModel): Intent {
+    override fun getOpenFileIntent(file: MediaItemDataModel): Intent {
         RecentFiles.recentFilesList.add(file.path)
 
         return Intent(Intent.ACTION_VIEW).apply {
@@ -74,7 +76,7 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
         }
     }
 
-    override fun mediaItemClicked(item: MediaItemModel) {
+    override fun mediaItemClicked(item: MediaItemDataModel) {
 //        selecting unselecting the item
         if (actionModeOn) {
             processClick(item)
@@ -92,7 +94,7 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
         view.openFile(getOpenFileIntent(item))
     }
 
-    override fun mediaItemLongClicked(item: MediaItemModel) {
+    override fun mediaItemLongClicked(item: MediaItemDataModel) {
         // long click a selected item do nothing
         if (item.selected)
             return
@@ -106,7 +108,7 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
         view.startActionMode()
     }
 
-    override fun processClick(item: MediaItemModel) {
+    override fun processClick(item: MediaItemDataModel) {
         view.mediaAdapter.selectOrUnselectItem(item)
         view.updateActionMode()
 
@@ -165,8 +167,8 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
             else -> {
                 // loading large items in background thread
                 view.loadingDialog.show()
-                SelectedMediaDetailsAsyncTask(object : SimpleSuccessAndFailureCallback<SelectedItemsDetailsModel> {
-                    override fun onSuccess(data: SelectedItemsDetailsModel) {
+                SelectedMediaDetailsAsyncTask(object : SimpleSuccessAndFailureCallback<SelectedItemsDetailsDataModel> {
+                    override fun onSuccess(data: SelectedItemsDetailsDataModel) {
                         view.showDetails(data.contains, data.totalSize)
                         view.loadingDialog.dismiss()
                     }
@@ -211,8 +213,8 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
             "${MediaStore.MediaColumns.DATE_MODIFIED} DESC", null
         )
         //  this is the querying work.. will be done in a worker thread
-        val work: (Unit) -> List<MediaItemModel> = {
-            val list = mutableListOf<MediaItemModel>()
+        val work: (Unit) -> List<MediaItemDataModel> = {
+            val list = mutableListOf<MediaItemDataModel>()
 
             query?.let { query ->
                 query.use { cursor ->
@@ -228,7 +230,7 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
 
                             val file = File(path)
                             list.add(
-                                MediaItemModel(
+                                MediaItemDataModel(
                                     name, path,
                                     getSize(size.toLong()),
                                     getMime(file),
@@ -245,8 +247,8 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
 
         // the worker thread that will handle the work and then notify the ui with the work results
         // with the callback
-        MediaLoaderAsyncTask(work, object : SimpleSuccessAndFailureCallback<List<MediaItemModel>> {
-            override fun onSuccess(data: List<MediaItemModel>) {
+        MediaLoaderAsyncTask(work, object : SimpleSuccessAndFailureCallback<List<MediaItemDataModel>> {
+            override fun onSuccess(data: List<MediaItemDataModel>) {
                 mediaItemsList = if (!showHiddenFiles()) // filtering the hidden files
                     data.filter { !it.name.startsWith('.') }
                 else

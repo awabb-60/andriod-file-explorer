@@ -5,13 +5,15 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.awab.fileexplorer.adapters.StoragesAdapter
 import com.awab.fileexplorer.databinding.ActivityHomeBinding
-import com.awab.fileexplorer.model.data_models.StorageModel
-import com.awab.fileexplorer.model.utils.storageAccess
 import com.awab.fileexplorer.presenter.HomePresenter
 import com.awab.fileexplorer.presenter.contract.HomePresenterContract
+import com.awab.fileexplorer.utils.adapters.RecentFilesAdapter
+import com.awab.fileexplorer.utils.adapters.StoragesAdapter
+import com.awab.fileexplorer.utils.data.data_models.StorageDataModel
+import com.awab.fileexplorer.utils.storageAccess
 import com.awab.fileexplorer.view.contract.HomeView
 
 class HomeActivity : AppCompatActivity(), HomeView {
@@ -41,18 +43,18 @@ class HomeActivity : AppCompatActivity(), HomeView {
         binding.rvStorages.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         binding.rvStorages.setHasFixedSize(true)
 
+        binding.rvRecentFiles.adapter = RecentFilesAdapter(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 0))
+        binding.rvRecentFiles.layoutManager = GridLayoutManager(this, 3)
+        binding.rvRecentFiles.setHasFixedSize(true)
+
         // setting click listeners for the media items
-        binding.btnMediaImages.setOnClickListener {
-            mHomePresenter.mediaItemClicked(it.id)
-        }
-        binding.btnMediaVideo.setOnClickListener {
-            mHomePresenter.mediaItemClicked(it.id)
-        }
-        binding.btnMediaAudio.setOnClickListener {
-            mHomePresenter.mediaItemClicked(it.id)
-        }
-        binding.btnMediaDocs.setOnClickListener {
-            mHomePresenter.mediaItemClicked(it.id)
+
+        binding.apply {
+            listOf(btnMediaImages, btnMediaVideo, btnMediaAudio, btnMediaDocs).forEach {mediaButton->
+                mediaButton.setOnClickListener {
+                    mHomePresenter.mediaItemClicked(mediaButton.id)
+                }
+            }
         }
     }
 
@@ -75,7 +77,7 @@ class HomeActivity : AppCompatActivity(), HomeView {
         startActivity(intent)
     }
 
-    override fun updateStoragesList(storages: Array<StorageModel>) {
+    override fun updateStoragesList(storages: Array<StorageDataModel>) {
         mStorageAdapter.set(storages)
     }
 }
