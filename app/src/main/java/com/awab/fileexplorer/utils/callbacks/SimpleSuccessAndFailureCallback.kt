@@ -1,4 +1,4 @@
-package com.awab.fileexplorer.presenter.callbacks
+package com.awab.fileexplorer.utils.callbacks
 
 /**
  * this used to get the data from the worker tasks

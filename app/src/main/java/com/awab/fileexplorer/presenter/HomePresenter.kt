@@ -2,11 +2,16 @@ package com.awab.fileexplorer.presenter
 
 import android.content.Intent
 import android.os.Parcelable
+import android.util.Log
 import androidx.core.content.ContextCompat
 import com.awab.fileexplorer.R
+import com.awab.fileexplorer.model.MainStorageModel
 import com.awab.fileexplorer.model.utils.getSize
+import com.awab.fileexplorer.model.utils.makeFileModels
 import com.awab.fileexplorer.presenter.contract.HomePresenterContract
 import com.awab.fileexplorer.utils.*
+import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
+import com.awab.fileexplorer.utils.data.data_models.PinedFileDataModel
 import com.awab.fileexplorer.utils.data.data_models.StorageDataModel
 import com.awab.fileexplorer.utils.data.types.MediaCategory
 import com.awab.fileexplorer.utils.data.types.StorageType
@@ -15,15 +20,16 @@ import com.awab.fileexplorer.view.StorageActivity
 import com.awab.fileexplorer.view.contract.HomeView
 import java.io.File
 
-
 class HomePresenter(override val view: HomeView): HomePresenterContract {
 
-    private  val TAG = "HomePresenter"
+    private val TAG = "HomePresenter"
 
     private val storages = ArrayList<Parcelable>()
 
+    override val model = MainStorageModel(view.context())
+
     override fun openStorage(it: StorageDataModel) {
-        if (!allPermissionsGranted(view.context(), INTERNAL_STORAGE_REQUIRED_PERMISSIONS)){
+        if (!allPermissionsGranted(view.context(), INTERNAL_STORAGE_REQUIRED_PERMISSIONS)) {
             view.checkForPermissions()
             return
         }
@@ -62,7 +68,7 @@ class HomePresenter(override val view: HomeView): HomePresenterContract {
         view.openActivity(mediaIntent)
     }
 
-    override fun makeStoragesModels(){
+    override fun loadStorages() {
         val storagesPaths = ContextCompat.getExternalFilesDirs(view.context(), null)
 
         // this only get the storage path of the internal storage and sd Card
@@ -95,13 +101,30 @@ class HomePresenter(override val view: HomeView): HomePresenterContract {
             val freeSize = getSize(file.freeSpace)
             val totalSize = getSize(file.totalSpace)
             val displaySize = "$freeSize free of $totalSize"
-             StorageDataModel(name = name,
+            StorageDataModel(
+                name = name,
                 size = displaySize,
                 freeSizeBytes = file.freeSpace,
                 totalSizeBytes = file.totalSpace,
                 path = file.absolutePath,
                 storageType = type
             )
-        }catch (e: Exception){null}
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    override fun loadPinedFiles() {
+        model.getPinedFiles(object : SimpleSuccessAndFailureCallback<List<PinedFileDataModel>> {
+            override fun onSuccess(data: List<PinedFileDataModel>) {
+                val files = data.map { File(it.path) }
+                view.updatePinedFilesList(makeFileModels(files))
+            }
+
+            override fun onFailure(message: String) {
+                view.updatePinedFilesList(listOf())
+                Log.d(TAG, "onFailure: no pined files")
+            }
+        })
     }
 }

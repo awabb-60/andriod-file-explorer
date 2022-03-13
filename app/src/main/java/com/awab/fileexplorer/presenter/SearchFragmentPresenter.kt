@@ -3,12 +3,12 @@ package com.awab.fileexplorer.presenter
 import android.content.Context.MODE_PRIVATE
 import android.widget.Toast
 import com.awab.fileexplorer.model.utils.getSearchResults
-import com.awab.fileexplorer.presenter.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.presenter.contract.SearchPresenterContract
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 import com.awab.fileexplorer.presenter.threads.SearchListAsyncTask
 import com.awab.fileexplorer.utils.SHARED_PREFERENCES_SHOW_HIDDEN_FILES
 import com.awab.fileexplorer.utils.VIEW_SETTINGS_SHARED_PREFERENCES
+import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 import com.awab.fileexplorer.view.contract.ISearchFragmentView
 

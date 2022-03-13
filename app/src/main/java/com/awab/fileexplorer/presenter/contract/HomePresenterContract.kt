@@ -1,5 +1,6 @@
 package com.awab.fileexplorer.presenter.contract
 
+import com.awab.fileexplorer.model.contrancts.StorageModel
 import com.awab.fileexplorer.utils.data.data_models.StorageDataModel
 import com.awab.fileexplorer.view.contract.HomeView
 
@@ -9,6 +10,8 @@ interface HomePresenterContract {
      * this presenter view
      */
     val view: HomeView
+
+    val model: StorageModel
 
     /**
      * open the storage in a new activity
@@ -23,5 +26,10 @@ interface HomePresenterContract {
     /**
      * make storage models for the available storages in the device
      */
-    fun makeStoragesModels()
+    fun loadStorages()
+
+    /**
+     * returns the pined files from the database
+     */
+    fun loadPinedFiles()
 }

@@ -2,16 +2,16 @@ package com.awab.fileexplorer.presenter.threads
 
 import android.os.AsyncTask
 import android.util.Log
-import com.awab.fileexplorer.presenter.callbacks.SimpleSuccessAndFailureCallback
-import com.awab.fileexplorer.utils.data.data_models.MediaItemDataModel
+import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
+import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 
 class MediaLoaderAsyncTask(
-    private val work: (Unit) -> List<MediaItemDataModel>,
-    private val callback: SimpleSuccessAndFailureCallback<List<MediaItemDataModel>>
+    private val work: (Unit) -> List<FileDataModel>,
+    private val callback: SimpleSuccessAndFailureCallback<List<FileDataModel>>
 ) :
-    AsyncTask<Unit, Unit, (List<MediaItemDataModel>)>() {
+    AsyncTask<Unit, Unit, (List<FileDataModel>)>() {
 
-    override fun doInBackground(vararg params: Unit?): List<MediaItemDataModel> {
+    override fun doInBackground(vararg params: Unit?): List<FileDataModel> {
         return try {
             //  loading the media files
             work.invoke(Unit)
@@ -21,10 +21,10 @@ class MediaLoaderAsyncTask(
         }
     }
 
-    override fun onPostExecute(result: List<MediaItemDataModel>) {
+    override fun onPostExecute(result: List<FileDataModel>) {
         if (result.isNotEmpty()) {
             callback.onSuccess(result)
-        }else
+        } else
             callback.onFailure("unable to load media")
         super.onPostExecute(result)
     }

@@ -1,7 +1,7 @@
 package com.awab.fileexplorer.presenter.contract
 
 import android.content.Intent
-import com.awab.fileexplorer.utils.data.data_models.MediaItemDataModel
+import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 import com.awab.fileexplorer.view.contract.MediaView
 
 interface MediaPresenterContract {
@@ -18,23 +18,23 @@ interface MediaPresenterContract {
     /**
      * call when an item is clicked
      */
-    fun mediaItemClicked(item: MediaItemDataModel)
+    fun mediaItemClicked(item: FileDataModel)
 
     /**
      * call when an item is long clicked
      */
-    fun mediaItemLongClicked(item: MediaItemDataModel)
+    fun mediaItemLongClicked(item: FileDataModel)
 
     /**
      * this called while the action mode is on.. to determine what should happened
      * select or un select the item or to stop the action mode if no item is selected
      */
-    fun processClick(item: MediaItemDataModel)
+    fun processClick(item: FileDataModel)
 
     /**
      * the an intent with ACTION_VIEW and the data and type of file
      */
-    fun getOpenFileIntent(file: MediaItemDataModel): Intent
+    fun getOpenFileIntent(file: FileDataModel): Intent
 
     /**
      * this return the title that will show how many items are selected

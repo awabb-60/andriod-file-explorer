@@ -9,14 +9,13 @@ import android.widget.Toast
 import androidx.documentfile.provider.DocumentFile
 import com.awab.fileexplorer.R
 import com.awab.fileexplorer.databinding.PickViewSettingsLayoutBinding
-import com.awab.fileexplorer.model.RecentFiles
 import com.awab.fileexplorer.model.contrancts.StorageModel
 import com.awab.fileexplorer.model.utils.getFolderSizeBytes
 import com.awab.fileexplorer.model.utils.getSize
 import com.awab.fileexplorer.presenter.SdCardPresenterSAF
-import com.awab.fileexplorer.presenter.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.presenter.threads.SelectedFilesDetailsAsyncTask
 import com.awab.fileexplorer.utils.*
+import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 import com.awab.fileexplorer.utils.data.data_models.SelectedItemsDetailsDataModel
 import com.awab.fileexplorer.utils.data.data_models.StorageDataModel
@@ -334,7 +333,6 @@ interface StoragePresenterContract {
      * @return an intent with ACTION_VIEW and has the data and type of the given file
      */
     fun getOpenFileIntent(file: FileDataModel): Intent {
-        RecentFiles.recentFilesList.add(file.path)
         if (file.mimeType == MimeType.APPLICATION) {
             return Intent(Intent.ACTION_VIEW).apply {
                 setDataAndType(file.uri, file.mimeType.mimeString)
@@ -500,5 +498,9 @@ interface StoragePresenterContract {
         val chooserIntent =
             Intent.createChooser(intent, view.context().getString(R.string.open_with_chooser_title))
         view.openFile(chooserIntent)
+    }
+
+    fun pinFile() {
+        model.saveToPinedFiles(supPresenter.getSelectedItems())
     }
 }

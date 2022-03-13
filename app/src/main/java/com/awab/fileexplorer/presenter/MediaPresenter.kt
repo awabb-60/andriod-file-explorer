@@ -5,17 +5,15 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.MediaStore
 import android.widget.Toast
-import androidx.core.net.toUri
 import com.awab.fileexplorer.R
-import com.awab.fileexplorer.model.RecentFiles
-import com.awab.fileexplorer.model.utils.getMime
 import com.awab.fileexplorer.model.utils.getSize
-import com.awab.fileexplorer.presenter.callbacks.SimpleSuccessAndFailureCallback
+import com.awab.fileexplorer.model.utils.makeFileModel
 import com.awab.fileexplorer.presenter.contract.MediaPresenterContract
 import com.awab.fileexplorer.presenter.threads.MediaLoaderAsyncTask
 import com.awab.fileexplorer.presenter.threads.SelectedMediaDetailsAsyncTask
 import com.awab.fileexplorer.utils.*
-import com.awab.fileexplorer.utils.data.data_models.MediaItemDataModel
+import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
+import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 import com.awab.fileexplorer.utils.data.data_models.SelectedItemsDetailsDataModel
 import com.awab.fileexplorer.utils.data.types.MediaCategory
 import com.awab.fileexplorer.utils.data.types.MimeType
@@ -27,7 +25,7 @@ import java.util.*
 class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
     private val TAG = "MediaPresenter"
 
-    var mediaItemsList = listOf<MediaItemDataModel>()
+    var mediaItemsList = listOf<FileDataModel>()
 
     override var actionModeOn: Boolean = false
 
@@ -67,16 +65,14 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
         }
     }
 
-    override fun getOpenFileIntent(file: MediaItemDataModel): Intent {
-        RecentFiles.recentFilesList.add(file.path)
-
+    override fun getOpenFileIntent(file: FileDataModel): Intent {
         return Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(file.uri, file.type.mimeString)
+            setDataAndType(file.uri, file.mimeType.mimeString)
             flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
         }
     }
 
-    override fun mediaItemClicked(item: MediaItemDataModel) {
+    override fun mediaItemClicked(item: FileDataModel) {
 //        selecting unselecting the item
         if (actionModeOn) {
             processClick(item)
@@ -86,7 +82,7 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
 //        opining the item
 
 //        file cant be opened
-        if (item.type == MimeType.UNKNOWN) {
+        if (item.mimeType == MimeType.UNKNOWN) {
             Toast.makeText(view.context(), "unsupported file format", Toast.LENGTH_SHORT).show()
             return
         }
@@ -94,7 +90,7 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
         view.openFile(getOpenFileIntent(item))
     }
 
-    override fun mediaItemLongClicked(item: MediaItemDataModel) {
+    override fun mediaItemLongClicked(item: FileDataModel) {
         // long click a selected item do nothing
         if (item.selected)
             return
@@ -108,7 +104,7 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
         view.startActionMode()
     }
 
-    override fun processClick(item: MediaItemDataModel) {
+    override fun processClick(item: FileDataModel) {
         view.mediaAdapter.selectOrUnselectItem(item)
         view.updateActionMode()
 
@@ -213,30 +209,18 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
             "${MediaStore.MediaColumns.DATE_MODIFIED} DESC", null
         )
         //  this is the querying work.. will be done in a worker thread
-        val work: (Unit) -> List<MediaItemDataModel> = {
-            val list = mutableListOf<MediaItemDataModel>()
+        val work: (Unit) -> List<FileDataModel> = {
+            val list = mutableListOf<FileDataModel>()
 
             query?.let { query ->
                 query.use { cursor ->
-                    val nameId = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DISPLAY_NAME)
                     val pathId = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA)
-                    val sizeId = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.SIZE)
 
                     while (cursor.moveToNext()) {
                         try {
-                            val name = cursor.getString(nameId)
                             val path = cursor.getString(pathId)
-                            val size = cursor.getString(sizeId)
 
-                            val file = File(path)
-                            list.add(
-                                MediaItemDataModel(
-                                    name, path,
-                                    getSize(size.toLong()),
-                                    getMime(file),
-                                    file.toUri()
-                                )
-                            )
+                            list.add(makeFileModel(File(path)))
                         } catch (e: Exception) {
                         }
                     }
@@ -247,8 +231,8 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
 
         // the worker thread that will handle the work and then notify the ui with the work results
         // with the callback
-        MediaLoaderAsyncTask(work, object : SimpleSuccessAndFailureCallback<List<MediaItemDataModel>> {
-            override fun onSuccess(data: List<MediaItemDataModel>) {
+        MediaLoaderAsyncTask(work, object : SimpleSuccessAndFailureCallback<List<FileDataModel>> {
+            override fun onSuccess(data: List<FileDataModel>) {
                 mediaItemsList = if (!showHiddenFiles()) // filtering the hidden files
                     data.filter { !it.name.startsWith('.') }
                 else

@@ -18,21 +18,27 @@ class StorageActionModeCallBack(private val presenterContract: StoragePresenterC
             onDestroyActionMode(mode)
             return false
         }
+
         mode?.title = presenterContract.getActionModeTitle()
-        menu?.findItem(R.id.miRename)?.isVisible = presenterContract.showMIRename()
+
+        val oneItemSelected = presenterContract.showMIRename()
+        menu?.findItem(R.id.miRename)?.isVisible = oneItemSelected
+        menu?.findItem(R.id.miPin)?.isVisible = oneItemSelected
+
         menu?.findItem(R.id.miOpenWith)?.isVisible = presenterContract.showMIOpenWith()
         return true
     }
 
     override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
-        when(item?.itemId){
-            R.id.miDelete-> presenterContract.confirmDelete()
-            R.id.miMove-> presenterContract.pickTransferLocation(TransferAction.MOVE)
-            R.id.miCopy-> presenterContract.pickTransferLocation(TransferAction.COPY)
-            R.id.miRename-> presenterContract.confirmRename()
-            R.id.miOpenWith-> presenterContract.openWith()
-            R.id.miDetails-> presenterContract.showDetails()
-            R.id.miSelectAll-> presenterContract.selectAll()
+        when (item?.itemId) {
+            R.id.miDelete -> presenterContract.confirmDelete()
+            R.id.miMove -> presenterContract.pickTransferLocation(TransferAction.MOVE)
+            R.id.miCopy -> presenterContract.pickTransferLocation(TransferAction.COPY)
+            R.id.miRename -> presenterContract.confirmRename()
+            R.id.miPin -> presenterContract.pinFile()
+            R.id.miOpenWith -> presenterContract.openWith()
+            R.id.miDetails -> presenterContract.showDetails()
+            R.id.miSelectAll -> presenterContract.selectAll()
         }
         return false
     }

@@ -4,7 +4,7 @@ import android.content.ContentResolver
 import android.os.AsyncTask
 import android.provider.MediaStore
 import com.awab.fileexplorer.model.utils.makeFileModels
-import com.awab.fileexplorer.presenter.callbacks.SimpleSuccessAndFailureCallback
+import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 import java.io.File
 

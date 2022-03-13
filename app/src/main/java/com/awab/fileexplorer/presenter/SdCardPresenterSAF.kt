@@ -8,13 +8,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.documentfile.provider.DocumentFile
 import com.awab.fileexplorer.model.MainStorageModel
 import com.awab.fileexplorer.model.utils.navigateToTreeFile
-import com.awab.fileexplorer.presenter.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 import com.awab.fileexplorer.presenter.contract.SupPresenter
 import com.awab.fileexplorer.presenter.threads.DeleteFromSdCardAsyncTask
 import com.awab.fileexplorer.utils.PICKER_REQUEST_CODE
 import com.awab.fileexplorer.utils.SD_CARD_TREE_URI_SP
 import com.awab.fileexplorer.utils.TREE_URI_
+import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.view.contract.StorageView
 import java.io.File
 

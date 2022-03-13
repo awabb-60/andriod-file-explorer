@@ -24,7 +24,7 @@ class StoragesAdapter(val onClick:(StorageDataModel) -> Unit) : RecyclerView.Ada
 
 
     @SuppressLint("NotifyDataSetChanged")
-    fun set(list: Array<StorageDataModel>){
+    fun submitList(list: Array<StorageDataModel>) {
         this.list = list
         notifyDataSetChanged()
     }

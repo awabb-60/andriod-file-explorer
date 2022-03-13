@@ -10,14 +10,14 @@ import com.awab.fileexplorer.R
 import com.awab.fileexplorer.databinding.FileItemBinding
 import com.awab.fileexplorer.presenter.contract.MediaPresenterContract
 import com.awab.fileexplorer.utils.bindFileItem
-import com.awab.fileexplorer.utils.data.data_models.MediaItemDataModel
+import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 import com.awab.fileexplorer.utils.getSpannableColoredString
 
 class MediaAdapter(val context: Context, val mediaPresenter: MediaPresenterContract) : RecyclerView.Adapter<MediaAdapter.ViewHolder>() {
 
     var searchText = ""
 
-    var currentList = listOf<MediaItemDataModel>()
+    var currentList = listOf<FileDataModel>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = FileItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -29,12 +29,12 @@ class MediaAdapter(val context: Context, val mediaPresenter: MediaPresenterContr
     override fun getItemCount(): Int = currentList.size
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setList(list: List<MediaItemDataModel>) {
+    fun setList(list: List<FileDataModel>) {
         this.currentList = list
         notifyDataSetChanged()
     }
 
-    fun selectOrUnselectItem(item: MediaItemDataModel) {
+    fun selectOrUnselectItem(item: FileDataModel) {
         for (i in currentList) {
             if (i == item) {
                 i.selected = !i.selected
@@ -44,7 +44,7 @@ class MediaAdapter(val context: Context, val mediaPresenter: MediaPresenterContr
         }
     }
 
-    fun getSelectedItems(): List<MediaItemDataModel> {
+    fun getSelectedItems(): List<FileDataModel> {
         return currentList.filter { it.selected }
     }
 
@@ -81,11 +81,13 @@ class MediaAdapter(val context: Context, val mediaPresenter: MediaPresenterContr
             }
         }
 
-        fun bind(item: MediaItemDataModel) {
+        fun bind(item: FileDataModel) {
             bindFileItem(context, item, binding, mediaPresenter.actionModeOn)
-            if (searchText.isNotEmpty()){
-                binding.tvFileName.text = getSpannableColoredString(context,
-                    binding.tvFileName.text.toString(),searchText, R.color.search_Text_color)
+            if (searchText.isNotEmpty()) {
+                binding.tvFileName.text = getSpannableColoredString(
+                    context,
+                    binding.tvFileName.text.toString(), searchText, R.color.search_Text_color
+                )
             }
         }
     }

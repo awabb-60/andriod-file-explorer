@@ -7,20 +7,23 @@
     android:layout_gravity="center">
 
     <ImageView
-        android:id="@+id/tvRecentFileImage"
+        android:id="@+id/tvPinedFileImage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@drawable/test"
+        android:contentDescription="@string/pined_file_image_description"
+        android:scaleType="centerInside"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/test" />
 
     <TextView
-        android:id="@+id/tvRecentFileName"
+        android:id="@+id/tvPinedFileName"
         android:layout_width="0dp"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
         android:layout_marginEnd="5dp"

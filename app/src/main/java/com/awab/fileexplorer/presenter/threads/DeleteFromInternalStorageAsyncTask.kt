@@ -3,7 +3,7 @@ package com.awab.fileexplorer.presenter.threads
 import android.os.AsyncTask
 import com.awab.fileexplorer.model.utils.deleteFileIO
 import com.awab.fileexplorer.model.utils.deleteFolderIO
-import com.awab.fileexplorer.presenter.callbacks.SimpleSuccessAndFailureCallback
+import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 import com.awab.fileexplorer.utils.data.types.FileType
 

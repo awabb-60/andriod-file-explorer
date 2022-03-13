@@ -2,6 +2,7 @@ package com.awab.fileexplorer.view.contract
 
 import android.content.Context
 import android.content.Intent
+import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 import com.awab.fileexplorer.utils.data.data_models.StorageDataModel
 
 interface HomeView {
@@ -25,4 +26,6 @@ interface HomeView {
      * put and update the storages items
      */
     fun updateStoragesList(storages: Array<StorageDataModel>)
+
+    fun updatePinedFilesList(list: List<FileDataModel>)
 }

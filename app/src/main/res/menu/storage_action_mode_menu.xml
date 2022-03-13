@@ -28,6 +28,11 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/miPin"
+        android:title="@string/mi_pin"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/miDetails"
         android:title="@string/miDetails"
         app:showAsAction="never" />

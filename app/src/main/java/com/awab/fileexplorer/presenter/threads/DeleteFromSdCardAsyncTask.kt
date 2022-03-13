@@ -2,7 +2,7 @@ package com.awab.fileexplorer.presenter.threads
 
 import android.os.AsyncTask
 import androidx.documentfile.provider.DocumentFile
-import com.awab.fileexplorer.presenter.callbacks.SimpleSuccessAndFailureCallback
+import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 
 /**

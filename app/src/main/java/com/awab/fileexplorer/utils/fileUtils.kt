@@ -93,6 +93,20 @@ fun makeFileModels(listFiles: List<File>, showHiddenFiles: Boolean = false): Lis
         )
     }
 
+fun makeFileModel(file: File, showHiddenFiles: Boolean = false): FileDataModel {
+    return FileDataModel(
+        name = file.name,
+        path = file.absolutePath,
+        size = getSize(file.length()),
+        date = Date(file.lastModified()),
+        type = getFileType(file),
+        mimeType = getMime(file),
+        uri = file.toUri(),
+        isEmpty = isEmpty(file, showHiddenFiles)
+    )
+
+}
+
 fun getSize(sizeInBytes: Long): String {
     var size = sizeInBytes.div(1024.0)
     var ex = "KB"
