@@ -6,22 +6,21 @@
     android:layout_height="match_parent"
     tools:context=".view.HomeActivity">
 
-
-    <TextView
-        android:id="@+id/tvRecentFilesTitle"
+    <com.awab.fileexplorer.view.custom_views.TapsLayout
+        android:id="@+id/tapsLayout"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:text="@string/pined_files_title"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        app:layout_constraintBottom_toTopOf="@id/pinedFilesCard"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="@+id/pinedFilesCard"
+        app:layout_constraintStart_toStartOf="parent"
+        app:tap_background_drawable="@drawable/selected_tap_background"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/pinedFilesCard"
+        android:id="@+id/quickAccessFilesCard"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:layout_margin="10dp"
@@ -29,13 +28,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvRecentFilesTitle">
+        app:layout_constraintTop_toBottomOf="@id/tapsLayout">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvRecentFiles"
+            android:id="@+id/rvQuickAccess"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:listitem="@layout/pined_file_layout" />
+            tools:listitem="@layout/quick_access_file_layout" />
 
     </androidx.cardview.widget.CardView>
 
@@ -49,7 +48,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pinedFilesCard">
+        app:layout_constraintTop_toBottomOf="@+id/quickAccessFilesCard">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvStorages"

@@ -27,5 +27,7 @@ interface HomeView {
      */
     fun updateStoragesList(storages: Array<StorageDataModel>)
 
-    fun updatePinedFilesList(list: List<FileDataModel>)
+    fun updateQuickAccessFilesList(list: List<FileDataModel>)
+
+    fun setPinedFilesCardHeight(cardHeight: Int)
 }

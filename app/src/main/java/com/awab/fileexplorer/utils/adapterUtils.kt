@@ -12,7 +12,7 @@ import android.widget.ImageView.ScaleType.CENTER_INSIDE
 import androidx.core.content.ContextCompat
 import com.awab.fileexplorer.R
 import com.awab.fileexplorer.databinding.FileItemBinding
-import com.awab.fileexplorer.databinding.PinedFileLayoutBinding
+import com.awab.fileexplorer.databinding.QuickAccessFileLayoutBinding
 import com.awab.fileexplorer.utils.data.data_models.AlbumCoverDataModel
 import com.awab.fileexplorer.utils.data.data_models.AppIconDataModel
 import com.awab.fileexplorer.utils.data.data_models.FileDataModel
@@ -47,7 +47,7 @@ fun bindFileItem(context: Context, item: FileDataModel, binding: FileItemBinding
     else View.GONE
 }
 
-fun bindFileItem(context: Context, item: FileDataModel, binding: PinedFileLayoutBinding) {
+fun bindFileItem(context: Context, item: FileDataModel, binding: QuickAccessFileLayoutBinding) {
     binding.tvPinedFileName.text = item.name
     loadFileImage(context, item, binding.tvPinedFileImage)
 }

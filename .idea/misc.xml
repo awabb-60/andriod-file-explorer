@@ -7,6 +7,7 @@
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/circuler_shape.xml" value="0.17175925925925925" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/dialog_background.xml" value="0.20989583333333334" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/done_background.xml" value="0.20989583333333334" />
+        <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/home_card_background.xml" value="0.20462962962962963" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/ic_arrow_up.xml" value="0.18744588744588744" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/ic_baseline_insert_drive_file_24.xml" value="0.2064814814814815" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/ic_chevron_left.xml" value="0.22552083333333334" />
@@ -35,6 +36,7 @@
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/media_button_background.xml" value="0.1899122807017544" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/search_filed_background.xml" value="0.18744588744588744" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/selected_loaction_tap_background.xml" value="0.1899122807017544" />
+        <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/selected_tap_background.xml" value="0.22552083333333334" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout-v31/item_file.xml" value="0.209375" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/activity_home.xml" value="0.25" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/activity_main.xml" value="0.209375" />
@@ -64,12 +66,13 @@
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/pick_storage.xml" value="0.25" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/pick_view_settings_layout.xml" value="0.1763157894736842" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/pick_view_type_layout.xml" value="0.22" />
-        <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/pined_file_layout.xml" value="0.19375" />
+        <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/pined_file_layout.xml" value="0.33" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/progress_dialog_layout.xml" value="0.18611111111111112" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/recent_file_item.xml" value="0.1" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/recent_file_layout.xml" value="0.1763157894736842" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/snack_bar_layout.xml" value="0.33" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/storage_item.xml" value="0.33" />
+        <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/taps_layout.xml" value="0.209375" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/menu-v26/main_meun.xml" value="0.19375" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/menu/action_mode_menu.xml" value="0.18611111111111112" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/menu/main_menu.xml" value="0.33" />

@@ -10,25 +10,25 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.awab.fileexplorer.databinding.ActivityHomeBinding
 import com.awab.fileexplorer.presenter.HomePresenter
 import com.awab.fileexplorer.presenter.contract.HomePresenterContract
-import com.awab.fileexplorer.utils.adapters.PinedFilesAdapter
+import com.awab.fileexplorer.utils.adapters.QuickAccessAdapter
 import com.awab.fileexplorer.utils.adapters.StoragesAdapter
 import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 import com.awab.fileexplorer.utils.data.data_models.StorageDataModel
 import com.awab.fileexplorer.utils.storageAccess
 import com.awab.fileexplorer.view.contract.HomeView
+import com.awab.fileexplorer.view.custom_views.Tap
 
 class HomeActivity : AppCompatActivity(), HomeView {
 
     private lateinit var binding: ActivityHomeBinding
     private lateinit var mHomePresenter: HomePresenterContract
     private lateinit var mStorageAdapter: StoragesAdapter
-    private lateinit var mPinedFilesAdapter: PinedFilesAdapter
+    private lateinit var mQuickAccessFilesAdapter: QuickAccessAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
 
         mHomePresenter = HomePresenter(this)
 
@@ -39,11 +39,17 @@ class HomeActivity : AppCompatActivity(), HomeView {
             mHomePresenter.loadPinedFiles()
         }
 
+        val pinedFilesTap = Tap("Pined Files") { mHomePresenter.loadPinedFiles() }
+        binding.tapsLayout.addTap(pinedFilesTap)
+
+        val recentFilesTap = Tap("Recent Files") { mHomePresenter.loadRecentFiles() }
+        binding.tapsLayout.addTap(recentFilesTap)
+
         // make the pined files adapter
-        mPinedFilesAdapter = PinedFilesAdapter(this)
-        binding.rvRecentFiles.adapter = mPinedFilesAdapter
-        binding.rvRecentFiles.layoutManager = GridLayoutManager(this, PinedFilesAdapter.PER_ROW)
-        binding.rvRecentFiles.setHasFixedSize(true)
+        mQuickAccessFilesAdapter = QuickAccessAdapter(this, mHomePresenter)
+        binding.rvQuickAccess.adapter = mQuickAccessFilesAdapter
+        binding.rvQuickAccess.layoutManager = GridLayoutManager(this, QuickAccessAdapter.PER_ROW)
+        binding.rvQuickAccess.setHasFixedSize(true)
 
         // make the storage adapter
         mStorageAdapter = StoragesAdapter {
@@ -73,6 +79,10 @@ class HomeActivity : AppCompatActivity(), HomeView {
         mHomePresenter.loadPinedFiles()
     }
 
+    override fun setPinedFilesCardHeight(cardHeight: Int) {
+        binding.quickAccessFilesCard.layoutParams.height = cardHeight
+    }
+
     override fun checkForPermissions() {
         storageAccess(this)
     }
@@ -89,7 +99,7 @@ class HomeActivity : AppCompatActivity(), HomeView {
         mStorageAdapter.submitList(storages)
     }
 
-    override fun updatePinedFilesList(list: List<FileDataModel>) {
-        mPinedFilesAdapter.submitList(list)
+    override fun updateQuickAccessFilesList(list: List<FileDataModel>) {
+        mQuickAccessFilesAdapter.submitList(list)
     }
 }

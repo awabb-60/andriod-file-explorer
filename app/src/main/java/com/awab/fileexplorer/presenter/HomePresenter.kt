@@ -12,6 +12,7 @@ import com.awab.fileexplorer.presenter.contract.HomePresenterContract
 import com.awab.fileexplorer.utils.*
 import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.utils.data.data_models.PinedFileDataModel
+import com.awab.fileexplorer.utils.data.data_models.RecentFileDataModel
 import com.awab.fileexplorer.utils.data.data_models.StorageDataModel
 import com.awab.fileexplorer.utils.data.types.MediaCategory
 import com.awab.fileexplorer.utils.data.types.StorageType
@@ -68,6 +69,24 @@ class HomePresenter(override val view: HomeView): HomePresenterContract {
         view.openActivity(mediaIntent)
     }
 
+    private fun makeStorageModel(name: String, file: File, type: StorageType): StorageDataModel? {
+        return try {
+            val freeSize = getSize(file.freeSpace)
+            val totalSize = getSize(file.totalSpace)
+            val displaySize = "$freeSize free of $totalSize"
+            StorageDataModel(
+                name = name,
+                size = displaySize,
+                freeSizeBytes = file.freeSpace,
+                totalSizeBytes = file.totalSpace,
+                path = file.absolutePath,
+                storageType = type
+            )
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     override fun loadStorages() {
         val storagesPaths = ContextCompat.getExternalFilesDirs(view.context(), null)
 
@@ -96,35 +115,35 @@ class HomePresenter(override val view: HomeView): HomePresenterContract {
         view.updateStoragesList(this.storages.toArray(arrayOf<StorageDataModel>()))
     }
 
-    private fun makeStorageModel(name: String, file:File, type: StorageType): StorageDataModel? {
-        return try {
-            val freeSize = getSize(file.freeSpace)
-            val totalSize = getSize(file.totalSpace)
-            val displaySize = "$freeSize free of $totalSize"
-            StorageDataModel(
-                name = name,
-                size = displaySize,
-                freeSizeBytes = file.freeSpace,
-                totalSizeBytes = file.totalSpace,
-                path = file.absolutePath,
-                storageType = type
-            )
-        } catch (e: Exception) {
-            null
-        }
-    }
-
     override fun loadPinedFiles() {
         model.getPinedFiles(object : SimpleSuccessAndFailureCallback<List<PinedFileDataModel>> {
             override fun onSuccess(data: List<PinedFileDataModel>) {
                 val files = data.map { File(it.path) }
-                view.updatePinedFilesList(makeFileModels(files))
+                view.updateQuickAccessFilesList(makeFileModels(files))
             }
 
             override fun onFailure(message: String) {
-                view.updatePinedFilesList(listOf())
+                view.updateQuickAccessFilesList(listOf())
                 Log.d(TAG, "onFailure: no pined files")
             }
         })
+    }
+
+    override fun loadRecentFiles() {
+        model.getRecentFiles(object : SimpleSuccessAndFailureCallback<List<RecentFileDataModel>> {
+            override fun onSuccess(data: List<RecentFileDataModel>) {
+                val files = data.map { File(it.path) }
+                view.updateQuickAccessFilesList(makeFileModels(files))
+            }
+
+            override fun onFailure(message: String) {
+                view.updateQuickAccessFilesList(listOf())
+                Log.d(TAG, message)
+            }
+        })
+    }
+
+    override fun setQuickAccessFilesCardHeight(cardHeight: Int) {
+        view.setPinedFilesCardHeight(cardHeight)
     }
 }

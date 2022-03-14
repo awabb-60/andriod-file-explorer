@@ -297,6 +297,8 @@ interface StoragePresenterContract {
 
 //        opining the item
         if (file.type == FileType.FILE) {
+            // saving the file to the recent files
+            model.saveToRecentFiles(listOf(file))
 //            file cant be opened
             if (file.mimeType == MimeType.UNKNOWN) {
                 Toast.makeText(view.context(), "unsupported file format", Toast.LENGTH_SHORT).show()

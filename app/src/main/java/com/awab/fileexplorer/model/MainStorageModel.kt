@@ -95,4 +95,15 @@ class MainStorageModel(val context: Context) : StorageModel {
             }
         }
     }
+
+    override fun getRecentFiles(callback: SimpleSuccessAndFailureCallback<List<RecentFileDataModel>>) {
+        MainScope().launch {
+            dao.getRecentFiles().also {
+                if (it.isEmpty())
+                    callback.onFailure("no Pined Files")
+                else
+                    callback.onSuccess(it)
+            }
+        }
+    }
 }

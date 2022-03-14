@@ -18,4 +18,7 @@ interface MyDAO {
 
     @Query("SELECT * FROM ${PinedFileDataModel.tableName} ORDER BY id")
     suspend fun getPinedFiles(): List<PinedFileDataModel>
+
+    @Query("SELECT * FROM ${RecentFileDataModel.tableName} ORDER BY id")
+    suspend fun getRecentFiles(): List<RecentFileDataModel>
 }

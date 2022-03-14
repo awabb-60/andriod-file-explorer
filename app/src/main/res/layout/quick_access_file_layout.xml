@@ -4,9 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="250dp"
     android:layout_height="200dp"
+    android:background="?attr/selectableItemBackground"
     android:layout_gravity="center">
 
     <ImageView
+        android:clickable="false"
         android:id="@+id/tvPinedFileImage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -20,14 +22,13 @@
         tools:src="@drawable/test" />
 
     <TextView
+        android:background="@color/pined_file_name_background"
         android:id="@+id/tvPinedFileName"
         android:layout_width="0dp"
         android:ellipsize="end"
         android:maxLines="1"
         android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:layout_marginEnd="5dp"
-        android:background="@color/light_gray"
+        android:clickable="false"
         android:gravity="center_horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

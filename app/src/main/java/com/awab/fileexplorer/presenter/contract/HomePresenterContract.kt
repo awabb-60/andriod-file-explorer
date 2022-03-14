@@ -32,4 +32,16 @@ interface HomePresenterContract {
      * returns the pined files from the database
      */
     fun loadPinedFiles()
+
+    /**
+     * returns the recent files from the database
+     */
+    fun loadRecentFiles()
+
+    /**
+     * set the height of the quick access card
+     * @param cardHeight the new height
+     */
+    fun setQuickAccessFilesCardHeight(cardHeight: Int)
+
 }

@@ -4,6 +4,7 @@ import android.net.Uri
 import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 import com.awab.fileexplorer.utils.data.data_models.PinedFileDataModel
+import com.awab.fileexplorer.utils.data.data_models.RecentFileDataModel
 
 /**
  * the model contract
@@ -59,8 +60,12 @@ interface StorageModel {
     fun saveToPinedFiles(list: List<FileDataModel>)
 
     /**
-     * return the saved pined files info on the database
+     * return the saved pined files  from the database
      */
     fun getPinedFiles(callback: SimpleSuccessAndFailureCallback<List<PinedFileDataModel>>)
 
+    /**
+     * return the saved pined files  from the database
+     */
+    fun getRecentFiles(callback: SimpleSuccessAndFailureCallback<List<RecentFileDataModel>>)
 }
