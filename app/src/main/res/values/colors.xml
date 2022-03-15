@@ -21,4 +21,5 @@
     <color name="colorPrimaryVariant">#CFAEAE</color>
     <color name="colorOnPrimary">#DF4646</color>
 
+    <color name="tap_stroke_color">#32020000</color>
 </resources>

@@ -8,16 +8,19 @@
 
     <com.awab.fileexplorer.view.custom_views.TapsLayout
         android:id="@+id/tapsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="5dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:show_preview="true"
         app:tap_background_drawable="@drawable/selected_tap_background"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:tap_height="40dp"
+        app:tap_margin="2dp" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/quickAccessFilesCard"

@@ -16,6 +16,15 @@ class TapsLayout(context: Context, val attr: AttributeSet) : LinearLayout(contex
     private var attributes = context.obtainStyledAttributes(attr, R.styleable.TapsLayout)
     private var firstTapSelected = false
 
+
+    init {
+        orientation = HORIZONTAL
+        if (attributes.getBoolean(R.styleable.TapsLayout_show_preview, false) && isInEditMode) {
+            addTap(Tap("Tap 1", 0) {})
+            addTap(Tap("Tap 2", 4) {})
+        }
+    }
+
     fun addTap(tap: Tap) {
         // saving the view index
         tap.viewIndex = childCount
@@ -26,8 +35,16 @@ class TapsLayout(context: Context, val attr: AttributeSet) : LinearLayout(contex
             text = tap.title
             TextViewCompat.setTextAppearance(this, R.style.TextAppearance_AppCompat_Title)
 
-            // setting the weight of the tap
-            val newLP = LayoutParams(0, LayoutParams.WRAP_CONTENT)
+            // adding the given tap height, or wrap_content
+            val tapHeight = attributes.getDimension(R.styleable.TapsLayout_tap_height, -1F)
+            val newLP = LayoutParams(0, if (tapHeight > -1F) tapHeight.toInt() else LayoutParams.WRAP_CONTENT)
+
+            // setting the taps margins
+            attributes.getDimension(R.styleable.TapsLayout_tap_margin, -1F).toInt().also {
+                if (it > -1) {
+                    newLP.setMargins(it, it, it, it)
+                }
+            }
             newLP.weight = 1F
             layoutParams = newLP
 
@@ -50,7 +67,6 @@ class TapsLayout(context: Context, val attr: AttributeSet) : LinearLayout(contex
 
     private fun selectTap(tap: Tap) {
         val viewIterator = children.iterator()
-
         // removing the background from all taps
         while (viewIterator.hasNext())
             viewIterator.next().background = null

@@ -2,5 +2,8 @@
 <resources>
     <declare-styleable name="TapsLayout">
         <attr name="tap_background_drawable" format="reference" />
+        <attr name="show_preview" format="boolean" />
+        <attr name="tap_height" format="dimension" />
+        <attr name="tap_margin" format="dimension" />
     </declare-styleable>
 </resources>
