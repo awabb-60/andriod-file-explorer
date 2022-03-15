@@ -32,6 +32,7 @@ import com.awab.fileexplorer.view.action_mode_callbacks.StorageActionModeCallBac
 import com.awab.fileexplorer.view.contract.StorageView
 import com.awab.fileexplorer.view.custom_views.CustomDialog
 import com.awab.fileexplorer.view.custom_views.PickPasteLocationDialogFragment
+import java.io.File
 
 class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
     private val TAG = "StorageActivity"
@@ -106,7 +107,14 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         if (savedInstanceState == null) {
             storageName = intent.getStringExtra(STORAGE_DISPLAY_NAME_EXTRA)!!
             storagePath = intent.getStringExtra(STORAGE_PATH_EXTRA)!!
+
+            // open the storage
             navigateToFolder(storageName, storagePath)
+
+            // navigate to the given folder
+            val navigateToPath = intent.getStringExtra(NAVIGATE_TO_FOLDER_PATH_EXTRA)
+            if (navigateToPath != null)
+                navigateToFolder(navigateToPath.split(File.separatorChar).last(), navigateToPath)
         }
 
         // make the loading dialog

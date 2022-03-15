@@ -33,6 +33,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tapsLayout">
 
+        <TextView
+            android:id="@+id/quickAccessEmptyMessage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/quick_access_isempty_message"
+            android:visibility="gone" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvQuickAccess"
             android:layout_width="match_parent"

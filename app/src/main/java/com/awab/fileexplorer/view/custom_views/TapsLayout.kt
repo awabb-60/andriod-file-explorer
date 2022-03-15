@@ -2,7 +2,9 @@ package com.awab.fileexplorer.view.custom_views
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.view.Gravity
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.children
@@ -16,6 +18,7 @@ class TapsLayout(context: Context, val attr: AttributeSet) : LinearLayout(contex
     private var attributes = context.obtainStyledAttributes(attr, R.styleable.TapsLayout)
     private var firstTapSelected = false
 
+    private lateinit var selectedTap: View
 
     init {
         orientation = HORIZONTAL
@@ -72,9 +75,23 @@ class TapsLayout(context: Context, val attr: AttributeSet) : LinearLayout(contex
             viewIterator.next().background = null
 
         // selecting the targeted tap
-        getChildAt(tap.viewIndex).background =
+        selectedTap = getChildAt(tap.viewIndex)
+        selectedTap.background =
             attributes.getDrawable(R.styleable.TapsLayout_tap_background_drawable)
     }
+
+    /**
+     * it recall the saved function of the selected tap
+     * make it look like the tap was clicked again
+     */
+    fun refreshCurrentTap() {
+        try {
+            selectedTap.callOnClick()
+        } catch (e: Exception) {
+            Log.d(TAG, "refreshCurrentTap: cant refresh the current tap")
+        }
+    }
+
 }
 
 data class Tap(val title: String, var viewIndex: Int = 0, val function: () -> Unit)

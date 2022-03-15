@@ -11,6 +11,7 @@ import com.awab.fileexplorer.R
 import com.awab.fileexplorer.databinding.PickViewSettingsLayoutBinding
 import com.awab.fileexplorer.model.contrancts.StorageModel
 import com.awab.fileexplorer.model.utils.getFolderSizeBytes
+import com.awab.fileexplorer.model.utils.getOpenFileIntent
 import com.awab.fileexplorer.model.utils.getSize
 import com.awab.fileexplorer.presenter.SdCardPresenterSAF
 import com.awab.fileexplorer.presenter.threads.SelectedFilesDetailsAsyncTask
@@ -327,23 +328,6 @@ interface StoragePresenterContract {
         actionModeOn = true
         supPresenter.selectOrUnSelectItem(file)
         view.startActionMode()
-    }
-
-    /**
-     * it will return an intent to open or to view a media file:Image, video ...
-     * @param file the that will be open or viewed
-     * @return an intent with ACTION_VIEW and has the data and type of the given file
-     */
-    fun getOpenFileIntent(file: FileDataModel): Intent {
-        if (file.mimeType == MimeType.APPLICATION) {
-            return Intent(Intent.ACTION_VIEW).apply {
-                setDataAndType(file.uri, file.mimeType.mimeString)
-            }
-        }
-        return Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(file.uri, file.mimeType.mimeString)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
     }
 
     fun pickTransferLocation(transferAction: TransferAction) {

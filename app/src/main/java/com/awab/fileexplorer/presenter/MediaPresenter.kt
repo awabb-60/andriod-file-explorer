@@ -6,6 +6,7 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.widget.Toast
 import com.awab.fileexplorer.R
+import com.awab.fileexplorer.model.utils.getOpenFileIntent
 import com.awab.fileexplorer.model.utils.getSize
 import com.awab.fileexplorer.model.utils.makeFileModel
 import com.awab.fileexplorer.presenter.contract.MediaPresenterContract
@@ -62,13 +63,6 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
                 getMediaFiles(docsContentUri, PROJECTION, selection, selectionArgs)
                 view.setTitle("Documents")
             }
-        }
-    }
-
-    override fun getOpenFileIntent(file: FileDataModel): Intent {
-        return Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(file.uri, file.mimeType.mimeString)
-            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
         }
     }
 

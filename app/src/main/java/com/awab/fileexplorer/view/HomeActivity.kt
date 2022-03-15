@@ -3,6 +3,7 @@ package com.awab.fileexplorer.view
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
@@ -63,7 +64,7 @@ class HomeActivity : AppCompatActivity(), HomeView {
 
         // setting click listeners for the media items
         binding.apply {
-            listOf(btnMediaImages, btnMediaVideo, btnMediaAudio, btnMediaDocs).forEach {mediaButton->
+            listOf(btnMediaImages, btnMediaVideo, btnMediaAudio, btnMediaDocs).forEach { mediaButton ->
                 mediaButton.setOnClickListener {
                     mHomePresenter.mediaItemClicked(mediaButton.id)
                 }
@@ -76,11 +77,7 @@ class HomeActivity : AppCompatActivity(), HomeView {
         // to update the list at the start of the activity and after navigating back from the storage or media
         // activities
         mHomePresenter.loadStorages()
-        mHomePresenter.loadPinedFiles()
-    }
-
-    override fun setPinedFilesCardHeight(cardHeight: Int) {
-        binding.quickAccessFilesCard.layoutParams.height = cardHeight
+        binding.tapsLayout.refreshCurrentTap()
     }
 
     override fun checkForPermissions() {
@@ -100,6 +97,17 @@ class HomeActivity : AppCompatActivity(), HomeView {
     }
 
     override fun updateQuickAccessFilesList(list: List<FileDataModel>) {
+        binding.rvQuickAccess.visibility = View.VISIBLE
+        binding.quickAccessEmptyMessage.visibility = View.GONE
         mQuickAccessFilesAdapter.submitList(list)
+    }
+
+    override fun quickAccessIsEmpty() {
+        binding.rvQuickAccess.visibility = View.GONE
+        binding.quickAccessEmptyMessage.visibility = View.VISIBLE
+    }
+
+    override fun updateQuickAccessCardHeight(cardHeight: Int) {
+        binding.quickAccessFilesCard.layoutParams.height = cardHeight
     }
 }

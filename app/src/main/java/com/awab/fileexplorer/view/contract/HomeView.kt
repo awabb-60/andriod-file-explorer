@@ -29,5 +29,7 @@ interface HomeView {
 
     fun updateQuickAccessFilesList(list: List<FileDataModel>)
 
-    fun setPinedFilesCardHeight(cardHeight: Int)
+    fun quickAccessIsEmpty()
+
+    fun updateQuickAccessCardHeight(cardHeight: Int)
 }

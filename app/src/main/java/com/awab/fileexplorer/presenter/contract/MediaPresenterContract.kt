@@ -32,11 +32,6 @@ interface MediaPresenterContract {
     fun processClick(item: FileDataModel)
 
     /**
-     * the an intent with ACTION_VIEW and the data and type of file
-     */
-    fun getOpenFileIntent(file: FileDataModel): Intent
-
-    /**
      * this return the title that will show how many items are selected
      */
     fun getActionModeTitle(): String

@@ -1,6 +1,7 @@
 package com.awab.fileexplorer.model.utils
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.util.Log
 import android.webkit.MimeTypeMap
@@ -432,4 +433,21 @@ fun navigateToTreeFile(treeDocumentFile: DocumentFile, filePath: String): Docume
             break
     }
     return file
+}
+
+/**
+ * it will return an intent to open or to view a media file:Image, video ...
+ * @param file the that will be open or viewed
+ * @return an intent with ACTION_VIEW and has the data and type of the given file
+ */
+fun getOpenFileIntent(file: FileDataModel): Intent {
+    if (file.mimeType == MimeType.APPLICATION) {
+        return Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(file.uri, file.mimeType.mimeString)
+        }
+    }
+    return Intent(Intent.ACTION_VIEW).apply {
+        setDataAndType(file.uri, file.mimeType.mimeString)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
 }

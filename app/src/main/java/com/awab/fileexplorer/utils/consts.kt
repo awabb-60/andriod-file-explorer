@@ -15,11 +15,17 @@ val  INTERNAL_STORAGE_REQUIRED_PERMISSIONS = arrayOf(WRITE_EXTERNAL_STORAGE_PERM
  */
 const val INTERNAL_STORAGE_DISPLAY_NAME = "Phone"
 const val EXTERNAL_SDCARD_DISPLAY_NAME = "Sd Card"
+
 /**
  * the storage path to start with
  */
 const val STORAGE_PATH_EXTRA = "STORAGE_PATH_EXTRA"
 const val STORAGE_DISPLAY_NAME_EXTRA = "STORAGE_NAME_EXTRA"
+
+/**
+ * the folder path to navigate to
+ */
+const val NAVIGATE_TO_FOLDER_PATH_EXTRA = "NAVIGATE_TO_FOLDER_PATH_EXTRA"
 
 const val PICKER_REQUEST_CODE = 10
 

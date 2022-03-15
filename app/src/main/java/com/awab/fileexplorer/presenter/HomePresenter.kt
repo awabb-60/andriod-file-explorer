@@ -6,14 +6,17 @@ import android.util.Log
 import androidx.core.content.ContextCompat
 import com.awab.fileexplorer.R
 import com.awab.fileexplorer.model.MainStorageModel
+import com.awab.fileexplorer.model.utils.getOpenFileIntent
 import com.awab.fileexplorer.model.utils.getSize
 import com.awab.fileexplorer.model.utils.makeFileModels
 import com.awab.fileexplorer.presenter.contract.HomePresenterContract
 import com.awab.fileexplorer.utils.*
 import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
+import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 import com.awab.fileexplorer.utils.data.data_models.PinedFileDataModel
 import com.awab.fileexplorer.utils.data.data_models.RecentFileDataModel
 import com.awab.fileexplorer.utils.data.data_models.StorageDataModel
+import com.awab.fileexplorer.utils.data.types.FileType
 import com.awab.fileexplorer.utils.data.types.MediaCategory
 import com.awab.fileexplorer.utils.data.types.StorageType
 import com.awab.fileexplorer.view.MediaActivity
@@ -21,7 +24,7 @@ import com.awab.fileexplorer.view.StorageActivity
 import com.awab.fileexplorer.view.contract.HomeView
 import java.io.File
 
-class HomePresenter(override val view: HomeView): HomePresenterContract {
+class HomePresenter(override val view: HomeView) : HomePresenterContract {
 
     private val TAG = "HomePresenter"
 
@@ -30,35 +33,38 @@ class HomePresenter(override val view: HomeView): HomePresenterContract {
     override val model = MainStorageModel(view.context())
 
     override fun openStorage(it: StorageDataModel) {
+        getOenStorageIntent(it)?.let { view.openActivity(it) }
+    }
+
+    private fun getOenStorageIntent(storage: StorageDataModel): Intent? {
         if (!allPermissionsGranted(view.context(), INTERNAL_STORAGE_REQUIRED_PERMISSIONS)) {
             view.checkForPermissions()
-            return
+            return null
         }
-        val storageIntent = Intent(view.context(), StorageActivity::class.java).apply {
-            putExtra(STORAGE_PATH_EXTRA, it.path)
-            putExtra(STORAGE_DISPLAY_NAME_EXTRA, it.name)
+        return Intent(view.context(), StorageActivity::class.java).apply {
+            putExtra(STORAGE_PATH_EXTRA, storage.path)
+            putExtra(STORAGE_DISPLAY_NAME_EXTRA, storage.name)
             // the type that will determine the presenter
-            putExtra(STORAGE_TYPE_EXTRA, it.storageType)
+            putExtra(STORAGE_TYPE_EXTRA, storage.storageType)
             putExtra(STORAGES_LIST_EXTRA, storages)
         }
-        view.openActivity(storageIntent)
     }
 
     override fun mediaItemClicked(id: Int) {
         val mediaIntent = Intent(view.context(), MediaActivity::class.java)
 
         // the ype o media that will be presented
-        val type = when(id){
-            R.id.btnMediaImages->{
+        val type = when (id) {
+            R.id.btnMediaImages -> {
                 MediaCategory.IMAGES
             }
-            R.id.btnMediaVideo->{
+            R.id.btnMediaVideo -> {
                 MediaCategory.VIDEOS
             }
-            R.id.btnMediaAudio->{
+            R.id.btnMediaAudio -> {
                 MediaCategory.AUDIO
             }
-            R.id.btnMediaDocs->{
+            R.id.btnMediaDocs -> {
                 MediaCategory.DOCUMENTS
             }
             else -> return
@@ -100,10 +106,14 @@ class HomePresenter(override val view: HomeView): HomePresenterContract {
         // the internal storage will be at the first
         val internalDir = storages[0]
         if (internalDir != null)
-            makeStorageModel(INTERNAL_STORAGE_DISPLAY_NAME, internalDir, StorageType.INTERNAL)?.let { list.add(it) }
+            makeStorageModel(
+                INTERNAL_STORAGE_DISPLAY_NAME,
+                internalDir,
+                StorageType.INTERNAL
+            )?.let { list.add(it) }
 
 //        making the sd card modes
-        if (storages.size == 1 )
+        if (storages.size == 1)
             return
 
         val sdCardDir = storages[1]
@@ -115,15 +125,51 @@ class HomePresenter(override val view: HomeView): HomePresenterContract {
         view.updateStoragesList(this.storages.toArray(arrayOf<StorageDataModel>()))
     }
 
+    override fun quickAccessItemClicked(file: FileDataModel) {
+        if (file.type == FileType.FILE) {
+            view.openActivity(getOpenFileIntent(file))
+        } else {
+            // open the storage that contains the file
+            getOpenFolderInStorageIntent(file)?.let { view.openActivity(it) }
+        }
+    }
+
+    /**
+     * this will return an intent with the data required to open the containing storage of the file
+     * and to navigate to the file immediately
+     * @param file the file that will get navigate to
+     * @return the storage intent with the info needed to navigate to the file,
+     * or null if the storage or the file dose not exists
+     */
+    private fun getOpenFolderInStorageIntent(file: FileDataModel): Intent? {
+        var intent: Intent? = null
+
+        // looping throw the storages to find tha right storage
+        for (storage in storages) {
+            if (storage is StorageDataModel && file.path.startsWith(storage.path) && File(file.path).exists()) {
+
+                // getting the intent that will open the correct storage
+                val navigateToFolderIntent = getOenStorageIntent(storage)
+
+                // adding the data that will make the storage activity immediately navigate to the file
+                navigateToFolderIntent?.putExtra(NAVIGATE_TO_FOLDER_PATH_EXTRA, file.path)
+
+                // save the intent
+                intent = navigateToFolderIntent
+            }
+        }
+        return intent
+    }
+
     override fun loadPinedFiles() {
         model.getPinedFiles(object : SimpleSuccessAndFailureCallback<List<PinedFileDataModel>> {
             override fun onSuccess(data: List<PinedFileDataModel>) {
                 val files = data.map { File(it.path) }
-                view.updateQuickAccessFilesList(makeFileModels(files))
+                updateQuickAccessCard(makeFileModels(files))
             }
 
             override fun onFailure(message: String) {
-                view.updateQuickAccessFilesList(listOf())
+                updateQuickAccessCard(listOf())
                 Log.d(TAG, "onFailure: no pined files")
             }
         })
@@ -133,17 +179,25 @@ class HomePresenter(override val view: HomeView): HomePresenterContract {
         model.getRecentFiles(object : SimpleSuccessAndFailureCallback<List<RecentFileDataModel>> {
             override fun onSuccess(data: List<RecentFileDataModel>) {
                 val files = data.map { File(it.path) }
-                view.updateQuickAccessFilesList(makeFileModels(files))
+                updateQuickAccessCard(makeFileModels(files))
             }
 
             override fun onFailure(message: String) {
-                view.updateQuickAccessFilesList(listOf())
+                updateQuickAccessCard(listOf())
                 Log.d(TAG, message)
             }
         })
     }
 
-    override fun setQuickAccessFilesCardHeight(cardHeight: Int) {
-        view.setPinedFilesCardHeight(cardHeight)
+    override fun updateQuickAccessCard(list: List<FileDataModel>) {
+        if (list.isEmpty())
+            view.quickAccessIsEmpty()
+        else {
+            view.updateQuickAccessFilesList(list)
+        }
+    }
+
+    override fun updateQuickAccessCardHeight(cardHeight: Int) {
+        view.updateQuickAccessCardHeight(cardHeight)
     }
 }

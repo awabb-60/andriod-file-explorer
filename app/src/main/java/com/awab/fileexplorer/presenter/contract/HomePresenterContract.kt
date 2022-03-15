@@ -1,6 +1,7 @@
 package com.awab.fileexplorer.presenter.contract
 
 import com.awab.fileexplorer.model.contrancts.StorageModel
+import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 import com.awab.fileexplorer.utils.data.data_models.StorageDataModel
 import com.awab.fileexplorer.view.contract.HomeView
 
@@ -39,9 +40,16 @@ interface HomePresenterContract {
     fun loadRecentFiles()
 
     /**
-     * set the height of the quick access card
-     * @param cardHeight the new height
+     * update the height of the quick access card adjusting the new list of files
+     * @param list the new list
      */
-    fun setQuickAccessFilesCardHeight(cardHeight: Int)
+    fun updateQuickAccessCard(list: List<FileDataModel>)
 
+    fun updateQuickAccessCardHeight(cardHeight: Int)
+
+    /**
+     * get called after an item is clicked in the quick access rv
+     * @param file the clicked item
+     */
+    fun quickAccessItemClicked(file: FileDataModel)
 }
