@@ -22,4 +22,5 @@
     <color name="colorOnPrimary">#DF4646</color>
 
     <color name="tap_stroke_color">#32020000</color>
+    <color name="ic_edit_quick_access_color">#3C95EF</color>
 </resources>

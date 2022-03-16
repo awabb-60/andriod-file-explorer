@@ -1,7 +1,7 @@
 package com.awab.fileexplorer.presenter.contract
 
 import com.awab.fileexplorer.model.contrancts.StorageModel
-import com.awab.fileexplorer.utils.data.data_models.FileDataModel
+import com.awab.fileexplorer.utils.data.data_models.QuickAccessFileDataModel
 import com.awab.fileexplorer.utils.data.data_models.StorageDataModel
 import com.awab.fileexplorer.view.contract.HomeView
 
@@ -43,13 +43,30 @@ interface HomePresenterContract {
      * update the height of the quick access card adjusting the new list of files
      * @param list the new list
      */
-    fun updateQuickAccessCard(list: List<FileDataModel>)
+    fun updateQuickAccessCard(list: List<QuickAccessFileDataModel>)
 
+    /**
+     * set the new height of the quick access card
+     */
     fun updateQuickAccessCardHeight(cardHeight: Int)
 
     /**
      * get called after an item is clicked in the quick access rv
-     * @param file the clicked item
+     * @param file the targeted file
      */
-    fun quickAccessItemClicked(file: FileDataModel)
+    fun quickAccessItemClicked(file: QuickAccessFileDataModel)
+
+    /**
+     * get called after an item is long clicked in the quick access rv
+     * @param file the targeted file
+     */
+    fun quickAccessItemLongClicked(file: QuickAccessFileDataModel)
+
+    /**
+     * delete the file form the recent or pined files
+     * @param file the file that will get deleted
+     */
+    fun deleteQuickAccessFile(file: QuickAccessFileDataModel)
+
+    fun quickAccessEditModeStopped()
 }

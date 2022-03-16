@@ -1,24 +1,19 @@
 package com.awab.fileexplorer.model.database.DAOs
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import com.awab.fileexplorer.utils.data.data_models.PinedFileDataModel
-import com.awab.fileexplorer.utils.data.data_models.RecentFileDataModel
+import androidx.room.*
+import com.awab.fileexplorer.utils.data.data_models.QuickAccessFileDataModel
+import com.awab.fileexplorer.utils.data.types.QuickAccessFileType
 
 @Dao
 interface MyDAO {
 
-    @Insert(entity = RecentFileDataModel::class, onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(item: RecentFileDataModel)
+    @Insert(entity = QuickAccessFileDataModel::class, onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insert(file: QuickAccessFileDataModel)
 
-    @Insert(entity = PinedFileDataModel::class, onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(item: PinedFileDataModel)
+    @Delete(entity = QuickAccessFileDataModel::class)
+    suspend fun deleteQuickAccessFile(file: QuickAccessFileDataModel)
 
-    @Query("SELECT * FROM ${PinedFileDataModel.tableName} ORDER BY id")
-    suspend fun getPinedFiles(): List<PinedFileDataModel>
+    @Query("SELECT * FROM ${QuickAccessFileDataModel.tableName} WHERE type =:targetedType ORDER BY id")
+    suspend fun getQuickAccessFiles(targetedType: QuickAccessFileType): List<QuickAccessFileDataModel>
 
-    @Query("SELECT * FROM ${RecentFileDataModel.tableName} ORDER BY id")
-    suspend fun getRecentFiles(): List<RecentFileDataModel>
 }

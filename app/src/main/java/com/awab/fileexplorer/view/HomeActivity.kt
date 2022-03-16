@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,7 +14,7 @@ import com.awab.fileexplorer.presenter.HomePresenter
 import com.awab.fileexplorer.presenter.contract.HomePresenterContract
 import com.awab.fileexplorer.utils.adapters.QuickAccessAdapter
 import com.awab.fileexplorer.utils.adapters.StoragesAdapter
-import com.awab.fileexplorer.utils.data.data_models.FileDataModel
+import com.awab.fileexplorer.utils.data.data_models.QuickAccessFileDataModel
 import com.awab.fileexplorer.utils.data.data_models.StorageDataModel
 import com.awab.fileexplorer.utils.storageAccess
 import com.awab.fileexplorer.view.contract.HomeView
@@ -52,6 +53,11 @@ class HomeActivity : AppCompatActivity(), HomeView {
         binding.rvQuickAccess.layoutManager = GridLayoutManager(this, QuickAccessAdapter.PER_ROW)
         binding.rvQuickAccess.setHasFixedSize(true)
 
+        binding.btnEditQuickAccess.setOnClickListener {
+            it.visibility = View.GONE
+            mQuickAccessFilesAdapter.startEditMode()
+        }
+
         // make the storage adapter
         mStorageAdapter = StoragesAdapter {
             mHomePresenter.openStorage(it)
@@ -70,6 +76,14 @@ class HomeActivity : AppCompatActivity(), HomeView {
                 }
             }
         }
+    }
+
+    override fun onBackPressed() {
+        if (!binding.btnEditQuickAccess.isVisible) {
+            binding.btnEditQuickAccess.isVisible = true
+            mQuickAccessFilesAdapter.stopEditMode()
+        } else
+            super.onBackPressed()
     }
 
     override fun onStart() {
@@ -96,7 +110,7 @@ class HomeActivity : AppCompatActivity(), HomeView {
         mStorageAdapter.submitList(storages)
     }
 
-    override fun updateQuickAccessFilesList(list: List<FileDataModel>) {
+    override fun updateQuickAccessFilesList(list: List<QuickAccessFileDataModel>) {
         binding.rvQuickAccess.visibility = View.VISIBLE
         binding.quickAccessEmptyMessage.visibility = View.GONE
         mQuickAccessFilesAdapter.submitList(list)
@@ -109,5 +123,9 @@ class HomeActivity : AppCompatActivity(), HomeView {
 
     override fun updateQuickAccessCardHeight(cardHeight: Int) {
         binding.quickAccessFilesCard.layoutParams.height = cardHeight
+    }
+
+    override fun showEditQuickAccess() {
+        binding.btnEditQuickAccess.visibility = View.VISIBLE
     }
 }

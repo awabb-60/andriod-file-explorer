@@ -2,7 +2,7 @@ package com.awab.fileexplorer.view.contract
 
 import android.content.Context
 import android.content.Intent
-import com.awab.fileexplorer.utils.data.data_models.FileDataModel
+import com.awab.fileexplorer.utils.data.data_models.QuickAccessFileDataModel
 import com.awab.fileexplorer.utils.data.data_models.StorageDataModel
 
 interface HomeView {
@@ -27,9 +27,11 @@ interface HomeView {
      */
     fun updateStoragesList(storages: Array<StorageDataModel>)
 
-    fun updateQuickAccessFilesList(list: List<FileDataModel>)
+    fun updateQuickAccessFilesList(list: List<QuickAccessFileDataModel>)
 
     fun quickAccessIsEmpty()
 
     fun updateQuickAccessCardHeight(cardHeight: Int)
+
+    fun showEditQuickAccess()
 }

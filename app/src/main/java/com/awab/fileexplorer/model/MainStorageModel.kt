@@ -8,9 +8,8 @@ import com.awab.fileexplorer.model.contrancts.StorageModel
 import com.awab.fileexplorer.model.database.room.DataBase
 import com.awab.fileexplorer.utils.*
 import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
-import com.awab.fileexplorer.utils.data.data_models.FileDataModel
-import com.awab.fileexplorer.utils.data.data_models.PinedFileDataModel
-import com.awab.fileexplorer.utils.data.data_models.RecentFileDataModel
+import com.awab.fileexplorer.utils.data.data_models.QuickAccessFileDataModel
+import com.awab.fileexplorer.utils.data.types.QuickAccessFileType
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -67,43 +66,35 @@ class MainStorageModel(val context: Context) : StorageModel {
         sharedPreferencesEditor.apply()
     }
 
-    override fun saveToRecentFiles(list: List<FileDataModel>) {
+    override fun saveToQuickAccessFiles(list: List<QuickAccessFileDataModel>) {
         MainScope().launch {
             list.forEach {
-                val item = RecentFileDataModel(name = it.name, path = it.path)
-                dao.insert(item)
+                dao.insert(it)
             }
         }
     }
 
-    override fun saveToPinedFiles(list: List<FileDataModel>) {
+    override fun getQuickAccessFiles(
+        targetedType: QuickAccessFileType,
+        callback: SimpleSuccessAndFailureCallback<List<QuickAccessFileDataModel>>
+    ) {
         MainScope().launch {
-            list.forEach {
-                val item = PinedFileDataModel(name = it.name, path = it.path)
-                dao.insert(item)
-            }
-        }
-    }
-
-    override fun getPinedFiles(callback: SimpleSuccessAndFailureCallback<List<PinedFileDataModel>>) {
-        MainScope().launch {
-            dao.getPinedFiles().also {
+            dao.getQuickAccessFiles(targetedType).also {
                 if (it.isEmpty())
-                    callback.onFailure("no Pined Files")
+                    callback.onFailure("no Quick Access Files")
                 else
                     callback.onSuccess(it)
             }
         }
     }
 
-    override fun getRecentFiles(callback: SimpleSuccessAndFailureCallback<List<RecentFileDataModel>>) {
+    override fun deleteQuickAccessFile(
+        file: QuickAccessFileDataModel,
+        callback: SimpleSuccessAndFailureCallback<Boolean>
+    ) {
         MainScope().launch {
-            dao.getRecentFiles().also {
-                if (it.isEmpty())
-                    callback.onFailure("no Pined Files")
-                else
-                    callback.onSuccess(it)
-            }
+            dao.deleteQuickAccessFile(file)
+            callback.onSuccess(true)
         }
     }
 }

@@ -2,9 +2,8 @@ package com.awab.fileexplorer.model.contrancts
 
 import android.net.Uri
 import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
-import com.awab.fileexplorer.utils.data.data_models.FileDataModel
-import com.awab.fileexplorer.utils.data.data_models.PinedFileDataModel
-import com.awab.fileexplorer.utils.data.data_models.RecentFileDataModel
+import com.awab.fileexplorer.utils.data.data_models.QuickAccessFileDataModel
+import com.awab.fileexplorer.utils.data.types.QuickAccessFileType
 
 /**
  * the model contract
@@ -50,22 +49,17 @@ interface StorageModel {
     fun saveViewingSettings(sortBy: String, order: String, showHiddenFiles: Boolean)
 
     /**
-     * saves the file to the recent files database
-     */
-    fun saveToRecentFiles(list: List<FileDataModel>)
-
-    /**
      * saves the file to the pined files database
      */
-    fun saveToPinedFiles(list: List<FileDataModel>)
+    fun saveToQuickAccessFiles(list: List<QuickAccessFileDataModel>)
 
     /**
      * return the saved pined files  from the database
      */
-    fun getPinedFiles(callback: SimpleSuccessAndFailureCallback<List<PinedFileDataModel>>)
+    fun getQuickAccessFiles(
+        targetedType: QuickAccessFileType,
+        callback: SimpleSuccessAndFailureCallback<List<QuickAccessFileDataModel>>
+    )
 
-    /**
-     * return the saved pined files  from the database
-     */
-    fun getRecentFiles(callback: SimpleSuccessAndFailureCallback<List<RecentFileDataModel>>)
+    fun deleteQuickAccessFile(file: QuickAccessFileDataModel, callback: SimpleSuccessAndFailureCallback<Boolean>)
 }

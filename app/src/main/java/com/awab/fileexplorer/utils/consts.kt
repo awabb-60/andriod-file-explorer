@@ -131,7 +131,6 @@ const val TRANSFER_INFO_EXTRA = "MOVE_SUCCESSFUL_EXTRA"
  */
 const val FINISH_COPY_INTENT = "FINISH_COPY_INTENT"
 
-
 /**
  * this the category of media to be shown in the media activity
  */

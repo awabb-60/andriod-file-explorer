@@ -5,10 +5,9 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.awab.fileexplorer.model.database.DAOs.MyDAO
-import com.awab.fileexplorer.utils.data.data_models.PinedFileDataModel
-import com.awab.fileexplorer.utils.data.data_models.RecentFileDataModel
+import com.awab.fileexplorer.utils.data.data_models.QuickAccessFileDataModel
 
-@Database(entities = [RecentFileDataModel::class, PinedFileDataModel::class], version = 1, exportSchema = false)
+@Database(entities = [QuickAccessFileDataModel::class], version = 1, exportSchema = false)
 abstract class DataBase : RoomDatabase() {
 
     abstract fun getDao(): MyDAO
@@ -30,7 +29,7 @@ abstract class DataBase : RoomDatabase() {
                     INSTANCE = Room.databaseBuilder(
                         context.applicationContext,
                         DataBase::class.java,
-                        "pined_and_recent_files_database"
+                        "quick_access_files_database"
                     )
                         .fallbackToDestructiveMigration()
                         .build()

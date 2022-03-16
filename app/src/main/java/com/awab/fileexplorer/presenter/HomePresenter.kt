@@ -3,21 +3,22 @@ package com.awab.fileexplorer.presenter
 import android.content.Intent
 import android.os.Parcelable
 import android.util.Log
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.awab.fileexplorer.R
 import com.awab.fileexplorer.model.MainStorageModel
 import com.awab.fileexplorer.model.utils.getOpenFileIntent
 import com.awab.fileexplorer.model.utils.getSize
-import com.awab.fileexplorer.model.utils.makeFileModels
+import com.awab.fileexplorer.model.utils.makeFileModel
 import com.awab.fileexplorer.presenter.contract.HomePresenterContract
 import com.awab.fileexplorer.utils.*
 import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.utils.data.data_models.FileDataModel
-import com.awab.fileexplorer.utils.data.data_models.PinedFileDataModel
-import com.awab.fileexplorer.utils.data.data_models.RecentFileDataModel
+import com.awab.fileexplorer.utils.data.data_models.QuickAccessFileDataModel
 import com.awab.fileexplorer.utils.data.data_models.StorageDataModel
 import com.awab.fileexplorer.utils.data.types.FileType
 import com.awab.fileexplorer.utils.data.types.MediaCategory
+import com.awab.fileexplorer.utils.data.types.QuickAccessFileType
 import com.awab.fileexplorer.utils.data.types.StorageType
 import com.awab.fileexplorer.view.MediaActivity
 import com.awab.fileexplorer.view.StorageActivity
@@ -125,13 +126,38 @@ class HomePresenter(override val view: HomeView) : HomePresenterContract {
         view.updateStoragesList(this.storages.toArray(arrayOf<StorageDataModel>()))
     }
 
-    override fun quickAccessItemClicked(file: FileDataModel) {
-        if (file.type == FileType.FILE) {
-            view.openActivity(getOpenFileIntent(file))
+    override fun quickAccessItemClicked(file: QuickAccessFileDataModel) {
+        val fileModel = makeFileModel(File(file.path))
+        if (fileModel.type == FileType.FILE) {
+            view.openActivity(getOpenFileIntent(fileModel))
         } else {
             // open the storage that contains the file
-            getOpenFolderInStorageIntent(file)?.let { view.openActivity(it) }
+            getOpenFolderInStorageIntent(fileModel)?.let { view.openActivity(it) }
         }
+    }
+
+    override fun quickAccessItemLongClicked(file: QuickAccessFileDataModel) {
+    }
+
+    override fun quickAccessEditModeStopped() {
+        view.showEditQuickAccess()
+    }
+
+    override fun deleteQuickAccessFile(file: QuickAccessFileDataModel) {
+        model.deleteQuickAccessFile(file, object : SimpleSuccessAndFailureCallback<Boolean> {
+            override fun onSuccess(data: Boolean) {
+                if (file.type == QuickAccessFileType.PINED)
+                    loadPinedFiles()
+                else
+                    loadRecentFiles()
+                Toast.makeText(view.context(), "file deleted", Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onFailure(message: String) {
+                Toast.makeText(view.context(), "can't deleted file", Toast.LENGTH_SHORT).show()
+            }
+        })
+
     }
 
     /**
@@ -162,40 +188,42 @@ class HomePresenter(override val view: HomeView) : HomePresenterContract {
     }
 
     override fun loadPinedFiles() {
-        model.getPinedFiles(object : SimpleSuccessAndFailureCallback<List<PinedFileDataModel>> {
-            override fun onSuccess(data: List<PinedFileDataModel>) {
-                val files = data.map { File(it.path) }
-                updateQuickAccessCard(makeFileModels(files))
-            }
+        model.getQuickAccessFiles(QuickAccessFileType.PINED,
+            object : SimpleSuccessAndFailureCallback<List<QuickAccessFileDataModel>> {
+                override fun onSuccess(data: List<QuickAccessFileDataModel>) {
+                    updateQuickAccessCard(data)
+                }
 
-            override fun onFailure(message: String) {
-                updateQuickAccessCard(listOf())
-                Log.d(TAG, "onFailure: no pined files")
-            }
-        })
+                override fun onFailure(message: String) {
+                    updateQuickAccessCard(listOf())
+                    Log.d(TAG, "onFailure: no pined files")
+                }
+            })
     }
 
     override fun loadRecentFiles() {
-        model.getRecentFiles(object : SimpleSuccessAndFailureCallback<List<RecentFileDataModel>> {
-            override fun onSuccess(data: List<RecentFileDataModel>) {
-                val files = data.map { File(it.path) }
-                updateQuickAccessCard(makeFileModels(files))
-            }
+        model.getQuickAccessFiles(
+            QuickAccessFileType.RECENT,
+            object : SimpleSuccessAndFailureCallback<List<QuickAccessFileDataModel>> {
+                override fun onSuccess(data: List<QuickAccessFileDataModel>) {
+                    updateQuickAccessCard(data.filter { it.type == QuickAccessFileType.RECENT })
+                }
 
-            override fun onFailure(message: String) {
-                updateQuickAccessCard(listOf())
-                Log.d(TAG, message)
-            }
-        })
+                override fun onFailure(message: String) {
+                    updateQuickAccessCard(listOf())
+                    Log.d(TAG, message)
+                }
+            })
     }
 
-    override fun updateQuickAccessCard(list: List<FileDataModel>) {
+    override fun updateQuickAccessCard(list: List<QuickAccessFileDataModel>) {
         if (list.isEmpty())
             view.quickAccessIsEmpty()
         else {
             view.updateQuickAccessFilesList(list)
         }
     }
+
 
     override fun updateQuickAccessCardHeight(cardHeight: Int) {
         view.updateQuickAccessCardHeight(cardHeight)

@@ -17,14 +17,8 @@ import com.awab.fileexplorer.presenter.SdCardPresenterSAF
 import com.awab.fileexplorer.presenter.threads.SelectedFilesDetailsAsyncTask
 import com.awab.fileexplorer.utils.*
 import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
-import com.awab.fileexplorer.utils.data.data_models.FileDataModel
-import com.awab.fileexplorer.utils.data.data_models.SelectedItemsDetailsDataModel
-import com.awab.fileexplorer.utils.data.data_models.StorageDataModel
-import com.awab.fileexplorer.utils.data.data_models.TransferInfoDataModel
-import com.awab.fileexplorer.utils.data.types.FileType
-import com.awab.fileexplorer.utils.data.types.MimeType
-import com.awab.fileexplorer.utils.data.types.StorageType
-import com.awab.fileexplorer.utils.data.types.TransferAction
+import com.awab.fileexplorer.utils.data.data_models.*
+import com.awab.fileexplorer.utils.data.types.*
 import com.awab.fileexplorer.utils.transfer_utils.TransferBroadCast
 import com.awab.fileexplorer.view.contract.StorageView
 import com.awab.fileexplorer.view.custom_views.CustomDialog
@@ -299,7 +293,15 @@ interface StoragePresenterContract {
 //        opining the item
         if (file.type == FileType.FILE) {
             // saving the file to the recent files
-            model.saveToRecentFiles(listOf(file))
+            model.saveToQuickAccessFiles(
+                listOf(
+                    QuickAccessFileDataModel(
+                        file.name,
+                        file.path,
+                        QuickAccessFileType.RECENT
+                    )
+                )
+            )
 //            file cant be opened
             if (file.mimeType == MimeType.UNKNOWN) {
                 Toast.makeText(view.context(), "unsupported file format", Toast.LENGTH_SHORT).show()
@@ -487,6 +489,15 @@ interface StoragePresenterContract {
     }
 
     fun pinFile() {
-        model.saveToPinedFiles(supPresenter.getSelectedItems())
+        val file = supPresenter.getSelectedItems()[0]
+        model.saveToQuickAccessFiles(
+            listOf(
+                QuickAccessFileDataModel(
+                    file.name,
+                    file.path,
+                    QuickAccessFileType.PINED
+                )
+            )
+        )
     }
 }
