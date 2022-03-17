@@ -25,11 +25,12 @@
     <string name="paste">Paste</string>
     <string name="pick_paste_location">Pick Paste Location</string>
     <string name="recent_files_title">Recent Files</string>
-    <string name="mi_pin">Pin</string>
+    <string name="mi_pin">Pin/unPin</string>
     <string name="pined_files_title">Pined Files</string>
     <string name="pined_file_image_description">pined file</string>
     <string name="file_thumbnail_image_description">file thumbnail</string>
     <string name="play_arrow_image_description">play arrow</string>
     <string name="selected_icon_image_description">selected icon</string>
     <string name="quick_access_isempty_message">no files</string>
+    <string name="unpin">unpin</string>
 </resources>

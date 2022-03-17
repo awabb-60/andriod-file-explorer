@@ -15,6 +15,11 @@ interface HomePresenterContract {
     val model: StorageModel
 
     /**
+     * this tell wither the quick access window in edit mode or not
+     */
+    var quickAccessInEditMode: Boolean
+
+    /**
      * open the storage in a new activity
      */
     fun openStorage(it: StorageDataModel)
@@ -69,4 +74,9 @@ interface HomePresenterContract {
     fun deleteQuickAccessFile(file: QuickAccessFileDataModel)
 
     fun quickAccessEditModeStopped()
+
+    /**
+     * navigate to the containing folder in the file system
+     */
+    fun locateFile(path: String)
 }

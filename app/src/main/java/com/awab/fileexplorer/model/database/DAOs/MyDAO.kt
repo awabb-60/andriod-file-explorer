@@ -15,5 +15,4 @@ interface MyDAO {
 
     @Query("SELECT * FROM ${QuickAccessFileDataModel.tableName} WHERE type =:targetedType ORDER BY id")
     suspend fun getQuickAccessFiles(targetedType: QuickAccessFileType): List<QuickAccessFileDataModel>
-
 }

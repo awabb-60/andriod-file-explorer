@@ -27,11 +27,28 @@ interface HomeView {
      */
     fun updateStoragesList(storages: Array<StorageDataModel>)
 
+    /**
+     * to update the list of file in the quick access window
+     */
     fun updateQuickAccessFilesList(list: List<QuickAccessFileDataModel>)
 
+    /**
+     * to adjust the quick access window to show that the list is empty
+     */
     fun quickAccessIsEmpty()
 
-    fun updateQuickAccessCardHeight(cardHeight: Int)
+    /**
+     * update the quick access window height
+     */
+    fun updateQuickAccessWindowHeight(cardHeight: Int)
 
+    /**
+     * show the edit button in the quick access window
+     */
     fun showEditQuickAccess()
+
+    /**
+     * show the details of a file in a dialog
+     */
+    fun showDetailsDialog(name: String, size: String, lastModified: String, path: String)
 }

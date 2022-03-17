@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -32,7 +31,6 @@ import com.awab.fileexplorer.view.action_mode_callbacks.StorageActionModeCallBac
 import com.awab.fileexplorer.view.contract.StorageView
 import com.awab.fileexplorer.view.custom_views.CustomDialog
 import com.awab.fileexplorer.view.custom_views.PickPasteLocationDialogFragment
-import java.io.File
 
 class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
     private val TAG = "StorageActivity"
@@ -47,9 +45,6 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
 
     private var progressDialogBinding: ProgressDialogLayoutBinding? = null
     private var progressDialog: AlertDialog? = null
-
-    private lateinit var storageName: String
-    private lateinit var storagePath: String
 
     private lateinit var _loadingDialog: AlertDialog
 
@@ -105,16 +100,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         // opening the storage folder
         // only work at the beginning of the storage activity
         if (savedInstanceState == null) {
-            storageName = intent.getStringExtra(STORAGE_DISPLAY_NAME_EXTRA)!!
-            storagePath = intent.getStringExtra(STORAGE_PATH_EXTRA)!!
-
-            // open the storage
-            navigateToFolder(storageName, storagePath)
-
-            // navigate to the given folder
-            val navigateToPath = intent.getStringExtra(NAVIGATE_TO_FOLDER_PATH_EXTRA)
-            if (navigateToPath != null)
-                navigateToFolder(navigateToPath.split(File.separatorChar).last(), navigateToPath)
+            presenter.start(intent)
         }
 
         // make the loading dialog
@@ -357,25 +343,20 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 //        check for sd card authorization
         if (resultCode == RESULT_OK && requestCode == PICKER_REQUEST_CODE) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                val treeUri = data?.data!!
-
-                if (mStoragePresenter.isValidTreeUri(treeUri)) {
+            val treeUri = data?.data!!
+            if (mStoragePresenter.isValidTreeUri(treeUri)) {
 //            sd card was selected successfully... save the uri
-                    mStoragePresenter.saveTreeUri(treeUri)
+                mStoragePresenter.saveTreeUri(treeUri)
 
 //                granting the permission to write to sd card
-                    grantUriPermission(
-                        packageName,
-                        treeUri,
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION and Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                    )
-                }
-                Toast.makeText(this, "authorization successful !", Toast.LENGTH_SHORT).show()
-
-            } else {
-                Toast.makeText(this, "Authorization failed", Toast.LENGTH_SHORT).show()
+                grantUriPermission(
+                    packageName,
+                    treeUri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION and Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
             }
+            Toast.makeText(this, "authorization successful !", Toast.LENGTH_SHORT).show()
+
         } else {
             Toast.makeText(this, "Authorization failed", Toast.LENGTH_SHORT).show()
         }
@@ -476,6 +457,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
     }
 
     private fun openSearchFragment() {
+        val storagePath = intent.getStringExtra(STORAGE_PATH_EXTRA)!!
         val searchFragment = SearchFragment.newInstance(storagePath)
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragmentContainer, searchFragment)

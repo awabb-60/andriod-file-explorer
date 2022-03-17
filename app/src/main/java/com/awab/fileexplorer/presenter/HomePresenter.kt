@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.awab.fileexplorer.R
 import com.awab.fileexplorer.model.MainStorageModel
+import com.awab.fileexplorer.model.utils.getFolderSizeBytes
 import com.awab.fileexplorer.model.utils.getOpenFileIntent
 import com.awab.fileexplorer.model.utils.getSize
 import com.awab.fileexplorer.model.utils.makeFileModel
@@ -24,6 +25,9 @@ import com.awab.fileexplorer.view.MediaActivity
 import com.awab.fileexplorer.view.StorageActivity
 import com.awab.fileexplorer.view.contract.HomeView
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 class HomePresenter(override val view: HomeView) : HomePresenterContract {
 
@@ -32,6 +36,8 @@ class HomePresenter(override val view: HomeView) : HomePresenterContract {
     private val storages = ArrayList<Parcelable>()
 
     override val model = MainStorageModel(view.context())
+
+    override var quickAccessInEditMode: Boolean = false
 
     override fun openStorage(it: StorageDataModel) {
         getOenStorageIntent(it)?.let { view.openActivity(it) }
@@ -137,6 +143,24 @@ class HomePresenter(override val view: HomeView) : HomePresenterContract {
     }
 
     override fun quickAccessItemLongClicked(file: QuickAccessFileDataModel) {
+        val fileModel = makeFileModel(File(file.path))
+        val date = SimpleDateFormat(DATE_FORMAT_PATTERN, Locale.US).format(fileModel.date)
+
+        val size = if (fileModel.type == FileType.FILE)
+            fileModel.size
+        else
+            getSize(getFolderSizeBytes(File(fileModel.path)))
+
+        view.showDetailsDialog(fileModel.name, size, date, fileModel.path)
+    }
+
+    override fun locateFile(path: String) {
+        val parentFile = File(path).parentFile
+        parentFile?.let { parent ->
+            getOpenFolderInStorageIntent(makeFileModel(parent))?.let {
+                view.openActivity(it)
+            }
+        }
     }
 
     override fun quickAccessEditModeStopped() {
@@ -158,33 +182,6 @@ class HomePresenter(override val view: HomeView) : HomePresenterContract {
             }
         })
 
-    }
-
-    /**
-     * this will return an intent with the data required to open the containing storage of the file
-     * and to navigate to the file immediately
-     * @param file the file that will get navigate to
-     * @return the storage intent with the info needed to navigate to the file,
-     * or null if the storage or the file dose not exists
-     */
-    private fun getOpenFolderInStorageIntent(file: FileDataModel): Intent? {
-        var intent: Intent? = null
-
-        // looping throw the storages to find tha right storage
-        for (storage in storages) {
-            if (storage is StorageDataModel && file.path.startsWith(storage.path) && File(file.path).exists()) {
-
-                // getting the intent that will open the correct storage
-                val navigateToFolderIntent = getOenStorageIntent(storage)
-
-                // adding the data that will make the storage activity immediately navigate to the file
-                navigateToFolderIntent?.putExtra(NAVIGATE_TO_FOLDER_PATH_EXTRA, file.path)
-
-                // save the intent
-                intent = navigateToFolderIntent
-            }
-        }
-        return intent
     }
 
     override fun loadPinedFiles() {
@@ -224,8 +221,36 @@ class HomePresenter(override val view: HomeView) : HomePresenterContract {
         }
     }
 
-
     override fun updateQuickAccessCardHeight(cardHeight: Int) {
-        view.updateQuickAccessCardHeight(cardHeight)
+        view.updateQuickAccessWindowHeight(cardHeight)
     }
+
+
+    /**
+     * this will return an intent with the data required to open the containing storage of the file
+     * and to navigate to the file immediately
+     * @param file the file that will get navigate to
+     * @return the storage intent with the info needed to navigate to the file,
+     * or null if the storage or the file dose not exists
+     */
+    private fun getOpenFolderInStorageIntent(file: FileDataModel): Intent? {
+        var intent: Intent? = null
+
+        // looping throw the storages to find tha right storage
+        for (storage in storages) {
+            if (storage is StorageDataModel && file.path.startsWith(storage.path) && File(file.path).exists()) {
+
+                // getting the intent that will open the correct storage
+                val navigateToFolderIntent = getOenStorageIntent(storage)
+
+                // adding the data that will make the storage activity immediately navigate to the file
+                navigateToFolderIntent?.putExtra(LOCATE_FOLDER_PATH_EXTRA, file.path)
+
+                // save the intent
+                intent = navigateToFolderIntent
+            }
+        }
+        return intent
+    }
+
 }

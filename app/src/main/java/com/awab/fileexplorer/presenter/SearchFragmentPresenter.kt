@@ -98,4 +98,7 @@ class SearchFragmentPresenter(
     override fun stopActionMode() {
         view.stopActionMode()
     }
+
+//    override fun locate(file: FileDataModel) {
+//    }
 }

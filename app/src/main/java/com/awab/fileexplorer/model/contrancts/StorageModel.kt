@@ -61,5 +61,5 @@ interface StorageModel {
         callback: SimpleSuccessAndFailureCallback<List<QuickAccessFileDataModel>>
     )
 
-    fun deleteQuickAccessFile(file: QuickAccessFileDataModel, callback: SimpleSuccessAndFailureCallback<Boolean>)
+    fun deleteQuickAccessFile(file: QuickAccessFileDataModel, callback: SimpleSuccessAndFailureCallback<Boolean>?)
 }

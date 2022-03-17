@@ -101,6 +101,14 @@ class FilesFragment : Fragment(), IFileFragmentView {
         return adapter.getSelectedItems()
     }
 
+    override fun getItems(): List<FileDataModel> {
+        return adapter.currentList
+    }
+
+    override fun scrollTo(position: Int) {
+        binding.rvFilesList.scrollToPosition(position)
+    }
+
     override fun stopActionMode() {
         adapter.stopActionMode()
     }

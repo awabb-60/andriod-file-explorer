@@ -1,9 +1,7 @@
 package com.awab.fileexplorer.presenter
 
 import android.content.Intent
-import android.os.Build
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.documentfile.provider.DocumentFile
 import com.awab.fileexplorer.model.MainStorageModel
@@ -50,8 +48,7 @@ class SdCardPresenterSAF(
 
     override fun requestPermission() {
         view.showToast("select the sd card")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-            openPicker()
+        openPicker()
     }
 
     override fun rename(path: String, newName: String) {
@@ -147,7 +144,6 @@ class SdCardPresenterSAF(
         return DocumentFile.fromTreeUri(view.context(), model.getTreeUri(storageName))
     }
 
-    @RequiresApi(19)
     private fun openPicker() {
         // Choose a directory using the system's file picker.
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)

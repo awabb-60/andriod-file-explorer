@@ -55,7 +55,6 @@ interface StoragePresenterContract {
      */
     var supPresenter: SupPresenter
 
-
     /**
      * this indicates when tha action mode is active... so the view show the action mode ui
      */
@@ -71,6 +70,27 @@ interface StoragePresenterContract {
      * the model that will handle all the data logic
      */
     val model: StorageModel
+
+    /**
+     * this will first open the storage main folder and display it
+     * and if the intent has information to locate a file then it will navigate
+     * to that file
+     * @param intent the intent that started the view
+     */
+    fun start(intent: Intent) {
+        // open the storage
+        val storageDisplayName = intent.getStringExtra(STORAGE_DISPLAY_NAME_EXTRA)!!
+        view.navigateToFolder(storageDisplayName, storagePath)
+
+        // if there is a folder to locate
+        // navigate to the given folder
+        val locateFilePath = intent.getStringExtra(LOCATE_FOLDER_PATH_EXTRA)
+        if (locateFilePath != null && locateFilePath != storagePath) {
+            // the located file is not the storage main folder
+            view.navigateToFolder(File(locateFilePath).name, locateFilePath)
+        }
+
+    }
 
     /**
      * this method bind thr supPresenter to the main presenter
@@ -172,7 +192,7 @@ interface StoragePresenterContract {
      * delete all the selected file after the confirmation.
      * @param showMessages the show toast messages that related to the operation
      */
-    fun delete(showMessages:Boolean = true)
+    fun delete(showMessages: Boolean = true)
 
     /**
      * the "rename" menu item must only be shown when one item is selected
@@ -414,7 +434,7 @@ interface StoragePresenterContract {
         // if the transfer action was move and the all files move successfully
         val info = intent?.getParcelableExtra<TransferInfoDataModel>(TRANSFER_INFO_EXTRA)
 
-        info?:return
+        info ?: return
 
         if (info.action == TransferAction.MOVE && info.wasSuccessful) {
             // deleting the moved files
@@ -481,6 +501,9 @@ interface StoragePresenterContract {
         supPresenter.loadFiles()
     }
 
+    /**
+     * open a picker for the user to choose the app they like to show this media file
+     */
     fun openWith() {
         val intent = getOpenFileIntent(supPresenter.getSelectedItems()[0])
         val chooserIntent =
@@ -488,16 +511,40 @@ interface StoragePresenterContract {
         view.openFile(chooserIntent)
     }
 
-    fun pinFile() {
+    /**
+     * save the selected file to the pined files
+     * or unpin it if the file already exist
+     */
+    fun pinOrUnpinFile() {
         val file = supPresenter.getSelectedItems()[0]
-        model.saveToQuickAccessFiles(
-            listOf(
-                QuickAccessFileDataModel(
-                    file.name,
-                    file.path,
-                    QuickAccessFileType.PINED
-                )
-            )
-        )
+        model.getQuickAccessFiles(
+            QuickAccessFileType.PINED,
+            object : SimpleSuccessAndFailureCallback<List<QuickAccessFileDataModel>> {
+                override fun onSuccess(data: List<QuickAccessFileDataModel>) {
+
+                    val targetedQuickAccessFile = data.find { file.path == it.path }
+
+                    // if the file in pined: unpin the file
+                    if (targetedQuickAccessFile != null) {
+                        model.deleteQuickAccessFile(targetedQuickAccessFile, null)
+                        view.showToast("unpinned form home screen")
+                    } else { // pin the file
+                        model.saveToQuickAccessFiles(
+                            listOf(
+                                QuickAccessFileDataModel(
+                                    file.name,
+                                    file.path,
+                                    QuickAccessFileType.PINED
+                                )
+                            )
+                        )
+                        view.showToast("pined to the home screen")
+                    }
+                }
+
+                override fun onFailure(message: String) {
+                    view.showToast("error: cant pin this file")
+                }
+            })
     }
 }

@@ -8,12 +8,15 @@ import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 import com.awab.fileexplorer.utils.data.data_models.SelectedItemsDetailsDataModel
 
 /**
- * this gets all the selected items data from the media items
+ * this gets all the selected items data
  */
-class SelectedFilesDetailsAsyncTask(val countHiddenFiles:Boolean, private val callBack: SimpleSuccessAndFailureCallback<SelectedItemsDetailsDataModel>) :
+class SelectedFilesDetailsAsyncTask(
+    private val countHiddenFiles: Boolean,
+    private val callBack: SimpleSuccessAndFailureCallback<SelectedItemsDetailsDataModel>
+) :
     AsyncTask<List<FileDataModel>, Unit, SelectedItemsDetailsDataModel>() {
 
-    override fun doInBackground(vararg params:List<FileDataModel>): SelectedItemsDetailsDataModel {
+    override fun doInBackground(vararg params: List<FileDataModel>): SelectedItemsDetailsDataModel {
         // getting details for the selected items
         val list = params[0]
         return SelectedItemsDetailsDataModel(getTotalSize(list), getContains(list, countHiddenFiles))

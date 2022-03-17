@@ -12,6 +12,7 @@ import com.awab.fileexplorer.utils.data.data_models.QuickAccessFileDataModel
 import com.awab.fileexplorer.utils.data.types.QuickAccessFileType
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import java.io.File
 
 /**
  * this the model class will load the date and save it
@@ -79,6 +80,8 @@ class MainStorageModel(val context: Context) : StorageModel {
         callback: SimpleSuccessAndFailureCallback<List<QuickAccessFileDataModel>>
     ) {
         MainScope().launch {
+            // filtering the deleted files
+            filterQuickAccessFiles()
             dao.getQuickAccessFiles(targetedType).also {
                 if (it.isEmpty())
                     callback.onFailure("no Quick Access Files")
@@ -88,13 +91,32 @@ class MainStorageModel(val context: Context) : StorageModel {
         }
     }
 
+    /**
+     * this will delete any no existing files (deleted files) that are still saved in the quick access files
+     */
+    private suspend fun filterQuickAccessFiles() {
+        val noExistingFiles = mutableListOf<QuickAccessFileDataModel>()
+        dao.getQuickAccessFiles(QuickAccessFileType.PINED).forEach {
+            if (!File(it.path).exists())
+                noExistingFiles.add(it)
+        }
+        dao.getQuickAccessFiles(QuickAccessFileType.RECENT).forEach {
+            if (!File(it.path).exists())
+                noExistingFiles.add(it)
+        }
+
+        noExistingFiles.forEach {
+            dao.deleteQuickAccessFile(it)
+        }
+    }
+
     override fun deleteQuickAccessFile(
         file: QuickAccessFileDataModel,
-        callback: SimpleSuccessAndFailureCallback<Boolean>
+        callback: SimpleSuccessAndFailureCallback<Boolean>?
     ) {
         MainScope().launch {
             dao.deleteQuickAccessFile(file)
-            callback.onSuccess(true)
+            callback?.onSuccess(true)
         }
     }
 }

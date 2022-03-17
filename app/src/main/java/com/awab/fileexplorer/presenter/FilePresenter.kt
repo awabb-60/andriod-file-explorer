@@ -60,4 +60,10 @@ class FilePresenter(
         view.stopActionMode()
     }
 
+//    override fun locate(file: FileDataModel) {
+//        view.getItems().forEachIndexed { index, fileDataModel ->
+//            if (file == fileDataModel)
+//                view.scrollTo(index)
+//        }
+//    }
 }

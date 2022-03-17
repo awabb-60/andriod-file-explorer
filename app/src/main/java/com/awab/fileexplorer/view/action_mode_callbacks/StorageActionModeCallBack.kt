@@ -21,9 +21,9 @@ class StorageActionModeCallBack(private val presenterContract: StoragePresenterC
 
         mode?.title = presenterContract.getActionModeTitle()
 
-        val oneItemSelected = presenterContract.showMIRename()
-        menu?.findItem(R.id.miRename)?.isVisible = oneItemSelected
-        menu?.findItem(R.id.miPin)?.isVisible = oneItemSelected
+        val onItemSelected = presenterContract.showMIRename()
+        menu?.findItem(R.id.miRename)?.isVisible = onItemSelected
+        menu?.findItem(R.id.miPin)?.isVisible = onItemSelected
 
         menu?.findItem(R.id.miOpenWith)?.isVisible = presenterContract.showMIOpenWith()
         return true
@@ -35,7 +35,7 @@ class StorageActionModeCallBack(private val presenterContract: StoragePresenterC
             R.id.miMove -> presenterContract.pickTransferLocation(TransferAction.MOVE)
             R.id.miCopy -> presenterContract.pickTransferLocation(TransferAction.COPY)
             R.id.miRename -> presenterContract.confirmRename()
-            R.id.miPin -> presenterContract.pinFile()
+            R.id.miPin -> presenterContract.pinOrUnpinFile()
             R.id.miOpenWith -> presenterContract.openWith()
             R.id.miDetails -> presenterContract.showDetails()
             R.id.miSelectAll -> presenterContract.selectAll()

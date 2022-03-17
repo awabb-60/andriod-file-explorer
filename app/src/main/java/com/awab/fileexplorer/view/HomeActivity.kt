@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.awab.fileexplorer.databinding.ActivityHomeBinding
+import com.awab.fileexplorer.databinding.ItemDetailsLayoutBinding
 import com.awab.fileexplorer.presenter.HomePresenter
 import com.awab.fileexplorer.presenter.contract.HomePresenterContract
 import com.awab.fileexplorer.utils.adapters.QuickAccessAdapter
@@ -18,6 +19,7 @@ import com.awab.fileexplorer.utils.data.data_models.QuickAccessFileDataModel
 import com.awab.fileexplorer.utils.data.data_models.StorageDataModel
 import com.awab.fileexplorer.utils.storageAccess
 import com.awab.fileexplorer.view.contract.HomeView
+import com.awab.fileexplorer.view.custom_views.CustomDialog
 import com.awab.fileexplorer.view.custom_views.Tap
 
 class HomeActivity : AppCompatActivity(), HomeView {
@@ -54,6 +56,7 @@ class HomeActivity : AppCompatActivity(), HomeView {
         binding.rvQuickAccess.setHasFixedSize(true)
 
         binding.btnEditQuickAccess.setOnClickListener {
+            mHomePresenter.quickAccessInEditMode = true
             it.visibility = View.GONE
             mQuickAccessFilesAdapter.startEditMode()
         }
@@ -79,7 +82,9 @@ class HomeActivity : AppCompatActivity(), HomeView {
     }
 
     override fun onBackPressed() {
-        if (!binding.btnEditQuickAccess.isVisible) {
+        // closing the edit mode in the quick access window
+        if (mHomePresenter.quickAccessInEditMode) {
+            mHomePresenter.quickAccessInEditMode = false
             binding.btnEditQuickAccess.isVisible = true
             mQuickAccessFilesAdapter.stopEditMode()
         } else
@@ -106,6 +111,21 @@ class HomeActivity : AppCompatActivity(), HomeView {
         startActivity(intent)
     }
 
+    override fun showDetailsDialog(name: String, size: String, lastModified: String, path: String) {
+        val dialogBinding = ItemDetailsLayoutBinding.inflate(layoutInflater)
+        dialogBinding.tvDetailsName.text = name
+        dialogBinding.tvDetailsLastModified.text = lastModified
+        dialogBinding.tvDetailsSize.text = size
+        dialogBinding.tvDetailsPath.text = path
+        val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
+        dialog.show()
+        dialogBinding.buttonsLayout.addButton("Ok") { dialog.cancel() }
+        dialogBinding.buttonsLayout.addButton("Locate") {
+            dialog.cancel()
+            mHomePresenter.locateFile(path)
+        }
+    }
+
     override fun updateStoragesList(storages: Array<StorageDataModel>) {
         mStorageAdapter.submitList(storages)
     }
@@ -121,7 +141,7 @@ class HomeActivity : AppCompatActivity(), HomeView {
         binding.quickAccessEmptyMessage.visibility = View.VISIBLE
     }
 
-    override fun updateQuickAccessCardHeight(cardHeight: Int) {
+    override fun updateQuickAccessWindowHeight(cardHeight: Int) {
         binding.quickAccessFilesCard.layoutParams.height = cardHeight
     }
 

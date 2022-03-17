@@ -7,7 +7,6 @@ import com.awab.fileexplorer.utils.data.data_models.FileDataModel
  */
 interface SupPresenter {
 
-
     /**
      * the main Storage presenter
      */
@@ -22,6 +21,7 @@ interface SupPresenter {
      * the action mode state: true==active, false== inactive
      */
     val actionModeOn:Boolean
+
     get() = mainStoragePresenter.actionModeOn
 
     /**
@@ -59,10 +59,17 @@ interface SupPresenter {
     /**
      * return the number of selected items
      */
-    fun getSelectedItemCount():Int
+    fun getSelectedItemCount(): Int
 
     /**
      * to remove the action mode ui from the the supPresenter view
      */
     fun stopActionMode()
+
+    /**
+     * if the given file dose exist in the files list it will scroll to that file position
+     * @param file the targeted file in the list
+     */
+//    fun locate(file: FileDataModel)
+
 }
