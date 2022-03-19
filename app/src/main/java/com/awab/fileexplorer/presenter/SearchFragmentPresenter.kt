@@ -1,5 +1,6 @@
 package com.awab.fileexplorer.presenter
 
+import android.provider.MediaStore
 import android.widget.Toast
 import com.awab.fileexplorer.model.MainStorageModel
 import com.awab.fileexplorer.model.utils.getSearchResults
@@ -47,24 +48,35 @@ class SearchFragmentPresenter(
     }
 
     override fun loadFiles() {
-        if (searchList.isEmpty())
-            model.loadSearchList(folderPath, object : SimpleSuccessAndFailureCallback<List<FileDataModel>> {
-                override fun onSuccess(data: List<FileDataModel>) {
-                    isReady(data)
-                }
+        if (searchList.isEmpty()) {
 
-                override fun onFailure(message: String) {
-                    Toast.makeText(view.context(), message, Toast.LENGTH_SHORT)
-                        .show()
-                    view.finishFragmnet()
-                }
-            })
+            val contentUri = MediaStore.Files.getContentUri("external")
+            val selection = "_data Like ?"
+            val selectionArgs = arrayOf("%$folderPath%")
+
+            model.queryFiles(
+                contentUri,
+                null,
+                selection,
+                selectionArgs,
+                object : SimpleSuccessAndFailureCallback<List<FileDataModel>> {
+                    override fun onSuccess(data: List<FileDataModel>) {
+                        isReady(data)
+                    }
+
+                    override fun onFailure(message: String) {
+                        Toast.makeText(view.context(), message, Toast.LENGTH_SHORT)
+                            .show()
+                        view.finishFragmnet()
+                    }
+                })
+        }
         else
             isReady(searchList)
     }
 
     override fun cancelLoadFiles() {
-        model.cancelLoadSearchList()
+        model.cancelQueryFiles()
     }
 
     override fun onFileClick(file: FileDataModel) {

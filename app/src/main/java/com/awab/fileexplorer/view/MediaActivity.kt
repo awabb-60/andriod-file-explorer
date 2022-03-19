@@ -27,7 +27,6 @@ class MediaActivity : AppCompatActivity(), MediaView, SearchView.OnQueryTextList
 
     private lateinit var binding: ActivityMediaBinding
     private lateinit var presenter: MediaPresenterContract
-
     private lateinit var adapter: MediaAdapter
 
     private var actionMode: ActionMode? = null
@@ -56,10 +55,13 @@ class MediaActivity : AppCompatActivity(), MediaView, SearchView.OnQueryTextList
         binding.rvMedia.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         binding.rvMedia.setHasFixedSize(true)
 
-        presenter.loadMedia(intent)
-
-
+        presenter.loadFiles(intent)
         _loadingDialog = CustomDialog.makeLoadingDialog(this)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        presenter.cancelLoadFiles()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -86,7 +88,7 @@ class MediaActivity : AppCompatActivity(), MediaView, SearchView.OnQueryTextList
     }
 
     override fun onClose(): Boolean {
-        presenter.loadMedia(intent)
+        presenter.loadFiles(intent)
         return false
     }
 

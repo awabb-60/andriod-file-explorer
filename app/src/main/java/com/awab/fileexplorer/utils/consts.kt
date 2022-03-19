@@ -1,7 +1,6 @@
 package com.awab.fileexplorer.utils
 
 import android.Manifest
-import android.provider.MediaStore
 
 //const val READ_EXTERNAL_STORAGE_PERMISSION = Manifest.permission.READ_EXTERNAL_STORAGE
 const val WRITE_EXTERNAL_STORAGE_PERMISSION = Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -135,10 +134,3 @@ const val FINISH_COPY_INTENT = "FINISH_COPY_INTENT"
  * this the category of media to be shown in the media activity
  */
 const val MEDIA_CATEGORY_EXTRA = "MEDIA_CATEGORY_EXTRA"
-
-val PROJECTION = arrayOf(
-    MediaStore.MediaColumns.DATA,
-    MediaStore.MediaColumns.DISPLAY_NAME,
-    MediaStore.MediaColumns.SIZE,
-    MediaStore.MediaColumns.MIME_TYPE
-)

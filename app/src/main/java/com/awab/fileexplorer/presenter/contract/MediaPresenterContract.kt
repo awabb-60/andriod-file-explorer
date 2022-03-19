@@ -13,7 +13,7 @@ interface MediaPresenterContract {
     /**
      * this load all the file from the given category and then update the view
      */
-    fun loadMedia(intent: Intent)
+    fun loadFiles(intent: Intent)
 
     /**
      * call when an item is clicked
@@ -68,4 +68,9 @@ interface MediaPresenterContract {
      * newText and display the search results
      */
     fun searchTextChanged(newText: String)
+
+    /**
+     * cancel the running loading operation of the media files
+     */
+    fun cancelLoadFiles()
 }

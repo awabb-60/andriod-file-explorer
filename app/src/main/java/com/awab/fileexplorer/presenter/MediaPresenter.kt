@@ -1,18 +1,17 @@
 package com.awab.fileexplorer.presenter
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.MediaStore
 import android.widget.Toast
 import com.awab.fileexplorer.R
+import com.awab.fileexplorer.model.MainStorageModel
 import com.awab.fileexplorer.model.utils.getOpenFileIntent
 import com.awab.fileexplorer.model.utils.getSize
-import com.awab.fileexplorer.model.utils.makeFileModel
 import com.awab.fileexplorer.presenter.contract.MediaPresenterContract
-import com.awab.fileexplorer.presenter.threads.MediaLoaderAsyncTask
 import com.awab.fileexplorer.presenter.threads.SelectedMediaDetailsAsyncTask
-import com.awab.fileexplorer.utils.*
+import com.awab.fileexplorer.utils.DATE_FORMAT_PATTERN
+import com.awab.fileexplorer.utils.MEDIA_CATEGORY_EXTRA
 import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 import com.awab.fileexplorer.utils.data.data_models.SelectedItemsDetailsDataModel
@@ -24,13 +23,14 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
-    private val TAG = "MediaPresenter"
 
     var mediaItemsList = listOf<FileDataModel>()
 
     override var actionModeOn: Boolean = false
 
-    override fun loadMedia(intent: Intent) {
+    val model = MainStorageModel(view.context())
+
+    override fun loadFiles(intent: Intent) {
         if (mediaItemsList.isNotEmpty()) {
             view.mediaAdapter.setList(mediaItemsList)
             return
@@ -43,24 +43,24 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
         when (category) {
             MediaCategory.IMAGES -> {
                 val contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-                getMediaFiles(contentUri, PROJECTION, null, null)
+                getMediaFiles(contentUri, null, null)
                 view.setTitle("Images")
             }
             MediaCategory.VIDEOS -> {
                 val contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-                getMediaFiles(contentUri, PROJECTION, null, null)
+                getMediaFiles(contentUri, null, null)
                 view.setTitle("Videos")
             }
             MediaCategory.AUDIO -> {
                 val contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-                getMediaFiles(contentUri, PROJECTION, null, null)
+                getMediaFiles(contentUri, null, null)
                 view.setTitle("Audio")
             }
             MediaCategory.DOCUMENTS -> {
                 val docsContentUri = MediaStore.Files.getContentUri("external")
                 val selection = "_data LIKE ? OR _data LIKE ? OR _data LIKE ? OR _data LIKE ? "
                 val selectionArgs = arrayOf("%.pdf%", "%.txt%", "%.html%", "%.xml%")
-                getMediaFiles(docsContentUri, PROJECTION, selection, selectionArgs)
+                getMediaFiles(docsContentUri, selection, selectionArgs)
                 view.setTitle("Documents")
             }
         }
@@ -188,57 +188,32 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
         view.openFile(chooserIntent)
     }
 
-    fun showHiddenFiles():Boolean{
-        val sp = view.context().getSharedPreferences(VIEW_SETTINGS_SHARED_PREFERENCES, Context.MODE_PRIVATE)
-        return sp.getBoolean(SHARED_PREFERENCES_SHOW_HIDDEN_FILES, false)
+    private fun getMediaFiles(
+        contentUri: Uri, selection: String?, selectionArgs: Array<String>?
+    ) {
+        val mediaFilesProjection = arrayOf(
+            MediaStore.MediaColumns.DATA,
+        )
+        model.queryFiles(
+            contentUri,
+            mediaFilesProjection,
+            selection,
+            selectionArgs,
+            object : SimpleSuccessAndFailureCallback<List<FileDataModel>> {
+                override fun onSuccess(data: List<FileDataModel>) {
+                    mediaItemsList = data
+                    view.mediaAdapter.setList(mediaItemsList)
+                }
+
+                override fun onFailure(message: String) {
+                    view.mediaAdapter.setList(listOf())
+                    view.showToast(message)
+                }
+            })
     }
 
-    private fun getMediaFiles(
-        contentUri: Uri, projection: Array<String>?,
-        selection: String?, selectionArgs: Array<String>?
-    ) {
-        //  load the media items
-        val query = view.context().contentResolver.query(
-            contentUri, projection, selection, selectionArgs,
-            "${MediaStore.MediaColumns.DATE_MODIFIED} DESC", null
-        )
-        //  this is the querying work.. will be done in a worker thread
-        val work: (Unit) -> List<FileDataModel> = {
-            val list = mutableListOf<FileDataModel>()
-
-            query?.let { query ->
-                query.use { cursor ->
-                    val pathId = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA)
-
-                    while (cursor.moveToNext()) {
-                        try {
-                            val path = cursor.getString(pathId)
-
-                            list.add(makeFileModel(File(path)))
-                        } catch (e: Exception) {
-                        }
-                    }
-                }
-            }
-            list
-        }
-
-        // the worker thread that will handle the work and then notify the ui with the work results
-        // with the callback
-        MediaLoaderAsyncTask(work, object : SimpleSuccessAndFailureCallback<List<FileDataModel>> {
-            override fun onSuccess(data: List<FileDataModel>) {
-                mediaItemsList = if (!showHiddenFiles()) // filtering the hidden files
-                    data.filter { !it.name.startsWith('.') }
-                else
-                    data
-                view.mediaAdapter.setList(mediaItemsList)
-            }
-
-            override fun onFailure(message: String) {
-                view.mediaAdapter.setList(listOf())
-                view.showToast(message)
-            }
-        }).execute()
+    override fun cancelLoadFiles() {
+        model.cancelQueryFiles()
     }
 
     override fun searchTextChanged(newText: String) {

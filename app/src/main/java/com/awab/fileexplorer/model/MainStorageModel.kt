@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import com.awab.fileexplorer.model.contrancts.StorageModel
 import com.awab.fileexplorer.model.database.room.DataBase
-import com.awab.fileexplorer.model.utils.makeFileModels
+import com.awab.fileexplorer.model.utils.makeFileModel
 import com.awab.fileexplorer.utils.*
 import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.utils.data.data_models.FileDataModel
@@ -26,9 +26,8 @@ class MainStorageModel(val context: Context) : StorageModel {
     private val dao = database.getDao()
 
     private val coroutineIOScope = CoroutineScope(Dispatchers.IO)
-    private val coroutineMainScope = CoroutineScope(Dispatchers.Main.immediate)
 
-    private var searchListJob: Job? = null
+    private var queryFilesJob: CompletableJob = Job()
 
     override fun saveTreeUri(treeUri: Uri, sdCardName: String) {
         val spE = context
@@ -130,53 +129,65 @@ class MainStorageModel(val context: Context) : StorageModel {
         }
     }
 
-    override fun loadSearchList(
-        folderPath: String,
+    override fun queryFiles(
+        contentUri: Uri,
+        projection: Array<String>?,
+        selection: String?,
+        selectionArgs: Array<String>?,
         callback: SimpleSuccessAndFailureCallback<List<FileDataModel>>
     ) {
-        searchListJob = coroutineMainScope.launch {
-            // loading the files in suspend fun running on the background thread
-            val data = getSearchList(folderPath)
+        // running coroutine in the main scope
+        CoroutineScope(Dispatchers.Main + queryFilesJob).launch {
+            val data = query(contentUri, projection, selection, selectionArgs)
+            if (data != null) {
+                val filteredData = if (!viewHiddenFilesSettings())
+                    data.filter { !it.name.startsWith('.') }
+                else
+                    data
 
-            if (data != null)
-                callback.onSuccess(data)
-            else
-                callback.onFailure("error happened while loading the files")
+                callback.onSuccess(filteredData)
+            } else
+                callback.onFailure("error cant load media files")
         }
     }
 
-    override fun cancelLoadSearchList() {
-        // cancel the job if started
-        searchListJob?.cancel()
-    }
-
-    private suspend fun getSearchList(folderPath: String): List<FileDataModel>? {
+    private suspend fun query(
+        contentUri: Uri,
+        projection: Array<String>?,
+        selection: String?,
+        selectionArgs: Array<String>?,
+    ): List<FileDataModel>? {
         return withContext(Dispatchers.Default) {
             try {
-                // the query for all the files that start with the folderPath
+                val list = mutableListOf<FileDataModel>()
+                // query the files
                 val query = context.contentResolver.query(
-                    MediaStore.Files.getContentUri("external"),
-                    null, "_data Like ?",
-                    arrayOf("%$folderPath%"), null
+                    contentUri, projection, selection, selectionArgs,
+                    "${MediaStore.MediaColumns.DATE_MODIFIED} DESC", null
                 )
-                val allFiles = mutableListOf<File>()
-                // getting the files paths
-                query?.let { cursor ->
-                    cursor.use {
-                        val pathId = it.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA)
-                        while (it.moveToNext()) {
-                            val path = it.getString(pathId)
-                            allFiles.add(File(path))
+
+                // looping throw the query data
+                query?.let {
+                    it.use { cursor ->
+                        val pathId = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA)
+                        val path2Id = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.RELATIVE_PATH)
+                        while (cursor.moveToNext()) {
+                            val path = cursor.getString(pathId)
+                            val path1 = cursor.getString(path2Id)
+                            list.add(makeFileModel(File(path)))
                         }
                     }
                 }
-
-                // making the file models
-                makeFileModels(allFiles)
+                query?.close()
+                list
             } catch (e: Exception) {
-                // error while loading the files
                 null
             }
         }
     }
+
+    override fun cancelQueryFiles() {
+        queryFilesJob.cancel()
+    }
+
 }

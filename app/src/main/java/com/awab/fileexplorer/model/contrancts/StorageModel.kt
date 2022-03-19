@@ -65,12 +65,18 @@ interface StorageModel {
     fun deleteQuickAccessFile(file: QuickAccessFileDataModel, callback: SimpleSuccessAndFailureCallback<Boolean>?)
 
     /**
-     * load all the files inside the given folder path
+     * run a query with the given projection to load all the files in it
      */
-    fun loadSearchList(folderPath: String, callback: SimpleSuccessAndFailureCallback<List<FileDataModel>>)
+    fun queryFiles(
+        contentUri: Uri,
+        projection: Array<String>?,
+        selection: String?,
+        selectionArgs: Array<String>?,
+        callback: SimpleSuccessAndFailureCallback<List<FileDataModel>>
+    )
 
     /**
-     * to cancel the running load search list operation
+     * to cancel the running query of the files
      */
-    fun cancelLoadSearchList()
+    fun cancelQueryFiles()
 }
