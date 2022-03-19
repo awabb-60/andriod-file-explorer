@@ -22,11 +22,16 @@ interface SearchPresenterContract:SupPresenter {
      * this filter the search list by the given text
      * and then update the view
      */
-    fun onTextChanged(text:String)
+    fun onTextChanged(text: String)
 
     /**
      * this get called after the query of the search list to update the view
      * and be ready to receive search text
      */
-    fun isReady(list:List<FileDataModel>)
+    fun isReady(list: List<FileDataModel>)
+
+    /**
+     * to cancel the running operation of loading the search files
+     */
+    fun cancelLoadFiles()
 }

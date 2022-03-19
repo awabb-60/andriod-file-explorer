@@ -71,13 +71,18 @@ class TapsLayout(context: Context, val attr: AttributeSet) : LinearLayout(contex
     private fun selectTap(tap: Tap) {
         val viewIterator = children.iterator()
         // removing the background from all taps
-        while (viewIterator.hasNext())
-            viewIterator.next().background = null
+        while (viewIterator.hasNext()) {
+            viewIterator.next().apply {
+                background = null
+                alpha = 0.5F
+            }
+        }
 
         // selecting the targeted tap
         selectedTap = getChildAt(tap.viewIndex)
         selectedTap.background =
             attributes.getDrawable(R.styleable.TapsLayout_tap_background_drawable)
+        selectedTap.alpha = 1F
     }
 
     /**

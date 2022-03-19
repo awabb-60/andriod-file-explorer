@@ -521,7 +521,6 @@ interface StoragePresenterContract {
             QuickAccessFileType.PINED,
             object : SimpleSuccessAndFailureCallback<List<QuickAccessFileDataModel>> {
                 override fun onSuccess(data: List<QuickAccessFileDataModel>) {
-
                     val targetedQuickAccessFile = data.find { file.path == it.path }
 
                     // if the file in pined: unpin the file

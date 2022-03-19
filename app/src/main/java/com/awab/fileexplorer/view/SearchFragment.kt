@@ -94,16 +94,16 @@ class SearchFragment : Fragment(), ISearchFragmentView {
         // bind this search presenter to tha main presenter
         mMainPresenter.bindSupPresenter(mSearchFragmentPresenter)
 
-        //  showing a progress bar until the Presenter is ready
+        //  showing a progress bar until the presenter is ready with the search list
         binding.searchProgressBar.visibility = View.VISIBLE
 
-        // querying the files for search
+        // querying the search list
         mSearchFragmentPresenter.loadFiles()
-
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        mSearchFragmentPresenter.cancelLoadFiles()
         _binding = null
         // the adapter has the context... and it must be destroyed here(memory leak)
         _adapter = null
@@ -126,7 +126,6 @@ class SearchFragment : Fragment(), ISearchFragmentView {
     }
 
     override fun isReady() {
-
         //  the presenter is ready, updating the view to start searching
         binding.searchProgressBar.visibility = View.GONE
         binding.searchView.visibility = View.VISIBLE

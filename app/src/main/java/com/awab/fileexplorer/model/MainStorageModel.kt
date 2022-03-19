@@ -2,16 +2,18 @@ package com.awab.fileexplorer.model
 
 import android.content.Context
 import android.net.Uri
+import android.provider.MediaStore
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import com.awab.fileexplorer.model.contrancts.StorageModel
 import com.awab.fileexplorer.model.database.room.DataBase
+import com.awab.fileexplorer.model.utils.makeFileModels
 import com.awab.fileexplorer.utils.*
 import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
+import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 import com.awab.fileexplorer.utils.data.data_models.QuickAccessFileDataModel
 import com.awab.fileexplorer.utils.data.types.QuickAccessFileType
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.io.File
 
 /**
@@ -22,6 +24,11 @@ class MainStorageModel(val context: Context) : StorageModel {
 
     private val database = DataBase.getInstance(context)
     private val dao = database.getDao()
+
+    private val coroutineIOScope = CoroutineScope(Dispatchers.IO)
+    private val coroutineMainScope = CoroutineScope(Dispatchers.Main.immediate)
+
+    private var searchListJob: Job? = null
 
     override fun saveTreeUri(treeUri: Uri, sdCardName: String) {
         val spE = context
@@ -68,7 +75,7 @@ class MainStorageModel(val context: Context) : StorageModel {
     }
 
     override fun saveToQuickAccessFiles(list: List<QuickAccessFileDataModel>) {
-        MainScope().launch {
+        coroutineIOScope.launch {
             list.forEach {
                 dao.insert(it)
             }
@@ -79,14 +86,16 @@ class MainStorageModel(val context: Context) : StorageModel {
         targetedType: QuickAccessFileType,
         callback: SimpleSuccessAndFailureCallback<List<QuickAccessFileDataModel>>
     ) {
-        MainScope().launch {
+        coroutineIOScope.launch {
             // filtering the deleted files
             filterQuickAccessFiles()
             dao.getQuickAccessFiles(targetedType).also {
-                if (it.isEmpty())
-                    callback.onFailure("no Quick Access Files")
-                else
-                    callback.onSuccess(it)
+                withContext(Dispatchers.Main.immediate) {
+                    if (it.isEmpty())
+                        callback.onFailure("no Quick Access Files")
+                    else
+                        callback.onSuccess(it)
+                }
             }
         }
     }
@@ -100,6 +109,7 @@ class MainStorageModel(val context: Context) : StorageModel {
             if (!File(it.path).exists())
                 noExistingFiles.add(it)
         }
+
         dao.getQuickAccessFiles(QuickAccessFileType.RECENT).forEach {
             if (!File(it.path).exists())
                 noExistingFiles.add(it)
@@ -114,9 +124,59 @@ class MainStorageModel(val context: Context) : StorageModel {
         file: QuickAccessFileDataModel,
         callback: SimpleSuccessAndFailureCallback<Boolean>?
     ) {
-        MainScope().launch {
+        coroutineIOScope.launch {
             dao.deleteQuickAccessFile(file)
             callback?.onSuccess(true)
+        }
+    }
+
+    override fun loadSearchList(
+        folderPath: String,
+        callback: SimpleSuccessAndFailureCallback<List<FileDataModel>>
+    ) {
+        searchListJob = coroutineMainScope.launch {
+            // loading the files in suspend fun running on the background thread
+            val data = getSearchList(folderPath)
+
+            if (data != null)
+                callback.onSuccess(data)
+            else
+                callback.onFailure("error happened while loading the files")
+        }
+    }
+
+    override fun cancelLoadSearchList() {
+        // cancel the job if started
+        searchListJob?.cancel()
+    }
+
+    private suspend fun getSearchList(folderPath: String): List<FileDataModel>? {
+        return withContext(Dispatchers.Default) {
+            try {
+                // the query for all the files that start with the folderPath
+                val query = context.contentResolver.query(
+                    MediaStore.Files.getContentUri("external"),
+                    null, "_data Like ?",
+                    arrayOf("%$folderPath%"), null
+                )
+                val allFiles = mutableListOf<File>()
+                // getting the files paths
+                query?.let { cursor ->
+                    cursor.use {
+                        val pathId = it.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA)
+                        while (it.moveToNext()) {
+                            val path = it.getString(pathId)
+                            allFiles.add(File(path))
+                        }
+                    }
+                }
+
+                // making the file models
+                makeFileModels(allFiles)
+            } catch (e: Exception) {
+                // error while loading the files
+                null
+            }
         }
     }
 }

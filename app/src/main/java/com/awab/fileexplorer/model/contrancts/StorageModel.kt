@@ -2,6 +2,7 @@ package com.awab.fileexplorer.model.contrancts
 
 import android.net.Uri
 import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
+import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 import com.awab.fileexplorer.utils.data.data_models.QuickAccessFileDataModel
 import com.awab.fileexplorer.utils.data.types.QuickAccessFileType
 
@@ -62,4 +63,14 @@ interface StorageModel {
     )
 
     fun deleteQuickAccessFile(file: QuickAccessFileDataModel, callback: SimpleSuccessAndFailureCallback<Boolean>?)
+
+    /**
+     * load all the files inside the given folder path
+     */
+    fun loadSearchList(folderPath: String, callback: SimpleSuccessAndFailureCallback<List<FileDataModel>>)
+
+    /**
+     * to cancel the running load search list operation
+     */
+    fun cancelLoadSearchList()
 }
