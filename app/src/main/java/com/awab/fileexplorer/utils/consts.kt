@@ -60,10 +60,10 @@ const val DEFAULT_SORTING_ARGUMENT = SORTING_BY_NAME
 
 // the sorting order arguments
 const val SORTING_ORDER_ASC = "SORTING_ORDER_ASC"
-const val SORTING_ORDER_DEC = "SORTING_TYPE_DEC"
+const val SORTING_ORDER_DEC = "SORTING_ORDER_DEC"
 
 const val DEFAULT_SORTING_ORDER = SORTING_ORDER_ASC
-const val DEFAULT_SHOW_HIDDEN_FILES = false
+const val DEFAULT_SHOW_HIDDEN_FILES = true
 
 const val DATE_FORMAT_PATTERN = "E dd-MMM-y  hh:mm a"
 

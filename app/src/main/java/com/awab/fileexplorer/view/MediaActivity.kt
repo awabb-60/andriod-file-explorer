@@ -14,8 +14,8 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.awab.fileexplorer.R
 import com.awab.fileexplorer.databinding.ActivityMediaBinding
-import com.awab.fileexplorer.databinding.ItemDetailsLayoutBinding
-import com.awab.fileexplorer.databinding.ItemsDetailsLayoutBinding
+import com.awab.fileexplorer.databinding.FileDetailsLayoutBinding
+import com.awab.fileexplorer.databinding.FilesDetailsLayoutBinding
 import com.awab.fileexplorer.presenter.MediaPresenter
 import com.awab.fileexplorer.presenter.contract.MediaPresenterContract
 import com.awab.fileexplorer.utils.adapters.MediaAdapter
@@ -108,7 +108,7 @@ class MediaActivity : AppCompatActivity(), MediaView, SearchView.OnQueryTextList
     }
 
     override fun showDetails(name: String, path: String, size: String, dateStr: String) {
-        val dialogBinding = ItemDetailsLayoutBinding.inflate(layoutInflater)
+        val dialogBinding = FileDetailsLayoutBinding.inflate(layoutInflater)
 
         dialogBinding.apply {
             tvDetailsName.text = name
@@ -125,10 +125,10 @@ class MediaActivity : AppCompatActivity(), MediaView, SearchView.OnQueryTextList
     }
 
     override fun showDetails(contains: String, totalSize: String) {
-        val dialogBinding = ItemsDetailsLayoutBinding.inflate(layoutInflater)
+        val dialogBinding = FilesDetailsLayoutBinding.inflate(layoutInflater)
 
         dialogBinding.apply {
-            tvDetailsContains.text = contains
+            tvDetailsContain.text = contains
             tvDetailsTotalSize.text = totalSize
         }
 

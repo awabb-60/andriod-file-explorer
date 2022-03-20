@@ -23,20 +23,20 @@ interface StorageModel {
      * it will load the saved tree uri of the sd card from the shared preferences
      * @return the tree uri of the sd card
      */
-    fun getTreeUri(storageName: String): Uri
+    fun getTreeUri(storageName: String): Uri?
 
 
     /**
      * it will return the saved sort argument
      * @return the a string that represent the sort argument
      */
-    fun viewSortBySettings(): String?
+    fun viewSortBySettings(): String
 
     /**
      * it will return the saved sort order
      * @return the a string that represent the sort order
      */
-    fun viewSortOrderSettings(): String?
+    fun viewSortOrderSettings(): String
 
     /**
      * it will return the saved setting for showing the hidden file

@@ -96,14 +96,19 @@ interface StorageView {
     fun confirmDelete()
 
     /**
-     * this is when one item is selected
+     * this is when one file is selected
      */
-    fun showDetails(name:String, lastModified:String, size:String, path:String)
+    fun showDetails(name: String, lastModified: String, size: String, path: String)
 
     /**
-     * this is when many items are selected
+     * this is when one folder is selected
      */
-    fun showDetails(contains:String, totalSize:String)
+    fun showDetails(name: String, contains: String, lastModified: String, size: String, path: String)
+
+    /**
+     * this is when many files and folder are selected
+     */
+    fun showDetails(contains: String, totalSize: String)
 
     /**
      * show a dialog to let the user pick new viewing settings

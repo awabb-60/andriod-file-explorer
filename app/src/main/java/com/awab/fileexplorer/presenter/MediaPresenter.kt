@@ -6,8 +6,6 @@ import android.provider.MediaStore
 import android.widget.Toast
 import com.awab.fileexplorer.R
 import com.awab.fileexplorer.model.MainStorageModel
-import com.awab.fileexplorer.model.utils.getOpenFileIntent
-import com.awab.fileexplorer.model.utils.getSize
 import com.awab.fileexplorer.presenter.contract.MediaPresenterContract
 import com.awab.fileexplorer.utils.DATE_FORMAT_PATTERN
 import com.awab.fileexplorer.utils.MEDIA_CATEGORY_EXTRA
@@ -16,6 +14,8 @@ import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 import com.awab.fileexplorer.utils.data.data_models.FilesDetailsDataModel
 import com.awab.fileexplorer.utils.data.types.MediaCategory
 import com.awab.fileexplorer.utils.data.types.MimeType
+import com.awab.fileexplorer.utils.getOpenFileIntent
+import com.awab.fileexplorer.utils.getSize
 import com.awab.fileexplorer.view.contract.MediaView
 import java.io.File
 import java.text.SimpleDateFormat

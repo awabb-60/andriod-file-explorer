@@ -3,11 +3,11 @@ package com.awab.fileexplorer.presenter
 import android.provider.MediaStore
 import android.widget.Toast
 import com.awab.fileexplorer.model.MainStorageModel
-import com.awab.fileexplorer.model.utils.getSearchResults
 import com.awab.fileexplorer.presenter.contract.SearchPresenterContract
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.utils.data.data_models.FileDataModel
+import com.awab.fileexplorer.utils.getSearchResults
 import com.awab.fileexplorer.view.contract.ISearchFragmentView
 
 class SearchFragmentPresenter(

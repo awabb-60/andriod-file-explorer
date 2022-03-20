@@ -9,10 +9,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.awab.fileexplorer.databinding.QuickAccessFileLayoutBinding
-import com.awab.fileexplorer.model.utils.makeFileModel
 import com.awab.fileexplorer.presenter.contract.HomePresenterContract
 import com.awab.fileexplorer.utils.bindFileItem
 import com.awab.fileexplorer.utils.data.data_models.QuickAccessFileDataModel
+import com.awab.fileexplorer.utils.makeFileModel
 import java.io.File
 
 class QuickAccessAdapter(val context: Context, val presenter: HomePresenterContract) :

@@ -10,9 +10,6 @@ import androidx.documentfile.provider.DocumentFile
 import com.awab.fileexplorer.R
 import com.awab.fileexplorer.databinding.PickViewSettingsLayoutBinding
 import com.awab.fileexplorer.model.contrancts.StorageModel
-import com.awab.fileexplorer.model.utils.getFolderSizeBytes
-import com.awab.fileexplorer.model.utils.getOpenFileIntent
-import com.awab.fileexplorer.model.utils.getSize
 import com.awab.fileexplorer.presenter.SdCardPresenterSAF
 import com.awab.fileexplorer.utils.*
 import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
@@ -246,8 +243,8 @@ interface StoragePresenterContract {
      * select all the files in the list
      */
     fun selectAll() {
-        view.updateActionMode()
         supPresenter.selectAll()
+        view.updateActionMode()
     }
 
     /**
@@ -277,14 +274,21 @@ interface StoragePresenterContract {
         val selectedItems = supPresenter.getSelectedItems()
 
         if (selectedItems.size == 1) {
-            val item = selectedItems[0]
-            val date = SimpleDateFormat(DATE_FORMAT_PATTERN, Locale.US).format(item.date)
-            if (item.type == FileType.FILE) {
-                view.showDetails(item.name, date, item.size, item.path)
+            val file = selectedItems[0]
+            val date = SimpleDateFormat(DATE_FORMAT_PATTERN, Locale.US).format(file.date)
+            if (file.type == FileType.FILE) {
+                view.showDetails(file.name, date, file.size, file.path)
             } else {
-                val sizeInBytes = getFolderSizeBytes(File(item.path))
-                val size = getSize(sizeInBytes)
-                view.showDetails(item.name, date, size, item.path)
+                val innerFiles = makeFilesList(
+                    File(file.path),
+                    model.viewSortBySettings(),
+                    model.viewSortOrderSettings(),
+                    model.viewHiddenFilesSettings()
+                )
+                val folderSize = getFolderSizeBytes(File(file.path))
+                val size = getSize(folderSize)
+                val contain = getContains(innerFiles, model.viewHiddenFilesSettings())
+                view.showDetails(file.name, contain, date, size, file.path)
             }
         } else {
             // loading large files on a background thread

@@ -34,6 +34,15 @@
         <item name="android:layout_margin">10dp</item>
     </style>
 
+    <style name="DetailsItemContainer">
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Title</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+    </style>
+
     <style name="DetailsItem">
         <item name="android:textAppearance">@style/TextAppearance.AppCompat.Title</item>
     </style>

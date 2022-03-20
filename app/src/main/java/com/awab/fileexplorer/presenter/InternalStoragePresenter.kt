@@ -1,15 +1,11 @@
 package com.awab.fileexplorer.presenter
 
 import com.awab.fileexplorer.model.MainStorageModel
-import com.awab.fileexplorer.model.utils.createFolderIO
-import com.awab.fileexplorer.model.utils.renameFileIO
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 import com.awab.fileexplorer.presenter.contract.SupPresenter
-import com.awab.fileexplorer.utils.INTERNAL_STORAGE_REQUIRED_PERMISSIONS
-import com.awab.fileexplorer.utils.allPermissionsGranted
+import com.awab.fileexplorer.utils.*
 import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.utils.data.types.StorageType
-import com.awab.fileexplorer.utils.storageAccess
 import com.awab.fileexplorer.view.contract.StorageView
 import java.io.File
 

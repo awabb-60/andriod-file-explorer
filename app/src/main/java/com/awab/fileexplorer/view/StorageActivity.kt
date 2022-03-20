@@ -18,7 +18,6 @@ import androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_FADE
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.awab.fileexplorer.*
 import com.awab.fileexplorer.databinding.*
-import com.awab.fileexplorer.model.utils.*
 import com.awab.fileexplorer.presenter.*
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 import com.awab.fileexplorer.utils.*
@@ -258,7 +257,7 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
     }
 
     override fun showDetails(name: String, lastModified: String, size: String, path: String) {
-        val dialogBinding = ItemDetailsLayoutBinding.inflate(layoutInflater)
+        val dialogBinding = FileDetailsLayoutBinding.inflate(layoutInflater)
         dialogBinding.tvDetailsName.text = name
         dialogBinding.tvDetailsLastModified.text = lastModified
         dialogBinding.tvDetailsSize.text = size
@@ -269,9 +268,22 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         dialogBinding.buttonsLayout.addButton("Ok") { dialog.cancel() }
     }
 
+    override fun showDetails(name: String, contains: String, lastModified: String, size: String, path: String) {
+        val dialogBinding = FolderDetailsLayoutBinding.inflate(layoutInflater)
+        dialogBinding.tvDetailsName.text = name
+        dialogBinding.tvDetailsContain.text = contains
+        dialogBinding.tvDetailsLastModified.text = lastModified
+        dialogBinding.tvDetailsSize.text = size
+        dialogBinding.tvDetailsPath.text = path
+
+        val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
+        dialog.show()
+        dialogBinding.buttonsLayout.addButton("Ok") { dialog.cancel() }
+    }
+
     override fun showDetails(contains: String, totalSize: String) {
-        val dialogBinding = ItemsDetailsLayoutBinding.inflate(layoutInflater)
-        dialogBinding.tvDetailsContains.text = contains
+        val dialogBinding = FilesDetailsLayoutBinding.inflate(layoutInflater)
+        dialogBinding.tvDetailsContain.text = contains
         dialogBinding.tvDetailsTotalSize.text = totalSize
 
         val dialog = CustomDialog.makeDialog(this, dialogBinding.root)
@@ -352,7 +364,11 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
                 grantUriPermission(
                     packageName,
                     treeUri,
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION and Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+                contentResolver.takePersistableUriPermission(
+                    treeUri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                 )
             }
             Toast.makeText(this, "authorization successful !", Toast.LENGTH_SHORT).show()

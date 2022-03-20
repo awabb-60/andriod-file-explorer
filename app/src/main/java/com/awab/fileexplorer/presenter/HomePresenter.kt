@@ -7,10 +7,6 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.awab.fileexplorer.R
 import com.awab.fileexplorer.model.MainStorageModel
-import com.awab.fileexplorer.model.utils.getFolderSizeBytes
-import com.awab.fileexplorer.model.utils.getOpenFileIntent
-import com.awab.fileexplorer.model.utils.getSize
-import com.awab.fileexplorer.model.utils.makeFileModel
 import com.awab.fileexplorer.presenter.contract.HomePresenterContract
 import com.awab.fileexplorer.utils.*
 import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback

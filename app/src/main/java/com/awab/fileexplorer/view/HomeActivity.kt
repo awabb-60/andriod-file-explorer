@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.awab.fileexplorer.databinding.ActivityHomeBinding
-import com.awab.fileexplorer.databinding.ItemDetailsLayoutBinding
+import com.awab.fileexplorer.databinding.FileDetailsLayoutBinding
 import com.awab.fileexplorer.presenter.HomePresenter
 import com.awab.fileexplorer.presenter.contract.HomePresenterContract
 import com.awab.fileexplorer.utils.adapters.QuickAccessAdapter
@@ -113,7 +113,7 @@ class HomeActivity : AppCompatActivity(), HomeView {
     }
 
     override fun showDetailsDialog(name: String, size: String, lastModified: String, path: String) {
-        val dialogBinding = ItemDetailsLayoutBinding.inflate(layoutInflater)
+        val dialogBinding = FileDetailsLayoutBinding.inflate(layoutInflater)
         dialogBinding.tvDetailsName.text = name
         dialogBinding.tvDetailsLastModified.text = lastModified
         dialogBinding.tvDetailsSize.text = size

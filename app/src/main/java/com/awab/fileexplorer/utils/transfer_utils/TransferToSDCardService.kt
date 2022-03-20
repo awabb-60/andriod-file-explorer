@@ -5,11 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.core.app.JobIntentService
 import androidx.documentfile.provider.DocumentFile
-import com.awab.fileexplorer.model.utils.navigateToTreeFile
-import com.awab.fileexplorer.utils.PASTE_LOCATION_PATH_EXTRA
-import com.awab.fileexplorer.utils.TRANSFER_ACTION_EXTRA
-import com.awab.fileexplorer.utils.TRANSFER_FILES_PATHS_EXTRA
-import com.awab.fileexplorer.utils.TREE_URI_FOR_TRANSFER_EXTRA
+import com.awab.fileexplorer.utils.*
 import com.awab.fileexplorer.utils.data.types.TransferAction
 import com.awab.fileexplorer.view.contract.StorageView
 import java.io.File

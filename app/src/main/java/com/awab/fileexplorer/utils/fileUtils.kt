@@ -1,4 +1,4 @@
-package com.awab.fileexplorer.model.utils
+package com.awab.fileexplorer.utils
 
 import android.content.Context
 import android.content.Intent
@@ -7,7 +7,6 @@ import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
-import com.awab.fileexplorer.utils.*
 import com.awab.fileexplorer.utils.data.data_models.BreadcrumbsDataModel
 import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 import com.awab.fileexplorer.utils.data.types.FileType
@@ -25,7 +24,7 @@ fun isEmpty(file: File, showHidingFiles: Boolean): Boolean {
         if (showHidingFiles)
             files.isEmpty()
         else // the hidden files will not get counted
-            files.filter { !it.isHidden }.isEmpty()
+            files.none { !it.isHidden }
     } catch (e: Exception) {
         true
     }
@@ -33,9 +32,9 @@ fun isEmpty(file: File, showHidingFiles: Boolean): Boolean {
 
 fun makeFilesList(
     file: File,
-    sortingBy: String = SORTING_BY_NAME,
-    sortingOrder: String = SORTING_ORDER_DEC,
-    showHidingFiles: Boolean = false
+    sortingBy: String,
+    sortingOrder: String,
+    showHidingFiles: Boolean
 ): List<FileDataModel> {
 
     return try {
@@ -60,10 +59,7 @@ fun makeFilesList(
                     file.listFiles()!!.sortedByDescending { it.lastModified() }
             }
             else -> { // default sorting by name
-                if (sortingOrder == SORTING_ORDER_ASC)
                     file.listFiles()!!.sortedBy { it.name }
-                else
-                    file.listFiles()!!.sortedByDescending { it.name }
             }
         }
 //        turn it into file models
@@ -82,31 +78,19 @@ fun makeFilesList(
 
 fun makeFileModels(listFiles: List<File>, showHiddenFiles: Boolean = false): List<FileDataModel> =
     listFiles.map {
-        FileDataModel(
-            name = it.name,
-            path = it.absolutePath,
-            size = getSize(it.length()),
-            date = Date(it.lastModified()),
-            type = getFileType(it),
-            mimeType = getMime(it),
-            uri = it.toUri(),
-            isEmpty = isEmpty(it, showHiddenFiles)
-        )
+        makeFileModel(it, showHiddenFiles)
     }
 
-fun makeFileModel(file: File, showHiddenFiles: Boolean = false): FileDataModel {
-    return FileDataModel(
-        name = file.name,
-        path = file.absolutePath,
-        size = getSize(file.length()),
-        date = Date(file.lastModified()),
-        type = getFileType(file),
-        mimeType = getMime(file),
-        uri = file.toUri(),
-        isEmpty = isEmpty(file, showHiddenFiles)
-    )
-
-}
+fun makeFileModel(file: File, showHiddenFiles: Boolean = false) = FileDataModel(
+    name = file.name,
+    path = file.absolutePath,
+    size = getSize(file.length()),
+    date = Date(file.lastModified()),
+    type = getFileType(file),
+    mimeType = getMime(file),
+    uri = file.toUri(),
+    isEmpty = isEmpty(file, showHiddenFiles)
+)
 
 fun getSize(sizeInBytes: Long): String {
     var size = sizeInBytes.div(1024.0)
@@ -129,22 +113,6 @@ fun getFolderSizeBytes(folder: File): Long {
     return sizeBytes
 }
 
-fun getInnerFilesCount(file: File, countHeddinFiles: Boolean): Int {
-    return if (countHeddinFiles)
-        file.walkTopDown().filter { it.isFile }.count()
-    else // not counting the hidden files
-        file.walkTopDown().filter { it.isFile }.filter { !it.isHidden }.count()
-}
-
-fun getInnerFoldersCount(file: File, countHiddenFiles: Boolean): Int {
-    // drop(1) to drop the parent folder
-    return if (countHiddenFiles)
-        file.walkTopDown().drop(1).filter { it.isDirectory }.count()
-    else
-        file.walkTopDown().drop(1).filter { it.isDirectory }.filter { !it.isHidden }.count()
-
-}
-
 /**
  * calculate the total size of the files and folders in the list
  * @param list the list to find it size
@@ -159,7 +127,6 @@ fun getTotalSize(list: List<FileDataModel>): String {
     }
     return getSize(totalSizeBytes)
 }
-
 
 /**
  * return a string that will show the number of files and folders (and what the folders contains) from the list
@@ -181,35 +148,25 @@ fun getContains(list: List<FileDataModel>, countHiddenFiles: Boolean): String {
     return "$fileCount Files, $folderCount Folders"
 }
 
+fun getInnerFilesCount(file: File, countHiddenFiles: Boolean): Int {
+    return if (countHiddenFiles)
+        file.walkTopDown().filter { it.isFile }.count()
+    else // not counting the hidden files
+        file.walkTopDown().filter { it.isFile }.filter { !it.isHidden }.count()
+}
+
+fun getInnerFoldersCount(file: File, countHiddenFiles: Boolean): Int {
+    // drop(1) to drop the parent folder
+    return if (countHiddenFiles)
+        file.walkTopDown().drop(1).filter { it.isDirectory }.count()
+    else
+        file.walkTopDown().drop(1).filter { it.isDirectory }.filter { !it.isHidden }.count()
+}
+
 fun getFileType(file: File): FileType = if (file.isFile) FileType.FILE else FileType.DIRECTORY
 
 fun getMime(file: File): MimeType {
     val type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(file.extension) ?: return MimeType.UNKNOWN
-    return when (type.split('/')[0]) {
-        "audio" -> MimeType.AUDIO
-        "image" -> MimeType.IMAGE
-        "video" -> MimeType.VIDEO
-        "text" -> {
-            when {
-                type.endsWith("html") -> MimeType.HTML
-                type.endsWith("xml") -> MimeType.HTML
-                type.endsWith("plain") -> MimeType.TEXT
-                else -> MimeType.UNKNOWN
-            }
-        }
-        "application" -> {
-            when {
-                type.endsWith("pdf") -> MimeType.PDF
-                type.endsWith("ogg") -> MimeType.AUDIO
-                type.endsWith("vnd.android.package-archive") -> MimeType.APPLICATION
-                else -> MimeType.UNKNOWN
-            }
-        }
-        else -> MimeType.UNKNOWN
-    }
-}
-
-fun getMime(type: String): MimeType {
     return when (type.split('/')[0]) {
         "audio" -> MimeType.AUDIO
         "image" -> MimeType.IMAGE
@@ -287,91 +244,6 @@ fun createFolderIO(file: File): Boolean {
         Log.d(TAG, "unable to create this folder!")
         false
     }
-}
-
-fun deleteFolderIO(path: String) {
-    try {
-        val file = File(path)
-        if (file.deleteRecursively())
-            Log.d(TAG, "${file.name} was deleted successfully")
-        else
-            Log.d(TAG, "error deleting this folder")
-    } catch (e: Exception) {
-        Log.d(TAG, "error deleting this file")
-    }
-}
-
-fun deleteFileIO(path: String) {
-    try {
-        val file = File(path)
-        if (file.delete())
-            Log.d(TAG, "file ${file.name} deleted successfully")
-        else
-            Log.d(TAG, "file ${file.name} not deleted successfully")
-    } catch (e: Exception) {
-        Log.d(TAG, "error deleting this file")
-    }
-}
-
-fun folderAlreadyExist(file: File): Boolean {
-    return try {
-        val list = file.parentFile!!.listFiles()!!
-        val mli = list.map { listOf(it.name, it.isDirectory) }
-        mli.contains(listOf(file.name, true))
-    } catch (e: Exception) {
-        true
-    }
-}
-
-fun nameAlreadyExist(file: File): Boolean {
-    return try {
-        val list = file.parentFile!!.listFiles()!!
-        val mli = list.map { it.name }
-        mli.contains(file.name)
-    } catch (e: Exception) {
-        true
-    }
-}
-
-fun getInnerFiles(file: File, showHidingFiles: Boolean): List<File> {
-    val list = file.listFiles()
-    list ?: return listOf()
-
-    val innerList = mutableListOf<File>()
-    for (currentFile in list) {
-//      skipping the hiding files and what inside it the hiding folders
-        if (currentFile.isHidden && !showHidingFiles)
-            continue
-
-//      adding the file or folder
-        innerList.add(currentFile)
-
-//      adding what inside the folder
-        if (currentFile.isDirectory) {
-            getInnerFiles(currentFile, showHidingFiles).forEach {
-                innerList.add(it)
-            }
-        }
-    }
-    return innerList
-}
-
-fun getInnerFiles2(file: File, showHidingFiles: Boolean): List<File> {
-    var innerList = file.walkTopDown().toList()
-    if (!showHidingFiles)
-        innerList = innerList.filter { !it.isHidden }
-//    dropping the first file which is the parent file
-    return innerList.toList().drop(1)
-}
-
-/**
- * get search result from folder
- */
-fun getSearchResults(folder: File, text: String, showHidingFiles: Boolean = false): List<FileDataModel> {
-    val innerFiles = getInnerFiles(folder, showHidingFiles).filter { text.lowercase() in it.name.lowercase() }
-
-//    returning the files models and showing the folders first
-    return makeFileModels(innerFiles).sortedBy { it.type == FileType.FILE && it.isEmpty }
 }
 
 /**

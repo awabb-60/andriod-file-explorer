@@ -4,14 +4,9 @@ import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import com.awab.fileexplorer.model.contrancts.StorageModel
 import com.awab.fileexplorer.model.database.room.DataBase
-import com.awab.fileexplorer.model.utils.getContains
-import com.awab.fileexplorer.model.utils.getSize
-import com.awab.fileexplorer.model.utils.getTotalSize
-import com.awab.fileexplorer.model.utils.makeFileModel
 import com.awab.fileexplorer.utils.*
 import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.utils.data.data_models.FileDataModel
@@ -44,24 +39,24 @@ class MainStorageModel(val context: Context) : StorageModel {
         spE.apply()
     }
 
-    override fun getTreeUri(storageName: String): Uri {
+    override fun getTreeUri(storageName: String): Uri? {
         val sp = context.getSharedPreferences(
             SD_CARD_TREE_URI_SP,
             AppCompatActivity.MODE_PRIVATE
         )
-        return sp.getString(TREE_URI_ + storageName, "")!!.toUri()
+        return Uri.parse(sp.getString(TREE_URI_ + storageName, ""))
     }
 
-    override fun viewSortBySettings(): String? {
+    override fun viewSortBySettings(): String {
         val sp =
             context.getSharedPreferences(VIEW_SETTINGS_SHARED_PREFERENCES, AppCompatActivity.MODE_PRIVATE)
-        return sp.getString(SHARED_PREFERENCES_SORTING_BY, DEFAULT_SORTING_ARGUMENT)
+        return sp.getString(SHARED_PREFERENCES_SORTING_BY, DEFAULT_SORTING_ARGUMENT) ?: DEFAULT_SORTING_ARGUMENT
     }
 
-    override fun viewSortOrderSettings(): String? {
+    override fun viewSortOrderSettings(): String {
         val sp =
             context.getSharedPreferences(VIEW_SETTINGS_SHARED_PREFERENCES, AppCompatActivity.MODE_PRIVATE)
-        return sp.getString(SHARED_PREFERENCES_SORTING_ORDER, DEFAULT_SORTING_ORDER)
+        return sp.getString(SHARED_PREFERENCES_SORTING_ORDER, DEFAULT_SORTING_ORDER) ?: DEFAULT_SORTING_ORDER
     }
 
     override fun viewHiddenFilesSettings(): Boolean {
@@ -173,6 +168,7 @@ class MainStorageModel(val context: Context) : StorageModel {
                 query?.let {
                     it.use { cursor ->
                         val pathId = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA)
+
                         while (cursor.moveToNext()) {
                             val path = cursor.getString(pathId)
                             list.add(makeFileModel(File(path)))

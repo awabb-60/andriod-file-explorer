@@ -11,8 +11,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.awab.fileexplorer.databinding.PickPasteLoacationDialogFragmnetBinding
-import com.awab.fileexplorer.model.utils.makeFileModels
-import com.awab.fileexplorer.model.utils.makeFilesList
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 import com.awab.fileexplorer.utils.DEFAULT_SORTING_ARGUMENT
 import com.awab.fileexplorer.utils.DEFAULT_SORTING_ORDER
@@ -21,6 +19,8 @@ import com.awab.fileexplorer.utils.adapters.PastLocationStoragesAdapter
 import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 import com.awab.fileexplorer.utils.data.data_models.StorageDataModel
 import com.awab.fileexplorer.utils.data.types.TransferAction
+import com.awab.fileexplorer.utils.makeFileModels
+import com.awab.fileexplorer.utils.makeFilesList
 import com.awab.fileexplorer.view.contract.StorageView
 import java.io.File
 

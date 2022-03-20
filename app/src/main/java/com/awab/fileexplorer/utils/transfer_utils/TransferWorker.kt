@@ -1,8 +1,6 @@
 package com.awab.fileexplorer.utils.transfer_utils
 
 import android.content.Intent
-import com.awab.fileexplorer.model.utils.getInnerFilesCount
-import com.awab.fileexplorer.model.utils.getInnerFoldersCount
 import com.awab.fileexplorer.utils.*
 import com.awab.fileexplorer.utils.data.data_models.TransferInfoDataModel
 import com.awab.fileexplorer.utils.data.types.TransferAction

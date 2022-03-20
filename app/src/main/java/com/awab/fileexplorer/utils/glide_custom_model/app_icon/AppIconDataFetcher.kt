@@ -2,8 +2,8 @@ package com.awab.fileexplorer.utils.glide_custom_model.app_icon
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import com.awab.fileexplorer.model.utils.getApkIcon
 import com.awab.fileexplorer.utils.data.data_models.AppIconDataModel
+import com.awab.fileexplorer.utils.getApkIcon
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.data.DataFetcher

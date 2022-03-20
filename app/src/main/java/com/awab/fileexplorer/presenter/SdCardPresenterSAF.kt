@@ -2,16 +2,13 @@ package com.awab.fileexplorer.presenter
 
 import android.content.Intent
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.documentfile.provider.DocumentFile
 import com.awab.fileexplorer.model.MainStorageModel
-import com.awab.fileexplorer.model.utils.navigateToTreeFile
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 import com.awab.fileexplorer.presenter.contract.SupPresenter
 import com.awab.fileexplorer.utils.PICKER_REQUEST_CODE
-import com.awab.fileexplorer.utils.SD_CARD_TREE_URI_SP
-import com.awab.fileexplorer.utils.TREE_URI_
 import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
+import com.awab.fileexplorer.utils.navigateToTreeFile
 import com.awab.fileexplorer.view.contract.StorageView
 import java.io.File
 
@@ -131,7 +128,8 @@ class SdCardPresenterSAF(
     }
 
     private fun getTreeUriFile(): DocumentFile? {
-        return DocumentFile.fromTreeUri(view.context(), model.getTreeUri(storageName))
+        val uri = model.getTreeUri(storageName) ?: return null
+        return DocumentFile.fromTreeUri(view.context(), uri)
     }
 
     private fun openPicker() {
@@ -141,17 +139,14 @@ class SdCardPresenterSAF(
     }
 
     private fun sdCardAuthorized(): Boolean {
-        val sp = view.context()
-            .getSharedPreferences(SD_CARD_TREE_URI_SP, AppCompatActivity.MODE_PRIVATE)
-
-        return if (sp.contains(TREE_URI_ + storageName)) {
+        return if (model.getTreeUri(storageName) != null) {
             // updating the permission
-            val uri = model.getTreeUri(storageName)
-            view.context().grantUriPermission(
-                view.context().packageName,
-                uri,
-                Intent.FLAG_GRANT_READ_URI_PERMISSION and Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-            )
+//            val uri =
+//            view.context().grantUriPermission(
+//                view.context().packageName,
+//                uri,
+//                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+//            )
             true
         } else
             false
