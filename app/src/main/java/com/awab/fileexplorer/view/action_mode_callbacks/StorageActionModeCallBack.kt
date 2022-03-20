@@ -26,6 +26,8 @@ class StorageActionModeCallBack(private val presenterContract: StoragePresenterC
         menu?.findItem(R.id.miPin)?.isVisible = onItemSelected
 
         menu?.findItem(R.id.miOpenWith)?.isVisible = presenterContract.showMIOpenWith()
+
+        menu?.findItem(R.id.miSelectAll)?.isVisible = presenterContract.showMISelectAll()
         return true
     }
 

@@ -9,12 +9,11 @@ import com.awab.fileexplorer.model.MainStorageModel
 import com.awab.fileexplorer.model.utils.getOpenFileIntent
 import com.awab.fileexplorer.model.utils.getSize
 import com.awab.fileexplorer.presenter.contract.MediaPresenterContract
-import com.awab.fileexplorer.presenter.threads.SelectedMediaDetailsAsyncTask
 import com.awab.fileexplorer.utils.DATE_FORMAT_PATTERN
 import com.awab.fileexplorer.utils.MEDIA_CATEGORY_EXTRA
 import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.utils.data.data_models.FileDataModel
-import com.awab.fileexplorer.utils.data.data_models.SelectedItemsDetailsDataModel
+import com.awab.fileexplorer.utils.data.data_models.FilesDetailsDataModel
 import com.awab.fileexplorer.utils.data.types.MediaCategory
 import com.awab.fileexplorer.utils.data.types.MimeType
 import com.awab.fileexplorer.view.contract.MediaView
@@ -74,7 +73,6 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
         }
 
 //        opining the item
-
 //        file cant be opened
         if (item.mimeType == MimeType.UNKNOWN) {
             Toast.makeText(view.context(), "unsupported file format", Toast.LENGTH_SHORT).show()
@@ -111,7 +109,6 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
 
     override fun getActionModeTitle(): String {
         val count = view.mediaAdapter.getSelectedItems().count()
-
         return if (count <= 1)
             "$count item Selected"
         else
@@ -138,7 +135,7 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
                 val path = selectedItem.path
                 val size = selectedItem.size
                 val date = Date(File(selectedItem.path).lastModified())
-                val dateStr = SimpleDateFormat(DATE_FORMAT_PATTERN).format(date)
+                val dateStr = SimpleDateFormat(DATE_FORMAT_PATTERN, Locale.US).format(date)
 
                 view.showDetails(name, path, size, dateStr)
             }
@@ -157,17 +154,19 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
             else -> {
                 // loading large items in background thread
                 view.loadingDialog.show()
-                SelectedMediaDetailsAsyncTask(object : SimpleSuccessAndFailureCallback<SelectedItemsDetailsDataModel> {
-                    override fun onSuccess(data: SelectedItemsDetailsDataModel) {
-                        view.showDetails(data.contains, data.totalSize)
-                        view.loadingDialog.dismiss()
-                    }
+                model.getSelectedMediaDetails(
+                    items,
+                    object : SimpleSuccessAndFailureCallback<FilesDetailsDataModel> {
+                        override fun onSuccess(data: FilesDetailsDataModel) {
+                            view.loadingDialog.dismiss()
+                            view.showDetails(data.contains, data.totalSize)
+                        }
 
-                    override fun onFailure(message: String) {
-                        view.loadingDialog.dismiss()
-                        view.showToast("some error occur")
-                    }
-                }).execute(items)
+                        override fun onFailure(message: String) {
+                            view.loadingDialog.dismiss()
+                            view.showToast("some error occur")
+                        }
+                    })
             }
         }
     }

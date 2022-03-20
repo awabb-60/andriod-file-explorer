@@ -48,6 +48,10 @@ class FilePresenter(
         view.selectAll()
     }
 
+    override fun getAllItems(): List<FileDataModel> {
+        return view.getAllItems()
+    }
+
     override fun getSelectedItems(): List<FileDataModel> {
         return view.getSelectedItems()
     }

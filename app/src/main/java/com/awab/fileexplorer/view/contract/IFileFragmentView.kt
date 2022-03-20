@@ -17,7 +17,7 @@ interface IFileFragmentView {
 
     fun getSelectedItems(): List<FileDataModel>
 
-    fun getItems(): List<FileDataModel>
+    fun getAllItems(): List<FileDataModel>
 
     fun scrollTo(position: Int)
 }

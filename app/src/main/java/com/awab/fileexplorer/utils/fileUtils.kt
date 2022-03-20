@@ -145,9 +145,13 @@ fun getInnerFoldersCount(file: File, countHiddenFiles: Boolean): Int {
 
 }
 
-fun getTotalSize(list: List<FileDataModel>?): String {
+/**
+ * calculate the total size of the files and folders in the list
+ * @param list the list to find it size
+ */
+fun getTotalSize(list: List<FileDataModel>): String {
     var totalSizeBytes = 0L
-    list?.forEach {
+    list.forEach {
         totalSizeBytes += if (it.type == FileType.FILE) {
             File(it.path).length()
         } else
@@ -156,10 +160,16 @@ fun getTotalSize(list: List<FileDataModel>?): String {
     return getSize(totalSizeBytes)
 }
 
-fun getContains(list: List<FileDataModel>?, countHiddenFiles: Boolean): String {
+
+/**
+ * return a string that will show the number of files and folders (and what the folders contains) from the list
+ * @param list the list of files to get it contains
+ * @param countHiddenFiles true to cont the hidden files false otherwise
+ */
+fun getContains(list: List<FileDataModel>, countHiddenFiles: Boolean): String {
     var fileCount = 0
     var folderCount = 0
-    list?.forEach {
+    list.forEach {
         if (it.type == FileType.FILE)
             fileCount++
         else {
@@ -407,21 +417,22 @@ fun recreateBreadcrumbsFromPath(
         itemPath += it
     }
     list.add(BreadcrumbsDataModel(File(itemPath).name, itemPath))
-
     return list
 }
 
 /**
- * this return the folder inside the treeDocumentFile that contains the file with the given file path
+ * this will navigate to  the Document file that has the filePath inside the given treeDocumentFile
+ * and return it or null if the file doesn't exists
+ * @param treeDocumentFile the parent file that contains the targeted file with the filePath
+ * @param filePath tha path of the file inside the parent folder
+ * @return the targeted file with filePath as a DocumentFile or null if the file doesn't exists
+ * or the parent file doesn't contain it
  */
 fun navigateToTreeFile(treeDocumentFile: DocumentFile, filePath: String): DocumentFile? {
     val storageName = treeDocumentFile.name ?: return null
 
     // the file path without the sd card storage path at the start
     val innerPath = filePath.removeRange(0, filePath.indexOf(storageName) + storageName.length)
-
-    // removing the name from the path
-//    innerPath = innerPath.dropLastWhile { it != File.separatorChar }
 
     // the sd card storage tree document file
     var file: DocumentFile? = treeDocumentFile

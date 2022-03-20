@@ -10,21 +10,22 @@ import android.widget.TextView
 import androidx.core.view.children
 import androidx.core.widget.TextViewCompat
 import com.awab.fileexplorer.R
+import com.awab.fileexplorer.utils.data.data_models.Tap
 
 class TapsLayout(context: Context, val attr: AttributeSet) : LinearLayout(context, attr) {
-
     private val TAG = "TapsLayout"
 
     private var attributes = context.obtainStyledAttributes(attr, R.styleable.TapsLayout)
     private var firstTapSelected = false
-
     private lateinit var selectedTap: View
 
     init {
         orientation = HORIZONTAL
+
+        // to show a preview of the layout while the editor is active
         if (attributes.getBoolean(R.styleable.TapsLayout_show_preview, false) && isInEditMode) {
             addTap(Tap("Tap 1", 0) {})
-            addTap(Tap("Tap 2", 4) {})
+            addTap(Tap("Tap 2", 1) {})
         }
     }
 
@@ -98,5 +99,3 @@ class TapsLayout(context: Context, val attr: AttributeSet) : LinearLayout(contex
     }
 
 }
-
-data class Tap(val title: String, var viewIndex: Int = 0, val function: () -> Unit)

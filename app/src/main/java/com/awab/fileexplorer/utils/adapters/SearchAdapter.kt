@@ -52,6 +52,10 @@ class SearchAdapter(val context: Context, val presenter: SupPresenter) : Recycle
         notifyDataSetChanged()
     }
 
+    fun getAllItems(): List<FileDataModel> {
+        return currentList
+    }
+
     fun getSelectedItems(): List<FileDataModel> {
         return currentList.filter { it.selected }
     }

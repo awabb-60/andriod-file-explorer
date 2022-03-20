@@ -17,10 +17,10 @@ import com.awab.fileexplorer.utils.adapters.QuickAccessAdapter
 import com.awab.fileexplorer.utils.adapters.StoragesAdapter
 import com.awab.fileexplorer.utils.data.data_models.QuickAccessFileDataModel
 import com.awab.fileexplorer.utils.data.data_models.StorageDataModel
+import com.awab.fileexplorer.utils.data.data_models.Tap
 import com.awab.fileexplorer.utils.storageAccess
 import com.awab.fileexplorer.view.contract.HomeView
 import com.awab.fileexplorer.view.custom_views.CustomDialog
-import com.awab.fileexplorer.view.custom_views.Tap
 
 class HomeActivity : AppCompatActivity(), HomeView {
 

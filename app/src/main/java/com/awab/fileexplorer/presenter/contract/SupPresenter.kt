@@ -52,9 +52,14 @@ interface SupPresenter {
     fun selectAll()
 
     /**
+     * return all items in the supPresenter view
+     */
+    fun getAllItems(): List<FileDataModel>
+
+    /**
      * return all the selected items in the supPresenter view
      */
-    fun getSelectedItems():List<FileDataModel>
+    fun getSelectedItems(): List<FileDataModel>
 
     /**
      * return the number of selected items
@@ -65,11 +70,4 @@ interface SupPresenter {
      * to remove the action mode ui from the the supPresenter view
      */
     fun stopActionMode()
-
-    /**
-     * if the given file dose exist in the files list it will scroll to that file position
-     * @param file the targeted file in the list
-     */
-//    fun locate(file: FileDataModel)
-
 }

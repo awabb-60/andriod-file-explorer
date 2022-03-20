@@ -5,10 +5,10 @@ import com.awab.fileexplorer.model.utils.createFolderIO
 import com.awab.fileexplorer.model.utils.renameFileIO
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 import com.awab.fileexplorer.presenter.contract.SupPresenter
-import com.awab.fileexplorer.presenter.threads.DeleteFromInternalStorageAsyncTask
 import com.awab.fileexplorer.utils.INTERNAL_STORAGE_REQUIRED_PERMISSIONS
 import com.awab.fileexplorer.utils.allPermissionsGranted
 import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
+import com.awab.fileexplorer.utils.data.types.StorageType
 import com.awab.fileexplorer.utils.storageAccess
 import com.awab.fileexplorer.view.contract.StorageView
 import java.io.File
@@ -62,24 +62,24 @@ class InternalStoragePresenter(
 
     override fun delete(showMessages:Boolean) {
         view.loadingDialog.show()
-        DeleteFromInternalStorageAsyncTask(object : SimpleSuccessAndFailureCallback<Boolean> {
-            override fun onSuccess(data: Boolean) {
-                view.loadingDialog.dismiss()
-                if (!data && showMessages)
-                    view.showToast("some error occur while deleting the files")
-                else if (data && showMessages)
-                    view.showToast("items deleted successfully")
+        model.deleteFromInternalStorage(
+            supPresenter.getSelectedItems(),
+            StorageType.INTERNAL,
+            object : SimpleSuccessAndFailureCallback<Boolean> {
+                override fun onSuccess(data: Boolean) {
+                    view.loadingDialog.dismiss()
+                    if (data && showMessages)
+                        view.showToast("files deleted successfully")
+                    supPresenter.loadFiles()
+                }
 
-                supPresenter.loadFiles()
-            }
-
-            // this called when file some files are not deleted
-            // so the loading ui will stile going
-            override fun onFailure(message: String) {
-                if (showMessages)
-                    view.showToast(message)
-            }
-        }).execute(supPresenter.getSelectedItems())
+                // this called when file some files are not deleted
+                // so the loading ui will stile going
+                override fun onFailure(message: String) {
+                    if (showMessages)
+                        view.showToast(message)
+                }
+            })
         view.stopActionMode()
     }
 }

@@ -101,7 +101,7 @@ class FilesFragment : Fragment(), IFileFragmentView {
         return adapter.getSelectedItems()
     }
 
-    override fun getItems(): List<FileDataModel> {
+    override fun getAllItems(): List<FileDataModel> {
         return adapter.currentList
     }
 

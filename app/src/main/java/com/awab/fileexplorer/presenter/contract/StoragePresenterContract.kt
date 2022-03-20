@@ -14,7 +14,6 @@ import com.awab.fileexplorer.model.utils.getFolderSizeBytes
 import com.awab.fileexplorer.model.utils.getOpenFileIntent
 import com.awab.fileexplorer.model.utils.getSize
 import com.awab.fileexplorer.presenter.SdCardPresenterSAF
-import com.awab.fileexplorer.presenter.threads.SelectedFilesDetailsAsyncTask
 import com.awab.fileexplorer.utils.*
 import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.utils.data.data_models.*
@@ -212,8 +211,14 @@ interface StoragePresenterContract {
      */
     fun showMIOpenWith(): Boolean {
 //        true to show rename
-        val items = supPresenter.getSelectedItems()
-        return items.count() == 1 && items[0].type == FileType.FILE
+        val files = supPresenter.getSelectedItems()
+        return files.count() == 1 && files[0].type == FileType.FILE
+    }
+
+    fun showMISelectAll(): Boolean {
+//        true to show rename
+        val files = supPresenter.getAllItems()
+        return files.find { !it.selected } != null
     }
 
     /**
@@ -232,17 +237,17 @@ interface StoragePresenterContract {
         val count = supPresenter.getSelectedItemCount()
 
         return if (count <= 1)
-            "$count item Selected"
+            "$count file Selected"
         else
-            "$count items Selected"
+            "$count files Selected"
     }
 
     /**
-     * select all the items in the list
+     * select all the files in the list
      */
     fun selectAll() {
-        supPresenter.selectAll()
         view.updateActionMode()
+        supPresenter.selectAll()
     }
 
     /**
@@ -269,10 +274,10 @@ interface StoragePresenterContract {
      * it will show all the details of the selected items in a dialog
      */
     fun showDetails() {
-        val items = supPresenter.getSelectedItems()
+        val selectedItems = supPresenter.getSelectedItems()
 
-        if (items.size == 1) {
-            val item = items[0]
+        if (selectedItems.size == 1) {
+            val item = selectedItems[0]
             val date = SimpleDateFormat(DATE_FORMAT_PATTERN, Locale.US).format(item.date)
             if (item.type == FileType.FILE) {
                 view.showDetails(item.name, date, item.size, item.path)
@@ -284,18 +289,17 @@ interface StoragePresenterContract {
         } else {
             // loading large files on a background thread
             view.loadingDialog.show()
-            SelectedFilesDetailsAsyncTask(model.viewHiddenFilesSettings(),
-                object : SimpleSuccessAndFailureCallback<SelectedItemsDetailsDataModel> {
-                    override fun onSuccess(data: SelectedItemsDetailsDataModel) {
-                        view.showDetails(data.contains, data.totalSize)
-                        view.loadingDialog.dismiss()
-                    }
+            model.getFilesDetails(selectedItems, object : SimpleSuccessAndFailureCallback<FilesDetailsDataModel> {
+                override fun onSuccess(data: FilesDetailsDataModel) {
+                    view.loadingDialog.dismiss()
+                    view.showDetails(data.contains, data.totalSize)
+                }
 
-                    override fun onFailure(message: String) {
-                        view.showToast(message)
-                        view.loadingDialog.dismiss()
-                    }
-                }).execute(items)
+                override fun onFailure(message: String) {
+                    view.loadingDialog.dismiss()
+                    view.showToast(message)
+                }
+            })
         }
     }
 

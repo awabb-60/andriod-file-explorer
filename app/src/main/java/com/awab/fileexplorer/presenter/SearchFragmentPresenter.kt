@@ -67,7 +67,7 @@ class SearchFragmentPresenter(
                     override fun onFailure(message: String) {
                         Toast.makeText(view.context(), message, Toast.LENGTH_SHORT)
                             .show()
-                        view.finishFragmnet()
+                        view.finishFragment()
                     }
                 })
         }
@@ -94,6 +94,10 @@ class SearchFragmentPresenter(
 
     override fun selectAll() {
         view.selectAll()
+    }
+
+    override fun getAllItems(): List<FileDataModel> {
+        return view.getAllItems()
     }
 
     override fun getSelectedItems(): List<FileDataModel> {

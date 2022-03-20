@@ -152,6 +152,10 @@ class SearchFragment : Fragment(), ISearchFragmentView {
         adapter.selectAll()
     }
 
+    override fun getAllItems(): List<FileDataModel> {
+        return adapter.getAllItems()
+    }
+
     override fun getSelectedItems(): List<FileDataModel> {
         return adapter.getSelectedItems()
     }
@@ -168,7 +172,7 @@ class SearchFragment : Fragment(), ISearchFragmentView {
         mSearchFragmentPresenter.onTextChanged(text.toString())
     }
 
-    override fun finishFragmnet() {
+    override fun finishFragment() {
         activity?.supportFragmentManager?.popBackStack()
     }
 

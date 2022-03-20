@@ -8,7 +8,6 @@ import com.awab.fileexplorer.model.MainStorageModel
 import com.awab.fileexplorer.model.utils.navigateToTreeFile
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 import com.awab.fileexplorer.presenter.contract.SupPresenter
-import com.awab.fileexplorer.presenter.threads.DeleteFromSdCardAsyncTask
 import com.awab.fileexplorer.utils.PICKER_REQUEST_CODE
 import com.awab.fileexplorer.utils.SD_CARD_TREE_URI_SP
 import com.awab.fileexplorer.utils.TREE_URI_
@@ -101,43 +100,34 @@ class SdCardPresenterSAF(
     }
 
     override fun delete(showMessages: Boolean) {
-        try {
-            val selectedItems = supPresenter.getSelectedItems()
-            val sdCardDocumentFile = getTreeUriFile() ?: return
+        val selectedItems = supPresenter.getSelectedItems()
+        val sdCardDocumentFile = getTreeUriFile() ?: return
 
-            // the parent folder that contains the files that will get deleted
-            val folder = File(selectedItems[0].path).parent ?: return
-            val parentFolder = navigateToTreeFile(sdCardDocumentFile, folder)
-            if (selectedItems.isEmpty() || parentFolder == null)
-                return
+        // the parent folder that contains the files that will get deleted
+        val folder = File(selectedItems[0].path).parent ?: return
+        val parentFolder = navigateToTreeFile(sdCardDocumentFile, folder)
+        if (selectedItems.isEmpty() || parentFolder == null)
+            return
 
-            view.loadingDialog.show()
-            // deleting the files
-            DeleteFromSdCardAsyncTask(parentFolder, object : SimpleSuccessAndFailureCallback<Boolean> {
-                override fun onSuccess(data: Boolean) {
-                    view.loadingDialog.dismiss()
-                    if (!data && showMessages)
-                        view.showToast("some error occur while deleting the files")
-                    else if (data && showMessages)
-                        view.showToast("items successfully deleted")
+        view.loadingDialog.show()
+        // deleting the files
+        model.deleteFromSdCard(selectedItems, parentFolder, object : SimpleSuccessAndFailureCallback<Boolean> {
+            override fun onSuccess(data: Boolean) {
+                view.loadingDialog.dismiss()
+                if (!data && showMessages)
+                    view.showToast("some error occur while deleting the files")
+                else if (data && showMessages)
+                    view.showToast("items successfully deleted")
 
-                    supPresenter.loadFiles()
-                }
+                supPresenter.loadFiles()
+            }
 
-                // this called when file some files are not deleted
-                // so the loading ui will stile going
-                override fun onFailure(message: String) {
-                    if (showMessages)
-                        view.showToast(message)
-                }
-            }).execute(selectedItems)
-
-            view.stopActionMode()
-        } catch (e: Exception) {
-            if (showMessages)
-                if(showMessages)
-                Toast.makeText(view.context(), "error deleting files", Toast.LENGTH_SHORT).show()
-        }
+            override fun onFailure(message: String) {
+                if (showMessages)
+                    view.showToast(message)
+            }
+        })
+        view.stopActionMode()
     }
 
     private fun getTreeUriFile(): DocumentFile? {
@@ -149,7 +139,6 @@ class SdCardPresenterSAF(
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
         view.openAuthorizationPicker(intent, PICKER_REQUEST_CODE)
     }
-
 
     private fun sdCardAuthorized(): Boolean {
         val sp = view.context()

@@ -5,14 +5,20 @@ import android.net.Uri
 import android.provider.MediaStore
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
+import androidx.documentfile.provider.DocumentFile
 import com.awab.fileexplorer.model.contrancts.StorageModel
 import com.awab.fileexplorer.model.database.room.DataBase
+import com.awab.fileexplorer.model.utils.getContains
+import com.awab.fileexplorer.model.utils.getSize
+import com.awab.fileexplorer.model.utils.getTotalSize
 import com.awab.fileexplorer.model.utils.makeFileModel
 import com.awab.fileexplorer.utils.*
 import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.utils.data.data_models.FileDataModel
+import com.awab.fileexplorer.utils.data.data_models.FilesDetailsDataModel
 import com.awab.fileexplorer.utils.data.data_models.QuickAccessFileDataModel
 import com.awab.fileexplorer.utils.data.types.QuickAccessFileType
+import com.awab.fileexplorer.utils.data.types.StorageType
 import kotlinx.coroutines.*
 import java.io.File
 
@@ -28,6 +34,8 @@ class MainStorageModel(val context: Context) : StorageModel {
     private val coroutineIOScope = CoroutineScope(Dispatchers.IO)
 
     private var queryFilesJob: CompletableJob = Job()
+    private var loadingDetailsJob: CompletableJob = Job()
+    private var deletingFilesJob: CompletableJob = Job()
 
     override fun saveTreeUri(treeUri: Uri, sdCardName: String) {
         val spE = context
@@ -88,13 +96,8 @@ class MainStorageModel(val context: Context) : StorageModel {
         coroutineIOScope.launch {
             // filtering the deleted files
             filterQuickAccessFiles()
-            dao.getQuickAccessFiles(targetedType).also {
-                withContext(Dispatchers.Main.immediate) {
-                    if (it.isEmpty())
-                        callback.onFailure("no Quick Access Files")
-                    else
-                        callback.onSuccess(it)
-                }
+            dao.getQuickAccessFiles(targetedType).also { data ->
+                withContext(Dispatchers.Main) { callback.onSuccess(data) }
             }
         }
     }
@@ -125,7 +128,7 @@ class MainStorageModel(val context: Context) : StorageModel {
     ) {
         coroutineIOScope.launch {
             dao.deleteQuickAccessFile(file)
-            callback?.onSuccess(true)
+            withContext(Dispatchers.Main) { callback?.onSuccess(true) }
         }
     }
 
@@ -170,10 +173,8 @@ class MainStorageModel(val context: Context) : StorageModel {
                 query?.let {
                     it.use { cursor ->
                         val pathId = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA)
-                        val path2Id = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.RELATIVE_PATH)
                         while (cursor.moveToNext()) {
                             val path = cursor.getString(pathId)
-                            val path1 = cursor.getString(path2Id)
                             list.add(makeFileModel(File(path)))
                         }
                     }
@@ -190,4 +191,117 @@ class MainStorageModel(val context: Context) : StorageModel {
         queryFilesJob.cancel()
     }
 
+    override fun getFilesDetails(
+        list: List<FileDataModel>,
+        callback: SimpleSuccessAndFailureCallback<FilesDetailsDataModel>
+    ) {
+        CoroutineScope(Dispatchers.Main + loadingDetailsJob).launch {
+            val data = withContext(Dispatchers.Default) {
+                FilesDetailsDataModel(getTotalSize(list), getContains(list, viewHiddenFilesSettings()))
+            }
+            callback.onSuccess(data)
+        }
+    }
+
+    override fun getSelectedMediaDetails(
+        list: List<FileDataModel>,
+        callback: SimpleSuccessAndFailureCallback<FilesDetailsDataModel>
+    ) {
+        CoroutineScope(Dispatchers.Main + loadingDetailsJob).launch {
+            val data = withContext(Dispatchers.Default) {
+                // getting details for the selected items
+                val contains = "${list.size} Files"
+                var totalSizeBytes = 0L
+                list.forEach {
+                    totalSizeBytes += File(it.path).length()
+                }
+                val totalSize = getSize(totalSizeBytes)
+                FilesDetailsDataModel(totalSize, contains)
+            }
+            callback.onSuccess(data)
+        }
+    }
+
+    override fun cancelGetDetails() {
+        loadingDetailsJob.cancel()
+    }
+
+    override fun deleteFromInternalStorage(
+        list: List<FileDataModel>,
+        storageType: StorageType,
+        callback: SimpleSuccessAndFailureCallback<Boolean>
+    ) {
+        if (list.isEmpty()) {
+            callback.onFailure("cant delete files")
+            return
+        }
+
+        CoroutineScope(Dispatchers.Main + deletingFilesJob).launch {
+            val success = deleteFilesFromInternalStorage(list)
+            if (success)
+                callback.onSuccess(success)
+            else
+                callback.onFailure("failed to delete some files")
+        }
+    }
+
+    private suspend fun deleteFilesFromInternalStorage(list: List<FileDataModel>): Boolean {
+        var allFilesDelete = true
+        withContext(Dispatchers.Default) {
+            try {
+                for (fileModel in list) {
+                    val file = File(fileModel.path)
+                    // deleting the file if the file exists
+                    if (file.exists()) {
+                        val fileDeleted = file.deleteRecursively()
+
+                        // if some files are not deleted
+                        if (!fileDeleted)
+                            allFilesDelete = false
+                    }
+                }
+            } catch (e: Exception) {
+                allFilesDelete = false
+            }
+        }
+        return allFilesDelete
+    }
+
+    override fun deleteFromSdCard(
+        list: List<FileDataModel>,
+        parentFolder: DocumentFile,
+        callback: SimpleSuccessAndFailureCallback<Boolean>
+    ) {
+        if (list.isEmpty()) {
+            callback.onFailure("cant delete files")
+            return
+        }
+        CoroutineScope(Dispatchers.Main + deletingFilesJob).launch {
+            val success = deleteFilesFromSdCard(list, parentFolder)
+            if (success)
+                callback.onSuccess(success)
+            else
+                callback.onFailure("failed to delete some files")
+        }
+    }
+
+    private suspend fun deleteFilesFromSdCard(list: List<FileDataModel>, parentFolder: DocumentFile): Boolean {
+        var allFilesDeleted = true
+
+        withContext(Dispatchers.Default) {
+            //  deleting all the targeted files
+            list.forEach {
+                try {
+                    val fileDeleted = parentFolder.findFile(it.name)?.delete()
+                    // some error occur... the file was not found or couldn't delete this file
+                    if (fileDeleted == null || !fileDeleted) {
+                        allFilesDeleted = false
+                    }
+                } catch (e: Exception) {
+                    allFilesDeleted = false
+                }
+            }
+        }
+        return allFilesDeleted
+    }
 }

@@ -25,5 +25,7 @@ interface ISearchFragmentView {
 
     fun stopActionMode()
 
-    fun finishFragmnet()
+    fun finishFragment()
+
+    fun getAllItems(): List<FileDataModel>
 }
