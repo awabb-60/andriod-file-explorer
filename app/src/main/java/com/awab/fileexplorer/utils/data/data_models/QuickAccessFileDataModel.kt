@@ -11,7 +11,7 @@ data class QuickAccessFileDataModel(
     val path: String,
     val type: QuickAccessFileType,
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0
+    val id: Int = 0,
 ) {
     companion object {
         const val tableName = "quick_access_file"

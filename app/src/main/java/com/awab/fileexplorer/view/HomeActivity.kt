@@ -29,6 +29,7 @@ class HomeActivity : AppCompatActivity(), HomeView {
     private lateinit var mStorageAdapter: StoragesAdapter
     private lateinit var mQuickAccessFilesAdapter: QuickAccessAdapter
 
+    private val TAG = "HomeActivity"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)

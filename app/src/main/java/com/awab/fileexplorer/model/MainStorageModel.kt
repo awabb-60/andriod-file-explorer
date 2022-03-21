@@ -106,19 +106,15 @@ class MainStorageModel(val context: Context) : StorageModel {
      * this will delete any no existing files (deleted files) that are still saved in the quick access files
      */
     private suspend fun filterQuickAccessFiles() {
-        val noExistingFiles = mutableListOf<QuickAccessFileDataModel>()
-        dao.getQuickAccessFiles(QuickAccessFileType.PINED).forEach {
-            if (!File(it.path).exists())
-                noExistingFiles.add(it)
-        }
+        withContext(Dispatchers.IO) {
+            val result: Deferred<List<QuickAccessFileDataModel>> = async {
+                dao.getQuickAccessFiles()
+            }
 
-        dao.getQuickAccessFiles(QuickAccessFileType.RECENT).forEach {
-            if (!File(it.path).exists())
-                noExistingFiles.add(it)
-        }
-
-        noExistingFiles.forEach {
-            dao.deleteQuickAccessFile(it)
+            result.await().forEach {
+                if (!File(it.path).exists())
+                    dao.deleteQuickAccessFile(it)
+            }
         }
     }
 
@@ -173,7 +169,6 @@ class MainStorageModel(val context: Context) : StorageModel {
                 query?.let {
                     it.use { cursor ->
                         val pathId = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA)
-
                         while (cursor.moveToNext()) {
                             val path = cursor.getString(pathId)
                             list.add(makeFileModel(File(path)))
@@ -198,7 +193,7 @@ class MainStorageModel(val context: Context) : StorageModel {
     ) {
         CoroutineScope(Dispatchers.Main + loadingDetailsJob).launch {
 
-        val data = withContext(Dispatchers.Default) {
+            val data = withContext(Dispatchers.Default) {
                 FilesDetailsDataModel(getTotalSize(list), getContains(list, viewHiddenFilesSettings()))
             }
             callback.onSuccess(data)
