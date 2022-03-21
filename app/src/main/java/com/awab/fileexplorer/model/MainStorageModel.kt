@@ -44,7 +44,12 @@ class MainStorageModel(val context: Context) : StorageModel {
             SD_CARD_TREE_URI_SP,
             AppCompatActivity.MODE_PRIVATE
         )
-        return Uri.parse(sp.getString(TREE_URI_ + storageName, ""))
+        val treeUriString = sp.getString(TREE_URI_ + storageName, "")
+        return if (treeUriString != "")
+            Uri.parse(treeUriString)
+        else
+            null
+
     }
 
     override fun viewSortBySettings(): String {
@@ -192,7 +197,8 @@ class MainStorageModel(val context: Context) : StorageModel {
         callback: SimpleSuccessAndFailureCallback<FilesDetailsDataModel>
     ) {
         CoroutineScope(Dispatchers.Main + loadingDetailsJob).launch {
-            val data = withContext(Dispatchers.Default) {
+
+        val data = withContext(Dispatchers.Default) {
                 FilesDetailsDataModel(getTotalSize(list), getContains(list, viewHiddenFilesSettings()))
             }
             callback.onSuccess(data)

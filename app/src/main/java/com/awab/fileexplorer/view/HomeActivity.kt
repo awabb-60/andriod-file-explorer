@@ -33,7 +33,6 @@ class HomeActivity : AppCompatActivity(), HomeView {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        ::binding.isInitialized
 
         mHomePresenter = HomePresenter(this)
 

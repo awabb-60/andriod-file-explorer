@@ -1,7 +1,6 @@
 package com.awab.fileexplorer.presenter
 
 import android.content.Intent
-import android.widget.Toast
 import androidx.documentfile.provider.DocumentFile
 import com.awab.fileexplorer.model.MainStorageModel
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
@@ -73,14 +72,15 @@ class SdCardPresenterSAF(
             requestPermission()
             return
         }
+
         try {
 //        cutting the parent directory path from sd card path
             val newFolderName = path.split('/').last().trim()
 
-            val sdCardDocumentFile = getTreeUriFile() ?: return
+            val sdCardDocumentFile = getTreeUriFile() ?: error("cant make parent tree document file")
 
 //        navigating to the parent
-            val folder = File(path).parent ?: return
+            val folder = File(path).parent ?: error("cant make this files")
             val parentFolder = navigateToTreeFile(sdCardDocumentFile, folder)
 
 //        creating the new directory and refreshing
@@ -89,10 +89,10 @@ class SdCardPresenterSAF(
                 if (success != null)
                     supPresenter.loadFiles()
                 else
-                    Toast.makeText(view.context(), "unable to create this file", Toast.LENGTH_SHORT).show()
+                    view.showToast("unable to create this file")
             }
         } catch (e: Exception) {
-            Toast.makeText(view.context(), "unable to create this file", Toast.LENGTH_SHORT).show()
+            view.showToast("unable to create this file")
         }
     }
 

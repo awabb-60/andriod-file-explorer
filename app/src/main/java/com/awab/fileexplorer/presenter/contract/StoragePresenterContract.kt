@@ -252,10 +252,7 @@ interface StoragePresenterContract {
      * this method check if there is no selected items, if so the action mode must stop
      * @return true if there is no selected items and the action mode must stop, false otherwise
      */
-    fun shouldStopActionMode(): Boolean {
-        val count = supPresenter.getSelectedItemCount()
-        return count <= 0
-    }
+    fun shouldStopActionMode() = supPresenter.getSelectedItemCount() <= 0
 
     /**
      * stop the action mode view state and return the view to the normal state
@@ -330,12 +327,12 @@ interface StoragePresenterContract {
                     )
                 )
             )
-//            file cant be opened
+            // file cant be opened
             if (file.mimeType == MimeType.UNKNOWN) {
                 Toast.makeText(view.context(), "unsupported file format", Toast.LENGTH_SHORT).show()
                 return
             }
-//            opening the file
+            // opening the file
             view.openFile(getOpenFileIntent(file))
         } else // navigating to folder
             view.navigateToFolder(file.name, file.path)
