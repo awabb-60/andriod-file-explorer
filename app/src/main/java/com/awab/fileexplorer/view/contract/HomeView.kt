@@ -18,11 +18,6 @@ interface HomeView {
     fun context():Context
 
     /**
-     * asks the user for permissions to use the app
-     */
-    fun checkForPermissions()
-
-    /**
      * put and update the storages items
      */
     fun updateStoragesList(storages: Array<StorageDataModel>)

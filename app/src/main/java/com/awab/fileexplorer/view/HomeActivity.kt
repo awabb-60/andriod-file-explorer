@@ -2,8 +2,13 @@ package com.awab.fileexplorer.view
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -13,12 +18,12 @@ import com.awab.fileexplorer.databinding.ActivityHomeBinding
 import com.awab.fileexplorer.databinding.FileDetailsLayoutBinding
 import com.awab.fileexplorer.presenter.HomePresenter
 import com.awab.fileexplorer.presenter.contract.HomePresenterContract
+import com.awab.fileexplorer.utils.PERMISSION_REQUEST_CODE
 import com.awab.fileexplorer.utils.adapters.QuickAccessAdapter
 import com.awab.fileexplorer.utils.adapters.StoragesAdapter
 import com.awab.fileexplorer.utils.data.data_models.QuickAccessFileDataModel
 import com.awab.fileexplorer.utils.data.data_models.StorageDataModel
 import com.awab.fileexplorer.utils.data.data_models.Tap
-import com.awab.fileexplorer.utils.storageAccess
 import com.awab.fileexplorer.view.contract.HomeView
 import com.awab.fileexplorer.view.custom_views.CustomDialog
 
@@ -36,9 +41,6 @@ class HomeActivity : AppCompatActivity(), HomeView {
         setContentView(binding.root)
 
         mHomePresenter = HomePresenter(this)
-
-        // ask the user for the storage permissions
-        storageAccess(this)
 
         binding.btnTesting.setOnClickListener {
             mHomePresenter.loadPinedFiles()
@@ -82,6 +84,14 @@ class HomeActivity : AppCompatActivity(), HomeView {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        // to update the list at the start of the activity and after navigating back from the storage or media
+        // activities
+        mHomePresenter.loadStorages()
+        binding.tapsLayout.refreshCurrentTap()
+    }
+
     override fun onBackPressed() {
         // closing the edit mode in the quick access window
         if (mHomePresenter.quickAccessInEditMode) {
@@ -92,16 +102,36 @@ class HomeActivity : AppCompatActivity(), HomeView {
             super.onBackPressed()
     }
 
-    override fun onStart() {
-        super.onStart()
-        // to update the list at the start of the activity and after navigating back from the storage or media
-        // activities
-        mHomePresenter.loadStorages()
-        binding.tapsLayout.refreshCurrentTap()
-    }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            for (idx in grantResults.indices) {
+                if (grantResults[idx] != PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, " this app need the storage permission to work", Toast.LENGTH_SHORT)
+                        .show()
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                        !shouldShowRequestPermissionRationale(permissions[idx])
+                    ) {
+                        val settingsIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                        val packageUri = Uri.fromParts("package", packageName, null)
+                        settingsIntent.data = packageUri
+                        startActivity(settingsIntent)
+                        Toast.makeText(
+                            this,
+                            "go to the permission section and allow the storage permission",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
 
-    override fun checkForPermissions() {
-        storageAccess(this)
+                }
+            }
+
+        }
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     override fun context(): Context {

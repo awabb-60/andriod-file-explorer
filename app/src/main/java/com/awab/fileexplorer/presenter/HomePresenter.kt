@@ -35,13 +35,18 @@ class HomePresenter(override val view: HomeView) : HomePresenterContract {
 
     override var quickAccessInEditMode: Boolean = false
 
+    init {
+        // ask the user for the storage permissions
+        storageAccess(view.context())
+    }
+
     override fun openStorage(it: StorageDataModel) {
         getOenStorageIntent(it)?.let { view.openActivity(it) }
     }
 
     private fun getOenStorageIntent(storage: StorageDataModel): Intent? {
         if (!allPermissionsGranted(view.context(), INTERNAL_STORAGE_REQUIRED_PERMISSIONS)) {
-            view.checkForPermissions()
+            storageAccess(view.context())
             return null
         }
         return Intent(view.context(), StorageActivity::class.java).apply {
@@ -248,5 +253,4 @@ class HomePresenter(override val view: HomeView) : HomePresenterContract {
         }
         return intent
     }
-
 }
