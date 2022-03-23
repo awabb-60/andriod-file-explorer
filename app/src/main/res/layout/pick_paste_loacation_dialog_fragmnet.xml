@@ -2,64 +2,74 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/tvTitle"
+        android:id="@+id/tvPickLocationTitle"
+        android:padding="5dp"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
         android:text="@string/pick_paste_location"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        app:layout_constraintEnd_toEndOf="@+id/storage_list_view"
+        app:layout_constraintEnd_toEndOf="@+id/storagesTaps"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="@id/storage_list_view"
+        app:layout_constraintStart_toStartOf="@id/storagesTaps"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/storage_list_view"
-        android:layout_width="300dp"
+    <com.awab.fileexplorer.view.custom_views.TapsLayout
+        android:id="@+id/storagesTaps"
+        style="@style/PickLocationTaps"
+        android:layout_width="match_parent"
+        android:layout_marginTop="10dp"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/tvPickLocationTitle"
+        app:show_preview="true"
+        app:tap_margin="5dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvLocations"
         android:layout_width="0dp"
         android:layout_height="400dp"
         android:layout_margin="1dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/storage_list_view"
+        app:layout_constraintBottom_toTopOf="@+id/buttonsLayout"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="@id/storage_list_view"
-        app:layout_constraintTop_toBottomOf="@id/storage_list_view"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/storagesTaps"
         app:layout_constraintVertical_bias="0.0"
         tools:listitem="@layout/file_item" />
 
     <LinearLayout
+        android:id="@+id/buttonsLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="@id/rvLocations"
-        app:layout_constraintStart_toStartOf="@id/rvLocations"
-        app:layout_constraintTop_toBottomOf="@id/rvLocations">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <Button
             android:id="@+id/btnCancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/cancel" />
+            android:text="@string/cancel"
+            android:textColor="@color/white"
+            tools:ignore="ButtonStyle" />
 
         <Button
             android:id="@+id/btnPaste"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/paste" />
+            android:text="@string/paste"
+            android:textColor="@color/white"
+            tools:ignore="ButtonStyle" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

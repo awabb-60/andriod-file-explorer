@@ -31,6 +31,15 @@
     <string name="file_thumbnail_image_description">file thumbnail</string>
     <string name="play_arrow_image_description">play arrow</string>
     <string name="selected_icon_image_description">selected icon</string>
-    <string name="quick_access_isempty_message">no files</string>
+    <string name="quick_access_is_empty_message">no files</string>
     <string name="unpin">unpin</string>
+    <string name="dark_mode">dark mode</string>
+    <string name="edit_quick_access">edit_quick_access</string>
+    <string name="sort_by_title">Sort by</string>
+    <string name="rb_name">Name</string>
+    <string name="rb_size">Size</string>
+    <string name="rb_date">Date</string>
+    <string name="order_title">Order</string>
+    <string name="rb_asc">Ascending</string>
+    <string name="rb_desc">Descending</string>
 </resources>

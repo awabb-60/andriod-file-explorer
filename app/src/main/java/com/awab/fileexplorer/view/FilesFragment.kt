@@ -93,8 +93,14 @@ class FilesFragment : Fragment(), IFileFragmentView {
 
     private fun updateFilesList(list: List<FileDataModel>) {
         adapter.submitList(list)
-//        hiding the rv to show the empty file indicator
-        binding.rvFilesList.visibility = if (list.isEmpty()) View.GONE else View.VISIBLE
+        // hiding the rv to show the empty file indicator if the list is empty
+        if (list.isEmpty()) {
+            binding.rvFilesList.visibility = View.GONE
+            binding.emptyFolderLayout.visibility = View.VISIBLE
+        } else {
+            binding.rvFilesList.visibility = View.VISIBLE
+            binding.emptyFolderLayout.visibility = View.GONE
+        }
     }
 
     override fun getSelectedItems(): List<FileDataModel> {

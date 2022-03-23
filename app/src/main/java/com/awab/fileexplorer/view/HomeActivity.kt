@@ -36,15 +36,11 @@ class HomeActivity : AppCompatActivity(), HomeView {
 
     private val TAG = "HomeActivity"
     override fun onCreate(savedInstanceState: Bundle?) {
+        mHomePresenter = HomePresenter(this)
+        mHomePresenter.setViewSettings()
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        mHomePresenter = HomePresenter(this)
-
-        binding.btnTesting.setOnClickListener {
-            mHomePresenter.loadPinedFiles()
-        }
 
         val pinedFilesTap = Tap("Pined Files") { mHomePresenter.loadPinedFiles() }
         binding.tapsLayout.addTap(pinedFilesTap)
@@ -52,6 +48,7 @@ class HomeActivity : AppCompatActivity(), HomeView {
         val recentFilesTap = Tap("Recent Files") { mHomePresenter.loadRecentFiles() }
         binding.tapsLayout.addTap(recentFilesTap)
 
+        binding.tapsLayout.selectTap(0)
         // make the pined files adapter
         mQuickAccessFilesAdapter = QuickAccessAdapter(this, mHomePresenter)
         binding.rvQuickAccess.adapter = mQuickAccessFilesAdapter
@@ -133,6 +130,7 @@ class HomeActivity : AppCompatActivity(), HomeView {
 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
+
 
     override fun context(): Context {
         return this

@@ -6,6 +6,7 @@ import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.View
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.content.res.AppCompatResources
 import com.awab.fileexplorer.R
 import com.awab.fileexplorer.databinding.LoadingLayoutBinding
@@ -17,8 +18,13 @@ class CustomDialog{
                 .setView(view)
                 .create()
 
-            val d = AppCompatResources.getDrawable(context, R.drawable.dialog_background)
-            dialog.window?.setBackgroundDrawable(d)
+            // select the right background drawable based on the dark mode state
+            val drawable = if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_NO)
+                AppCompatResources.getDrawable(context, R.drawable.dialog_background)
+            else
+                AppCompatResources.getDrawable(context, R.drawable.dialog_background_night)
+
+            dialog.window?.setBackgroundDrawable(drawable)
             dialog.window?.setDimAmount(0.4F)
 
             return dialog

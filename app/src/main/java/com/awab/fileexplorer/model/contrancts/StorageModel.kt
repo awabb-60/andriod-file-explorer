@@ -45,12 +45,18 @@ interface StorageModel {
     fun viewHiddenFilesSettings(): Boolean
 
     /**
+     * return the saved dark mode state
+     * @return true if the app in dark mode state false otherwise
+     */
+    fun viewDarkModeSettings(): Boolean
+
+    /**
      * save the view settings to the shared preferences.
      * @param sortBy the sort argument.
      * @param order the sort order.
      * @param showHiddenFiles the hidden files visibility.
      */
-    fun saveViewingSettings(sortBy: String, order: String, showHiddenFiles: Boolean)
+    fun saveViewingSettings(sortBy: String, order: String, showHiddenFiles: Boolean, darkModeState: Boolean)
 
     /**
      * saves the file to the pined files database
@@ -128,4 +134,5 @@ interface StorageModel {
         parentFolder: DocumentFile,
         callback: SimpleSuccessAndFailureCallback<Boolean>
     )
+
 }

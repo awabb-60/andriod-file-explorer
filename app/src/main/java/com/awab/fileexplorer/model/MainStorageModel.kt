@@ -3,6 +3,7 @@ package com.awab.fileexplorer.model
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.documentfile.provider.DocumentFile
 import com.awab.fileexplorer.model.contrancts.StorageModel
@@ -23,20 +24,25 @@ import java.io.File
  */
 class MainStorageModel(val context: Context) : StorageModel {
 
+    private val TAG = "MainStorageModel"
     private val database = DataBase.getInstance(context)
     private val dao = database.getDao()
 
-    private val coroutineIOScope = CoroutineScope(Dispatchers.IO)
+    private val roomHandlerException = CoroutineExceptionHandler { _, exception ->
+        Log.d(TAG, "exception handler ${exception.message}")
+    }
 
-    private var queryFilesJob: CompletableJob = Job()
-    private var loadingDetailsJob: CompletableJob = Job()
-    private var deletingFilesJob: CompletableJob = Job()
+    private lateinit var roomJob: Job
+
+    private lateinit var queryFilesJob: Job
+    private lateinit var loadingDetailsJob: Job
+    private lateinit var deletingFilesJob: Job
 
     override fun saveTreeUri(treeUri: Uri, sdCardName: String) {
         val spE = context
             .getSharedPreferences(SD_CARD_TREE_URI_SP, AppCompatActivity.MODE_PRIVATE).edit()
         spE.putString(TREE_URI_ + sdCardName, treeUri.toString())
-        spE.apply()
+            .apply()
     }
 
     override fun getTreeUri(storageName: String): Uri? {
@@ -70,19 +76,32 @@ class MainStorageModel(val context: Context) : StorageModel {
         return sp.getBoolean(SHARED_PREFERENCES_SHOW_HIDDEN_FILES, DEFAULT_SHOW_HIDDEN_FILES)
     }
 
-    override fun saveViewingSettings(sortBy: String, order: String, showHiddenFiles: Boolean) {
+    override fun viewDarkModeSettings(): Boolean {
+        val sp = context.getSharedPreferences(VIEW_SETTINGS_SHARED_PREFERENCES, AppCompatActivity.MODE_PRIVATE)
+        return sp.getBoolean(SHARED_PREFERENCES_DARK_MODE_STATE, DEFAULT_DARK_MODE_STATE)
+    }
+
+    override fun saveViewingSettings(
+        sortBy: String,
+        order: String,
+        showHiddenFiles: Boolean,
+        darkModeState: Boolean
+    ) {
         val sharedPreferencesEditor = context.getSharedPreferences(
             VIEW_SETTINGS_SHARED_PREFERENCES,
             AppCompatActivity.MODE_PRIVATE
         ).edit()
+
         sharedPreferencesEditor.putString(SHARED_PREFERENCES_SORTING_BY, sortBy)
-        sharedPreferencesEditor.putString(SHARED_PREFERENCES_SORTING_ORDER, order)
-        sharedPreferencesEditor.putBoolean(SHARED_PREFERENCES_SHOW_HIDDEN_FILES, showHiddenFiles)
-        sharedPreferencesEditor.apply()
+            .putString(SHARED_PREFERENCES_SORTING_ORDER, order)
+            .putBoolean(SHARED_PREFERENCES_SHOW_HIDDEN_FILES, showHiddenFiles)
+            .putBoolean(SHARED_PREFERENCES_DARK_MODE_STATE, darkModeState)
+            .apply()
+
     }
 
     override fun saveToQuickAccessFiles(list: List<QuickAccessFileDataModel>) {
-        coroutineIOScope.launch {
+        roomJob = CoroutineScope(Dispatchers.IO).launch {
             list.forEach {
                 dao.insert(it)
             }
@@ -93,28 +112,43 @@ class MainStorageModel(val context: Context) : StorageModel {
         targetedType: QuickAccessFileType,
         callback: SimpleSuccessAndFailureCallback<List<QuickAccessFileDataModel>>
     ) {
-        coroutineIOScope.launch {
-            // filtering the deleted files
-            filterQuickAccessFiles()
-            dao.getQuickAccessFiles(targetedType).also { data ->
-                withContext(Dispatchers.Main) { callback.onSuccess(data) }
+        roomJob = CoroutineScope(Dispatchers.IO).launch(roomHandlerException) {
+            // filter the database first the getting the files
+            val filteringJob = async { filterQuickAccessFiles() }
+
+            filteringJob.await()
+            dao.getQuickAccessFiles(targetedType).also {
+                withContext(Dispatchers.Main) { callback.onSuccess(it) }
+            }
+        }
+
+        roomJob.invokeOnCompletion { throwable ->
+            if (throwable == null) {
+                Log.d(TAG, "getting quick access job completed successfully")
+            } else {
+                callback.onFailure("cant load files")
             }
         }
     }
 
     /**
-     * this will delete any no existing files (deleted files) that are still saved in the quick access files
+     * this will delete any none existing files (deleted files) that are still saved in the quick access files
+     * @return true if the files has been filtered with no exceptions false otherwise
      */
     private suspend fun filterQuickAccessFiles() {
-        withContext(Dispatchers.IO) {
-            val result: Deferred<List<QuickAccessFileDataModel>> = async {
-                dao.getQuickAccessFiles()
-            }
+        val result: Deferred<List<QuickAccessFileDataModel>> = CoroutineScope(Dispatchers.IO).async {
+            dao.getQuickAccessFiles()
+        }
+        result.await().forEach {
+            if (!File(it.path).exists())
+                deleteQuickAccessFile(it, object : SimpleSuccessAndFailureCallback<Boolean> {
+                    override fun onSuccess(data: Boolean) {
+                    }
 
-            result.await().forEach {
-                if (!File(it.path).exists())
-                    dao.deleteQuickAccessFile(it)
-            }
+                    override fun onFailure(message: String) {
+                        throw Exception(message)
+                    }
+                })
         }
     }
 
@@ -122,9 +156,15 @@ class MainStorageModel(val context: Context) : StorageModel {
         file: QuickAccessFileDataModel,
         callback: SimpleSuccessAndFailureCallback<Boolean>?
     ) {
-        coroutineIOScope.launch {
+        val deleteJob = CoroutineScope(Dispatchers.IO).launch(roomHandlerException) {
             dao.deleteQuickAccessFile(file)
-            withContext(Dispatchers.Main) { callback?.onSuccess(true) }
+        }
+
+        deleteJob.invokeOnCompletion { throwable ->
+            if (throwable == null)
+                callback?.onSuccess(true)
+            else
+                callback?.onFailure("cant load delete files")
         }
     }
 
@@ -136,7 +176,7 @@ class MainStorageModel(val context: Context) : StorageModel {
         callback: SimpleSuccessAndFailureCallback<List<FileDataModel>>
     ) {
         // running coroutine in the main scope
-        CoroutineScope(Dispatchers.Main + queryFilesJob).launch {
+        queryFilesJob = CoroutineScope(Dispatchers.Main).launch {
             val data = query(contentUri, projection, selection, selectionArgs)
             if (data != null) {
                 val filteredData = if (!viewHiddenFilesSettings())
@@ -184,14 +224,15 @@ class MainStorageModel(val context: Context) : StorageModel {
     }
 
     override fun cancelQueryFiles() {
-        queryFilesJob.cancel()
+        if (::queryFilesJob.isInitialized)
+            queryFilesJob.cancel()
     }
 
     override fun getFilesDetails(
         list: List<FileDataModel>,
         callback: SimpleSuccessAndFailureCallback<FilesDetailsDataModel>
     ) {
-        CoroutineScope(Dispatchers.Main + loadingDetailsJob).launch {
+        loadingDetailsJob = CoroutineScope(Dispatchers.Main).launch {
 
             val data = withContext(Dispatchers.Default) {
                 FilesDetailsDataModel(getTotalSize(list), getContains(list, viewHiddenFilesSettings()))
@@ -204,7 +245,7 @@ class MainStorageModel(val context: Context) : StorageModel {
         list: List<FileDataModel>,
         callback: SimpleSuccessAndFailureCallback<FilesDetailsDataModel>
     ) {
-        CoroutineScope(Dispatchers.Main + loadingDetailsJob).launch {
+        loadingDetailsJob = CoroutineScope(Dispatchers.Main).launch {
             val data = withContext(Dispatchers.Default) {
                 // getting details for the selected items
                 val contains = "${list.size} Files"
@@ -220,7 +261,8 @@ class MainStorageModel(val context: Context) : StorageModel {
     }
 
     override fun cancelGetDetails() {
-        loadingDetailsJob.cancel()
+        if (::loadingDetailsJob.isInitialized)
+            loadingDetailsJob.cancel()
     }
 
     override fun deleteFromInternalStorage(
@@ -233,7 +275,7 @@ class MainStorageModel(val context: Context) : StorageModel {
             return
         }
 
-        CoroutineScope(Dispatchers.Main + deletingFilesJob).launch {
+        deletingFilesJob = CoroutineScope(Dispatchers.Main).launch {
             val success = deleteFilesFromInternalStorage(list)
             if (success)
                 callback.onSuccess(success)
@@ -251,7 +293,6 @@ class MainStorageModel(val context: Context) : StorageModel {
                     // deleting the file if the file exists
                     if (file.exists()) {
                         val fileDeleted = file.deleteRecursively()
-
                         // if some files are not deleted
                         if (!fileDeleted)
                             allFilesDelete = false
@@ -273,7 +314,7 @@ class MainStorageModel(val context: Context) : StorageModel {
             callback.onFailure("cant delete files")
             return
         }
-        CoroutineScope(Dispatchers.Main + deletingFilesJob).launch {
+        deletingFilesJob = CoroutineScope(Dispatchers.Main).launch {
             val success = deleteFilesFromSdCard(list, parentFolder)
             if (success)
                 callback.onSuccess(success)
@@ -301,4 +342,6 @@ class MainStorageModel(val context: Context) : StorageModel {
         }
         return allFilesDeleted
     }
+
+
 }

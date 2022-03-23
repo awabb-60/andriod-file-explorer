@@ -112,16 +112,19 @@ class SearchFragment : Fragment(), ISearchFragmentView {
     override fun searchTextEmpty() {
         adapter.setItemsList(listOf())
         binding.searchListLayout.visibility = View.VISIBLE
+        binding.emptyFolderLayout.visibility = View.GONE
         binding.tvSearchResultsSize.text = ""
     }
 
     override fun searchResultEmpty() {
         binding.searchListLayout.visibility = View.GONE
+        binding.emptyFolderLayout.visibility = View.VISIBLE
     }
 
     override fun showSearchList(list: List<FileDataModel>, searchText: String) {
         adapter.setItemsList(list, searchText)
         binding.searchListLayout.visibility = View.VISIBLE
+        binding.emptyFolderLayout.visibility = View.GONE
         binding.tvSearchResultsSize.text = "found <${list.size}>"
     }
 

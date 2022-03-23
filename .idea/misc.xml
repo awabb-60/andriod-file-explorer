@@ -6,6 +6,7 @@
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/circuler_progeess.xml" value="0.17175925925925925" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/circuler_shape.xml" value="0.17175925925925925" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/dialog_background.xml" value="0.20989583333333334" />
+        <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/dialog_background_night.xml" value="0.19771689497716896" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/done_background.xml" value="0.20989583333333334" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/home_card_background.xml" value="0.20462962962962963" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/ic_arrow_up.xml" value="0.18744588744588744" />
@@ -35,13 +36,17 @@
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/item_selected_backgraung.xml" value="0.18744588744588744" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/media_button_backgraound.xml" value="0.19771689497716896" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/media_button_background.xml" value="0.1899122807017544" />
+        <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/media_button_background_night.xml" value="0.19771689497716896" />
+        <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/media_icon_image.xml" value="0.19444444444444445" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/search_filed_background.xml" value="0.18744588744588744" />
+        <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/search_filed_background_night.xml" value="0.19444444444444445" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/selected_loaction_tap_background.xml" value="0.1899122807017544" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/selected_tap_background.xml" value="0.22552083333333334" />
+        <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/selected_tap_background_night.xml" value="0.20046296296296295" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout-v31/item_file.xml" value="0.209375" />
-        <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/activity_home.xml" value="0.25" />
+        <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/activity_home.xml" value="0.19771863117870722" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/activity_main.xml" value="0.209375" />
-        <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/activity_media.xml" value="0.1631578947368421" />
+        <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/activity_media.xml" value="0.25" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/activity_storage.xml" value="0.190625" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/add_folder.xml" value="0.19375" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/b_item.xml" value="0.209375" />
@@ -65,9 +70,9 @@
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/items_details_layout.xml" value="0.17222222222222222" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/loading_layout.xml" value="0.25" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/naming_file_layout.xml" value="0.209375" />
-        <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/pick_paste_loacation_dialog_fragmnet.xml" value="0.1" />
+        <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/pick_paste_loacation_dialog_fragmnet.xml" value="0.25" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/pick_storage.xml" value="0.25" />
-        <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/pick_view_settings_layout.xml" value="0.1763157894736842" />
+        <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/pick_view_settings_layout.xml" value="0.33" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/pick_view_type_layout.xml" value="0.22" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/pined_file_layout.xml" value="0.33" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/progress_dialog_layout.xml" value="0.18611111111111112" />

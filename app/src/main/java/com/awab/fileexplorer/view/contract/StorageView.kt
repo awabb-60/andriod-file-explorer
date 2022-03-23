@@ -110,10 +110,15 @@ interface StorageView {
      */
     fun showDetails(contains: String, totalSize: String)
 
+    fun recreateView()
+
     /**
      * show a dialog to let the user pick new viewing settings
      */
     fun pickNewViewingSettings(dialog: AlertDialog, dialogBinding: PickViewSettingsLayoutBinding)
+
+
+    fun getScreenWidth(): Int
 
     /**
      * to pick the paste location
@@ -123,7 +128,7 @@ interface StorageView {
     /**
      * this open a dialog that will show the copying/ moving progress
      */
-    fun openProgressScreen(action:String)
+    fun openProgressScreen(action: String)
 
     /**
      * this update the progress dialog with the copy/move progress

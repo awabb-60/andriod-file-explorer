@@ -8,19 +8,29 @@
         android:id="@+id/rgViewType"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:text="@string/sort_by_title"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption" />
+
         <RadioButton
             android:id="@+id/rbName"
-            android:text="Name"
+            android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:text="@string/rb_name" />
+
         <RadioButton
             android:id="@+id/rbSize"
-            android:text="Size"
+            android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:text="@string/rb_size" />
+
         <RadioButton
             android:id="@+id/rbDate"
-            android:text="Date"
+            android:text="@string/rb_date"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
     </RadioGroup>
@@ -32,19 +42,20 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Order"
+            android:text="@string/order_title"
             android:textAppearance="@style/TextAppearance.AppCompat.Caption"
             android:layout_margin="5dp"/>
         <RadioButton
             android:id="@+id/rbAscending"
-            android:text="Ascending"
+            android:text="@string/rb_asc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
+
         <RadioButton
             android:id="@+id/rbDescending"
-            android:text="Descending"
+            android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:text="@string/rb_desc" />
     </RadioGroup>
 
     <androidx.appcompat.widget.SwitchCompat
@@ -52,7 +63,14 @@
         android:id="@+id/btnShowHiddenFiles"
         android:text="@string/show_hidden_files"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/btnDarkModeState"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:text="@string/dark_mode" />
 
     <com.awab.fileexplorer.view.custom_views.DialogButtonsLayout
         android:id="@+id/buttons_layout"

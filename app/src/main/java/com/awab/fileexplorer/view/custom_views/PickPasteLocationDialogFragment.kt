@@ -7,17 +7,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.awab.fileexplorer.databinding.PickPasteLoacationDialogFragmnetBinding
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 import com.awab.fileexplorer.utils.DEFAULT_SORTING_ARGUMENT
 import com.awab.fileexplorer.utils.DEFAULT_SORTING_ORDER
 import com.awab.fileexplorer.utils.adapters.PastLocationFilesAdapter
-import com.awab.fileexplorer.utils.adapters.PastLocationStoragesAdapter
 import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 import com.awab.fileexplorer.utils.data.data_models.StorageDataModel
+import com.awab.fileexplorer.utils.data.data_models.Tap
 import com.awab.fileexplorer.utils.data.types.TransferAction
 import com.awab.fileexplorer.utils.makeFileModels
 import com.awab.fileexplorer.utils.makeFilesList
@@ -25,7 +23,6 @@ import com.awab.fileexplorer.view.contract.StorageView
 import java.io.File
 
 class PickPasteLocationDialogFragment : DialogFragment(),
-    PastLocationStoragesAdapter.LocationStoragesListener,
     PastLocationFilesAdapter.LocationFilesListener {
 
     private lateinit var mStoragePresenter: StoragePresenterContract
@@ -34,7 +31,6 @@ class PickPasteLocationDialogFragment : DialogFragment(),
     lateinit var action: TransferAction
 
     private lateinit var filesAdapter: PastLocationFilesAdapter
-    private lateinit var storagesAdapter: PastLocationStoragesAdapter
 
     private val locationStack = mutableListOf<FileDataModel>()
 
@@ -42,12 +38,18 @@ class PickPasteLocationDialogFragment : DialogFragment(),
     val binding: PickPasteLoacationDialogFragmnetBinding
         get() = _binding!!
 
+    private var fragmentWidth = 100
+
+    private var currentStorage = storagesList[0]
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
         // catching the main storage presenter
-        if (context is StorageView)
+        if (context is StorageView) {
             mStoragePresenter = context.presenter
+            fragmentWidth = (context.getScreenWidth() * 0.9).toInt()
+        }
     }
 
     override fun onCreateView(
@@ -62,14 +64,15 @@ class PickPasteLocationDialogFragment : DialogFragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // this is the adapter for that display the storages
-        storagesAdapter = PastLocationStoragesAdapter(storagesList, this)
-        binding.storageListView.adapter = storagesAdapter
-        binding.storageListView.layoutManager = GridLayoutManager(
-            requireContext(), storagesList.size,
-            RecyclerView.VERTICAL, false
-        )
-        binding.storageListView.setHasFixedSize(true)
+        view.layoutParams.width = fragmentWidth
+
+        val taps = storagesList.map {
+            Tap(it.name) {
+                storageChanged(it)
+            }
+        }
+
+        taps.forEach { binding.storagesTaps.addTap(it) }
 
         // this is the adapter for that display the files
         filesAdapter = PastLocationFilesAdapter(requireContext(), listOf(), this)
@@ -88,7 +91,7 @@ class PickPasteLocationDialogFragment : DialogFragment(),
                 locationStack.last().path
 
             // start the transfer
-            mStoragePresenter.transfer(currentLocation, storagesAdapter.getCurrentStorage(), action)
+            mStoragePresenter.transfer(currentLocation, currentStorage, action)
             dismiss()
         }
 
@@ -115,8 +118,7 @@ class PickPasteLocationDialogFragment : DialogFragment(),
             } else
                 false
         }
-        // the first storage is pick by default
-        storageChanged(storagesAdapter.storages[0])
+        binding.storagesTaps.selectTap(0)
     }
 
 
@@ -125,12 +127,13 @@ class PickPasteLocationDialogFragment : DialogFragment(),
         _binding = null
     }
 
-    override fun storageChanged(storage: StorageDataModel) {
+    private fun storageChanged(storage: StorageDataModel) {
         locationStack.clear()
         val f = makeFileModels(listOf(File(storage.path)))
         locationStack.add(f[0])
         val files = makeFilesList(File(storage.path), DEFAULT_SORTING_ARGUMENT, DEFAULT_SORTING_ORDER, true)
         filesAdapter.updateList(files)
+        currentStorage = storage
     }
 
     override fun onFileClick(file: FileDataModel) {

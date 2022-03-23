@@ -6,6 +6,7 @@ import android.os.Parcelable
 import android.view.LayoutInflater
 import android.widget.RadioGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.documentfile.provider.DocumentFile
 import com.awab.fileexplorer.R
 import com.awab.fileexplorer.databinding.PickViewSettingsLayoutBinding
@@ -464,6 +465,7 @@ interface StoragePresenterContract {
         val viewSortBy = model.viewSortBySettings()
         val viewSortOrder = model.viewSortOrderSettings()
         val showHiddenFiles = model.viewHiddenFilesSettings()
+        val darkModeState = model.viewDarkModeSettings()
 
         val dialogBinding = PickViewSettingsLayoutBinding.inflate(LayoutInflater.from(view.context()))
         val rgSortingBy: RadioGroup = dialogBinding.rgViewType
@@ -484,6 +486,7 @@ interface StoragePresenterContract {
             else -> rgSortingBy.check(R.id.rbName)
         }
         dialogBinding.btnShowHiddenFiles.isChecked = showHiddenFiles
+        dialogBinding.btnDarkModeState.isChecked = darkModeState
         val dialog =
             CustomDialog.makeDialog(view.context(), dialogBinding.root).apply { setTitle("View Settings") }
         view.pickNewViewingSettings(dialog, dialogBinding)
@@ -495,15 +498,29 @@ interface StoragePresenterContract {
      * @param order the sort order.
      * @param showHiddenFiles the hidden files visibility.
      */
-    fun saveViewingSettings(sortBy: String, order: String, showHiddenFiles: Boolean) {
-        model.saveViewingSettings(sortBy, order, showHiddenFiles)
+    fun saveViewingSettings(sortBy: String, order: String, showHiddenFiles: Boolean, darkModeState: Boolean) {
+        // see if the dark mode state changed
+        val needRefreshing = darkModeState != model.viewDarkModeSettings()
+
+        model.saveViewingSettings(sortBy, order, showHiddenFiles, darkModeState)
+
+        // if the dark mode state change the hole view need to get recreated
+        if (needRefreshing)
+            view.recreateView()
+        else
+            supPresenter.loadFiles()
     }
 
+
     /**
-     * refresh the files list
+     * the the saved view settings for the app
      */
-    fun refreshList() {
-        supPresenter.loadFiles()
+    fun setViewSettings() {
+        if (model.viewDarkModeSettings())
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        else
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+
     }
 
     /**

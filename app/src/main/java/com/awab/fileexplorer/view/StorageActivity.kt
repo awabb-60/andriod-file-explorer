@@ -124,6 +124,8 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
             Toast.makeText(this, "cant open this storage", Toast.LENGTH_SHORT).show()
             finish()
         }
+        if (::mStoragePresenter.isInitialized)
+            mStoragePresenter.setViewSettings()
     }
 
     override val presenter: StoragePresenterContract
@@ -291,6 +293,10 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
         dialogBinding.buttonsLayout.addButton("Ok") { dialog.cancel() }
     }
 
+    override fun recreateView() {
+        recreate()
+    }
+
     override fun pickNewViewingSettings(dialog: AlertDialog, dialogBinding: PickViewSettingsLayoutBinding) {
         dialog.show()
         dialogBinding.buttonsLayout.addButton("Save") {
@@ -312,13 +318,16 @@ class StorageActivity : AppCompatActivity(), BreadcrumbsListener, StorageView {
                 else -> SORTING_ORDER_ASC
             }
             val showHiddenFiles = dialogBinding.btnShowHiddenFiles.isChecked
-            presenter.saveViewingSettings(sortBy, order, showHiddenFiles)
-            presenter.refreshList()
+            val darkModeState = dialogBinding.btnDarkModeState.isChecked
+
+            presenter.saveViewingSettings(sortBy, order, showHiddenFiles, darkModeState)
             dialog.cancel()
         }
     }
 
-    override fun showPickLocation(fragment:PickPasteLocationDialogFragment) {
+    override fun getScreenWidth() = binding.root.width
+
+    override fun showPickLocation(fragment: PickPasteLocationDialogFragment) {
         fragment.show(supportFragmentManager, "Pick Paste Location")
     }
 

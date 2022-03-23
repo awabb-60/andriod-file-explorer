@@ -22,10 +22,10 @@
         tools:src="@drawable/test" />
 
     <TextView
-        android:background="@color/pined_file_name_background"
         android:id="@+id/tvPinedFileName"
         android:layout_width="0dp"
         android:ellipsize="end"
+        style="@style/QuickAccessFileName"
         android:maxLines="1"
         android:layout_height="wrap_content"
         android:clickable="false"

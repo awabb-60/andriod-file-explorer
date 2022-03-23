@@ -79,4 +79,9 @@ interface HomePresenterContract {
      * navigate to the containing folder in the file system
      */
     fun locateFile(path: String)
+
+    /**
+     * the the saved view settings for the app
+     */
+    fun setViewSettings()
 }

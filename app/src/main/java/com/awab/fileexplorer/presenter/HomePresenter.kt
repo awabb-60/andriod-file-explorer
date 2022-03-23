@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Parcelable
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import com.awab.fileexplorer.R
 import com.awab.fileexplorer.model.MainStorageModel
@@ -194,7 +195,7 @@ class HomePresenter(override val view: HomeView) : HomePresenterContract {
 
                 override fun onFailure(message: String) {
                     updateQuickAccessCard(listOf())
-                    Log.d(TAG, "onFailure: no pined files")
+                    Log.d(TAG, "loading pined files: $message")
                 }
             })
     }
@@ -209,7 +210,7 @@ class HomePresenter(override val view: HomeView) : HomePresenterContract {
 
                 override fun onFailure(message: String) {
                     updateQuickAccessCard(listOf())
-                    Log.d(TAG, message)
+                    Log.d(TAG, "loading recent files: $message")
                 }
             })
     }
@@ -252,5 +253,14 @@ class HomePresenter(override val view: HomeView) : HomePresenterContract {
             }
         }
         return intent
+    }
+
+
+    override fun setViewSettings() {
+        if (model.viewDarkModeSettings())
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        else
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+
     }
 }

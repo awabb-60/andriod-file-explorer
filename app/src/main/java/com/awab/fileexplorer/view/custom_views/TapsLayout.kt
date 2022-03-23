@@ -16,7 +16,7 @@ class TapsLayout(context: Context, val attr: AttributeSet) : LinearLayout(contex
     private val TAG = "TapsLayout"
 
     private var attributes = context.obtainStyledAttributes(attr, R.styleable.TapsLayout)
-    private var firstTapSelected = false
+    private val taps = mutableListOf<View>()
     private lateinit var selectedTap: View
 
     init {
@@ -26,6 +26,7 @@ class TapsLayout(context: Context, val attr: AttributeSet) : LinearLayout(contex
         if (attributes.getBoolean(R.styleable.TapsLayout_show_preview, false) && isInEditMode) {
             addTap(Tap("Tap 1", 0) {})
             addTap(Tap("Tap 2", 1) {})
+            selectTap(0)
         }
     }
 
@@ -35,6 +36,7 @@ class TapsLayout(context: Context, val attr: AttributeSet) : LinearLayout(contex
 
         // making the tap view
         val tapView = TextView(context).apply {
+            taps.add(this)
             // setting the title and the appearance
             text = tap.title
             TextViewCompat.setTextAppearance(this, R.style.TextAppearance_AppCompat_Title)
@@ -64,9 +66,14 @@ class TapsLayout(context: Context, val attr: AttributeSet) : LinearLayout(contex
         addView(tapView)
         weightSum = childCount.toFloat()
 
-        // select tha first tap auto
-        if (!firstTapSelected)
-            firstTapSelected = tapView.callOnClick()
+//        // select tha first tap auto
+//        if (!firstTapSelected)
+//            firstTapSelected = tapView.callOnClick()
+    }
+
+    fun selectTap(index: Int) {
+        if (index in taps.indices)
+            taps[index].callOnClick()
     }
 
     private fun selectTap(tap: Tap) {

@@ -15,7 +15,7 @@
     <color name="search_Text_color">#B0ED3737</color>
 
     <color name="light_gray">#C9C9C9</color>
-    <color name="pined_file_name_background">#ABC9C9C9</color>
+    <color name="quick_access_file_name_background">#ABC9C9C9</color>
 
     <color name="colorPrimary">#F8E6E6</color>
     <color name="colorPrimaryVariant">#CFAEAE</color>
@@ -23,4 +23,12 @@
 
     <color name="tap_stroke_color">#32020000</color>
     <color name="ic_edit_quick_access_color">#3C95EF</color>
+
+    <!--    night-->
+    <color name="dark_mode_theme_color">#502626</color>
+    <color name="dark_mode_theme_color_dialog">#C64949</color>
+    <color name="dark_gray">#363636</color>
+
+    <color name="transparent">#00FFFFFF</color>
+
 </resources>

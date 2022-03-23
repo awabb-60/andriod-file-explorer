@@ -56,7 +56,7 @@
         android:ellipsize="end"
         android:gravity="center"
         android:maxLines="1"
-        android:textColor="@color/black"
+        style="@style/FileItemName"
         android:textSize="@dimen/navigation_file_name_text_size"
         tools:text="file name" />
 
