@@ -24,7 +24,8 @@ import java.io.File
  */
 class MainStorageModel(val context: Context) : StorageModel {
 
-    private val TAG = "MainStorageModel"
+    private val TAG = "AppDebug"
+
     private val database = DataBase.getInstance(context)
     private val dao = database.getDao()
 
@@ -114,9 +115,10 @@ class MainStorageModel(val context: Context) : StorageModel {
     ) {
         roomJob = CoroutineScope(Dispatchers.IO).launch(roomHandlerException) {
             // filter the database first the getting the files
-            val filteringJob = async { filterQuickAccessFiles() }
+            val filteringJob = launch { filterQuickAccessFiles() }
 
-            filteringJob.await()
+            filteringJob.join()
+            yield()
             dao.getQuickAccessFiles(targetedType).also {
                 withContext(Dispatchers.Main) { callback.onSuccess(it) }
             }
@@ -126,7 +128,7 @@ class MainStorageModel(val context: Context) : StorageModel {
             if (throwable == null) {
                 Log.d(TAG, "getting quick access job completed successfully")
             } else {
-                callback.onFailure("cant load files")
+                callback.onFailure("error:can't load files")
             }
         }
     }
@@ -178,6 +180,7 @@ class MainStorageModel(val context: Context) : StorageModel {
         // running coroutine in the main scope
         queryFilesJob = CoroutineScope(Dispatchers.Main).launch {
             val data = query(contentUri, projection, selection, selectionArgs)
+            yield()
             if (data != null) {
                 val filteredData = if (!viewHiddenFilesSettings())
                     data.filter { !it.name.startsWith('.') }
@@ -186,32 +189,50 @@ class MainStorageModel(val context: Context) : StorageModel {
 
                 callback.onSuccess(filteredData)
             } else
-                callback.onFailure("error cant load media files")
+                callback.onFailure("error cant query files")
         }
     }
 
     private suspend fun query(
         contentUri: Uri,
-        projection: Array<String>?,
+        projection: Array<String>? = arrayOf(MediaStore.MediaColumns.DATA),
         selection: String?,
         selectionArgs: Array<String>?,
     ): List<FileDataModel>? {
         return withContext(Dispatchers.Default) {
+
+            val sortBy = when (viewSortBySettings()) {
+                SORTING_BY_NAME -> MediaStore.MediaColumns.DISPLAY_NAME
+                SORTING_BY_SIZE -> MediaStore.MediaColumns.SIZE
+                SORTING_BY_DATE -> MediaStore.MediaColumns.DATE_MODIFIED
+                else -> MediaStore.MediaColumns.DISPLAY_NAME
+            }
+
+            val order = when (viewSortOrderSettings()) {
+                SORTING_ORDER_ASC -> "ASC"
+                SORTING_ORDER_DEC -> "DESC"
+                else -> "ASC"
+            }
+
+            Log.d(TAG, "query: \"$sortBy $order\"")
+
             try {
                 val list = mutableListOf<FileDataModel>()
                 // query the files
                 val query = context.contentResolver.query(
                     contentUri, projection, selection, selectionArgs,
-                    "${MediaStore.MediaColumns.DATE_MODIFIED} DESC", null
+                    "$sortBy $order", null
                 )
 
                 // looping throw the query data
                 query?.let {
                     it.use { cursor ->
                         val pathId = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA)
-                        while (cursor.moveToNext()) {
-                            val path = cursor.getString(pathId)
-                            list.add(makeFileModel(File(path)))
+                        for (i in 0..3) {
+                            while (cursor.moveToNext() && isActive) {
+                                val path = cursor.getString(pathId)
+                                list.add(makeFileModel(File(path)))
+                            }
                         }
                     }
                 }
@@ -237,6 +258,9 @@ class MainStorageModel(val context: Context) : StorageModel {
             val data = withContext(Dispatchers.Default) {
                 FilesDetailsDataModel(getTotalSize(list), getContains(list, viewHiddenFilesSettings()))
             }
+
+            // to check for if the job is still active
+            yield()
             callback.onSuccess(data)
         }
     }

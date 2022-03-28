@@ -30,10 +30,6 @@ class QuickAccessAdapter(val context: Context, val presenter: HomePresenterContr
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = QuickAccessFileLayoutBinding.inflate(LayoutInflater.from(parent.context), parent, false)
 
-        // updating the card height at the start
-        if (itemDimen == 0)
-            presenter.updateQuickAccessCardHeight(((parent.width / PER_ROW) * 2) + (MARGIN_SIZE * 2))
-
         itemDimen = (parent.width / PER_ROW) - (MARGIN_SIZE * 2)
 
         val layoutParams = binding.root.layoutParams as ViewGroup.MarginLayoutParams
@@ -42,6 +38,7 @@ class QuickAccessAdapter(val context: Context, val presenter: HomePresenterContr
         layoutParams.height = (itemDimen * 0.95).toInt()
 
         layoutParams.setMargins(MARGIN_SIZE, MARGIN_SIZE, MARGIN_SIZE, MARGIN_SIZE)
+
         return ViewHolder(binding)
     }
 

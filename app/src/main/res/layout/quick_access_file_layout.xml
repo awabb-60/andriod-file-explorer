@@ -19,7 +19,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/test" />
+        tools:src="@mipmap/ic_launcher" />
 
     <TextView
         android:id="@+id/tvPinedFileName"

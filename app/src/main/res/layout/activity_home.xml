@@ -26,7 +26,7 @@
         android:id="@+id/quickAccessFilesCard"
         style="@style/QuickAccessCard"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="180dp"
         android:layout_margin="10dp"
         app:cardCornerRadius="10dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -45,8 +45,8 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvQuickAccess"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:listitem="@layout/quick_access_file_layout" />
+            tools:listitem="@layout/quick_access_file_layout"
+            android:layout_height="match_parent" />
 
         <ImageButton
             android:id="@+id/btnEditQuickAccess"

@@ -53,7 +53,7 @@ interface HomePresenterContract {
     /**
      * set the new height of the quick access card
      */
-    fun updateQuickAccessCardHeight(cardHeight: Int)
+    fun updateQuickAccessCardHeight(fileDim: Int, listSize: Int)
 
     /**
      * get called after an item is clicked in the quick access rv

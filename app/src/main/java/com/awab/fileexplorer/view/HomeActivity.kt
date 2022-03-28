@@ -34,7 +34,6 @@ class HomeActivity : AppCompatActivity(), HomeView {
     private lateinit var mStorageAdapter: StoragesAdapter
     private lateinit var mQuickAccessFilesAdapter: QuickAccessAdapter
 
-    private val TAG = "HomeActivity"
     override fun onCreate(savedInstanceState: Bundle?) {
         mHomePresenter = HomePresenter(this)
         mHomePresenter.setViewSettings()
@@ -168,10 +167,17 @@ class HomeActivity : AppCompatActivity(), HomeView {
     override fun quickAccessIsEmpty() {
         binding.rvQuickAccess.visibility = View.GONE
         binding.quickAccessEmptyMessage.visibility = View.VISIBLE
+
+        // shrinking the window height to math the taps
+        binding.quickAccessFilesCard.layoutParams.height = (binding.root.layoutParams.height * 0.2).toInt()
+
+        // removing the edit button
+        binding.btnEditQuickAccess.visibility = View.GONE
     }
 
-    override fun updateQuickAccessWindowHeight(cardHeight: Int) {
+    override fun updateQuickAccessCardHeight(cardHeight: Int) {
         binding.quickAccessFilesCard.layoutParams.height = cardHeight
+        binding.btnEditQuickAccess.visibility = View.VISIBLE
     }
 
     override fun showEditQuickAccess() {

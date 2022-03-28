@@ -12,8 +12,10 @@ import com.awab.fileexplorer.utils.MEDIA_CATEGORY_EXTRA
 import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 import com.awab.fileexplorer.utils.data.data_models.FilesDetailsDataModel
+import com.awab.fileexplorer.utils.data.data_models.QuickAccessFileDataModel
 import com.awab.fileexplorer.utils.data.types.MediaCategory
 import com.awab.fileexplorer.utils.data.types.MimeType
+import com.awab.fileexplorer.utils.data.types.QuickAccessFileType
 import com.awab.fileexplorer.utils.getOpenFileIntent
 import com.awab.fileexplorer.utils.getSize
 import com.awab.fileexplorer.view.contract.MediaView
@@ -65,21 +67,22 @@ class MediaPresenter(override val view: MediaView) : MediaPresenterContract {
         }
     }
 
-    override fun mediaItemClicked(item: FileDataModel) {
+    override fun mediaFileClicked(file: FileDataModel) {
 //        selecting unselecting the item
         if (actionModeOn) {
-            processClick(item)
+            processClick(file)
             return
         }
 
 //        opining the item
 //        file cant be opened
-        if (item.mimeType == MimeType.UNKNOWN) {
+        if (file.mimeType == MimeType.UNKNOWN) {
             Toast.makeText(view.context(), "unsupported file format", Toast.LENGTH_SHORT).show()
             return
         }
 //            opening the file
-        view.openFile(getOpenFileIntent(item))
+        view.openFile(getOpenFileIntent(file))
+        model.saveToQuickAccessFiles(listOf(QuickAccessFileDataModel(file.path, QuickAccessFileType.RECENT)))
     }
 
     override fun mediaItemLongClicked(item: FileDataModel) {

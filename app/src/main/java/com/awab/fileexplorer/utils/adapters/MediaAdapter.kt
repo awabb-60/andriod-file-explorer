@@ -69,7 +69,7 @@ class MediaAdapter(val context: Context, val mediaPresenter: MediaPresenterContr
         init {
             binding.root.setOnClickListener {
                 if (adapterPosition != RecyclerView.NO_POSITION) {
-                    mediaPresenter.mediaItemClicked(currentList[adapterPosition])
+                    mediaPresenter.mediaFileClicked(currentList[adapterPosition])
                 }
             }
 

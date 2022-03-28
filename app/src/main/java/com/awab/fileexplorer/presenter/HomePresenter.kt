@@ -10,6 +10,7 @@ import com.awab.fileexplorer.R
 import com.awab.fileexplorer.model.MainStorageModel
 import com.awab.fileexplorer.presenter.contract.HomePresenterContract
 import com.awab.fileexplorer.utils.*
+import com.awab.fileexplorer.utils.adapters.QuickAccessAdapter
 import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 import com.awab.fileexplorer.utils.data.data_models.QuickAccessFileDataModel
@@ -183,11 +184,19 @@ class HomePresenter(override val view: HomeView) : HomePresenterContract {
                 Toast.makeText(view.context(), "can't deleted file", Toast.LENGTH_SHORT).show()
             }
         })
-
     }
 
     override fun loadPinedFiles() {
-        model.getQuickAccessFiles(QuickAccessFileType.PINED,
+        loadQuickAccessFiles(QuickAccessFileType.PINED)
+    }
+
+    override fun loadRecentFiles() {
+        loadQuickAccessFiles(QuickAccessFileType.RECENT)
+    }
+
+    private fun loadQuickAccessFiles(type: QuickAccessFileType) {
+        model.getQuickAccessFiles(
+            type,
             object : SimpleSuccessAndFailureCallback<List<QuickAccessFileDataModel>> {
                 override fun onSuccess(data: List<QuickAccessFileDataModel>) {
                     updateQuickAccessCard(data)
@@ -195,24 +204,10 @@ class HomePresenter(override val view: HomeView) : HomePresenterContract {
 
                 override fun onFailure(message: String) {
                     updateQuickAccessCard(listOf())
-                    Log.d(TAG, "loading pined files: $message")
-                }
-            })
-    }
-
-    override fun loadRecentFiles() {
-        model.getQuickAccessFiles(
-            QuickAccessFileType.RECENT,
-            object : SimpleSuccessAndFailureCallback<List<QuickAccessFileDataModel>> {
-                override fun onSuccess(data: List<QuickAccessFileDataModel>) {
-                    updateQuickAccessCard(data.filter { it.type == QuickAccessFileType.RECENT })
-                }
-
-                override fun onFailure(message: String) {
-                    updateQuickAccessCard(listOf())
                     Log.d(TAG, "loading recent files: $message")
                 }
-            })
+            }
+        )
     }
 
     override fun updateQuickAccessCard(list: List<QuickAccessFileDataModel>) {
@@ -220,11 +215,21 @@ class HomePresenter(override val view: HomeView) : HomePresenterContract {
             view.quickAccessIsEmpty()
         else {
             view.updateQuickAccessFilesList(list)
+//            updateQuickAccessCardHeight(QuickAccessAdapter.itemDimen, list.size)
         }
     }
 
-    override fun updateQuickAccessCardHeight(cardHeight: Int) {
-        view.updateQuickAccessWindowHeight(cardHeight)
+    override fun updateQuickAccessCardHeight(fileDim: Int, listSize: Int) {
+        when (listSize) {
+            0 -> view.quickAccessIsEmpty()
+            // height for on row of files
+            in 1..QuickAccessAdapter.PER_ROW -> {
+                view.updateQuickAccessCardHeight(fileDim)
+            }
+            // when the size can fil 2 rows or more... the height will fit 2 file only
+            else -> view.updateQuickAccessCardHeight(fileDim * 2)
+        }
+
     }
 
 

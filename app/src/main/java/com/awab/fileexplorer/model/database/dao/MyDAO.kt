@@ -1,4 +1,4 @@
-package com.awab.fileexplorer.model.database.DAOs
+package com.awab.fileexplorer.model.database.dao
 
 import androidx.room.*
 import com.awab.fileexplorer.utils.data.data_models.QuickAccessFileDataModel
@@ -7,7 +7,7 @@ import com.awab.fileexplorer.utils.data.types.QuickAccessFileType
 @Dao
 interface MyDAO {
 
-    @Insert(entity = QuickAccessFileDataModel::class, onConflict = OnConflictStrategy.IGNORE)
+    @Insert(entity = QuickAccessFileDataModel::class, onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(file: QuickAccessFileDataModel)
 
     @Delete(entity = QuickAccessFileDataModel::class)

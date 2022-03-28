@@ -16,9 +16,9 @@ interface MediaPresenterContract {
     fun loadFiles(intent: Intent)
 
     /**
-     * call when an item is clicked
+     * callback when a file is clicked
      */
-    fun mediaItemClicked(item: FileDataModel)
+    fun mediaFileClicked(file: FileDataModel)
 
     /**
      * call when an item is long clicked

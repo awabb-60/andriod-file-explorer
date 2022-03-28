@@ -322,7 +322,6 @@ interface StoragePresenterContract {
             model.saveToQuickAccessFiles(
                 listOf(
                     QuickAccessFileDataModel(
-                        file.name,
                         file.path,
                         QuickAccessFileType.RECENT
                     )
@@ -553,7 +552,6 @@ interface StoragePresenterContract {
                         model.saveToQuickAccessFiles(
                             listOf(
                                 QuickAccessFileDataModel(
-                                    file.name,
                                     file.path,
                                     QuickAccessFileType.PINED
                                 )

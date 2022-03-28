@@ -35,7 +35,7 @@ interface HomeView {
     /**
      * update the quick access window height
      */
-    fun updateQuickAccessWindowHeight(cardHeight: Int)
+    fun updateQuickAccessCardHeight(cardHeight: Int)
 
     /**
      * show the edit button in the quick access window

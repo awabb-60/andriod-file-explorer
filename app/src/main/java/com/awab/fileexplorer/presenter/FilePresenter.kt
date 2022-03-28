@@ -24,12 +24,11 @@ class FilePresenter(
     }
 
     override fun loadFiles() {
-        val sortBy = model.viewSortBySettings()
-        val order = model.viewSortOrderSettings()
-        val showHiddenFiles = model.viewHiddenFilesSettings()
-        val list =
-            makeFilesList(folder, sortingBy = sortBy, sortingOrder = order, showHidingFiles = showHiddenFiles)
-        view.updateList(list)
+        val files = makeFilesList(
+            folder,
+            model.viewSortBySettings(), model.viewSortOrderSettings(), model.viewHiddenFilesSettings()
+        )
+        view.updateList(files)
     }
 
     override fun onFileClick(file: FileDataModel) {

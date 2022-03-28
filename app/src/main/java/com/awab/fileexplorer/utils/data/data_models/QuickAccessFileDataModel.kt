@@ -7,7 +7,6 @@ import com.awab.fileexplorer.utils.data.types.QuickAccessFileType
 
 @Entity(tableName = QuickAccessFileDataModel.tableName)
 data class QuickAccessFileDataModel(
-    val name: String,
     val path: String,
     val type: QuickAccessFileType,
     @PrimaryKey(autoGenerate = true)
