@@ -28,6 +28,7 @@
     <color name="dark_mode_theme_color">#502626</color>
     <color name="dark_mode_theme_color_dialog">#C64949</color>
     <color name="dark_gray">#363636</color>
+    <color name="dark_mode_quick_access_file_name_background">#4C4C4C</color>
 
     <color name="transparent">#00FFFFFF</color>
 

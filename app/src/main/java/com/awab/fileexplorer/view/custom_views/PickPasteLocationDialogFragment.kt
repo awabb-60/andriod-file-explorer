@@ -40,7 +40,7 @@ class PickPasteLocationDialogFragment : DialogFragment(),
 
     private var fragmentWidth = 100
 
-    private var currentStorage = storagesList[0]
+    private var currentStorage: StorageDataModel? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -91,7 +91,7 @@ class PickPasteLocationDialogFragment : DialogFragment(),
                 locationStack.last().path
 
             // start the transfer
-            mStoragePresenter.transfer(currentLocation, currentStorage, action)
+            currentStorage?.let { storage -> mStoragePresenter.transfer(currentLocation, storage, action) }
             dismiss()
         }
 

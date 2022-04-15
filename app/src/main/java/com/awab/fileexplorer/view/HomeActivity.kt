@@ -58,7 +58,7 @@ class HomeActivity : AppCompatActivity(), HomeView {
             it.animate()
                 .rotationX(180F)
                 .translationX(binding.btnEditQuickAccess.width.toFloat())
-                .setDuration(500).start()
+                .setDuration(300).start()
 
             mQuickAccessFilesAdapter.startEditMode()
         }
@@ -98,7 +98,7 @@ class HomeActivity : AppCompatActivity(), HomeView {
             binding.btnEditQuickAccess.animate()
                 .rotationX(0F)
                 .translationX(0F)
-                .setDuration(500).start()
+                .setDuration(300).start()
             mQuickAccessFilesAdapter.stopEditMode()
         } else
             super.onBackPressed()

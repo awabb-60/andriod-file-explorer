@@ -37,11 +37,11 @@
         <item name="cardBackgroundColor">@color/dark_gray</item>
     </style>
 
-    <style name="QuickAccessFileName" />
-
-    <style name="StorageItem">
-        <item name="android:background">@color/dark_gray</item>
+    <style name="QuickAccessFileName">
+        <item name="android:background">@color/dark_mode_quick_access_file_name_background</item>
     </style>
+
+    <style name="StorageItem"></style>
 
     <style name="FileItemName">
         <item name="android:textColor">@color/white</item>
@@ -52,7 +52,7 @@
     </style>
 
     <style name="PickLocationTaps">
-        <item name="tap_background_drawable">@drawable/dialog_background_night</item>
+        <item name="tap_background_drawable">@drawable/selected_tap_background_night</item>
     </style>
 
 

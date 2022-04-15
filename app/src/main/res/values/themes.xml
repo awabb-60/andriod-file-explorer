@@ -34,13 +34,13 @@
         <item name="tap_background_drawable">@drawable/selected_tap_background</item>
     </style>
 
-    <style name="QuickAccessCard"></style>
+    <style name="QuickAccessCard" />
 
     <style name="QuickAccessFileName">
         <item name="android:background">@color/quick_access_file_name_background</item>
     </style>
 
-    <style name="StorageItem"></style>
+    <style name="StorageItem" />
 
     <style name="FileItemName">
         <item name="android:textColor">@color/black</item>
@@ -51,7 +51,7 @@
     </style>
 
     <style name="PickLocationTaps">
-        <item name="tap_background_drawable">@drawable/dialog_background</item>
+        <item name="tap_background_drawable">@drawable/selected_tap_background</item>
     </style>
 
     <style name="dialogButtons">
@@ -74,6 +74,7 @@
     <style name="FileExplorerFileIcon">
         <item name="android:background">@color/white</item>
     </style>
+
 
     <style name="MediaCategoryItemStyle">
         <item name="android:background">@drawable/media_button_background</item>
