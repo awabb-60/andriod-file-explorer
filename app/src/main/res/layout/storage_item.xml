@@ -70,4 +70,5 @@
             android:textSize="11sp"
             tools:text="1.35GB free of 14.83GB" />
     </RelativeLayout>
+
 </RelativeLayout>

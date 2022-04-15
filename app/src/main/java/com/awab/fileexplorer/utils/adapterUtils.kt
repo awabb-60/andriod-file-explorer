@@ -77,7 +77,7 @@ private fun loadFileImage(context: Context, item: FileDataModel, view: ImageView
                 Glide.with(context)
                     .load(appIconModelData)
                     .placeholder(R.drawable.ic_default_application_file)
-                    .into(view)
+                    .into(view.apply { scaleType = CENTER_INSIDE })
             }
 
             MimeType.AUDIO -> {

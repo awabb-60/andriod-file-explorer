@@ -22,6 +22,7 @@ import com.awab.fileexplorer.utils.data.types.StorageType
 import com.awab.fileexplorer.view.MediaActivity
 import com.awab.fileexplorer.view.StorageActivity
 import com.awab.fileexplorer.view.contract.HomeView
+import kotlinx.coroutines.*
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -29,13 +30,17 @@ import kotlin.collections.ArrayList
 
 class HomePresenter(override val view: HomeView) : HomePresenterContract {
 
-    private val TAG = "HomePresenter"
+    private val countDownTime: Long = 0
+
+    private val TAG = "AppDebug"
 
     private val storages = ArrayList<Parcelable>()
 
     override val model = MainStorageModel(view.context())
 
     override var quickAccessInEditMode: Boolean = false
+
+    lateinit var deleteQuickAccessFileJob: Job
 
     init {
         // ask the user for the storage permissions
@@ -167,23 +172,40 @@ class HomePresenter(override val view: HomeView) : HomePresenterContract {
     }
 
     override fun quickAccessEditModeStopped() {
+        quickAccessInEditMode = false
         view.showEditQuickAccess()
     }
 
     override fun deleteQuickAccessFile(file: QuickAccessFileDataModel) {
-        model.deleteQuickAccessFile(file, object : SimpleSuccessAndFailureCallback<Boolean> {
-            override fun onSuccess(data: Boolean) {
-                if (file.type == QuickAccessFileType.PINED)
-                    loadPinedFiles()
-                else
-                    loadRecentFiles()
-                Toast.makeText(view.context(), "file deleted", Toast.LENGTH_SHORT).show()
-            }
+        startDeleteQuickAccessFilesCountDown(file)
+    }
 
-            override fun onFailure(message: String) {
-                Toast.makeText(view.context(), "can't deleted file", Toast.LENGTH_SHORT).show()
+    private fun startDeleteQuickAccessFilesCountDown(file: QuickAccessFileDataModel) {
+        deleteQuickAccessFileJob = CoroutineScope(Dispatchers.Default).launch {
+
+            delay(countDownTime)
+
+            withContext(Dispatchers.Main) {
+                model.deleteQuickAccessFile(file, object : SimpleSuccessAndFailureCallback<Boolean> {
+                    override fun onSuccess(data: Boolean) {
+                        if (file.type == QuickAccessFileType.PINED)
+                            loadPinedFiles()
+                        else
+                            loadRecentFiles()
+                        Toast.makeText(view.context(), "file deleted", Toast.LENGTH_SHORT).show()
+                    }
+
+                    override fun onFailure(message: String) {
+                        Toast.makeText(view.context(), "can't deleted file", Toast.LENGTH_SHORT).show()
+                    }
+                })
             }
-        })
+        }
+    }
+
+    override fun undoDeleteQuickAccessFile() {
+        if (::deleteQuickAccessFileJob.isInitialized)
+            deleteQuickAccessFileJob.cancel()
     }
 
     override fun loadPinedFiles() {

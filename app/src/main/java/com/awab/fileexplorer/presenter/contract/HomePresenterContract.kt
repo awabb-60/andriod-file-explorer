@@ -73,6 +73,8 @@ interface HomePresenterContract {
      */
     fun deleteQuickAccessFile(file: QuickAccessFileDataModel)
 
+    fun undoDeleteQuickAccessFile()
+
     fun quickAccessEditModeStopped()
 
     /**

@@ -77,13 +77,10 @@ class TapsLayout(context: Context, val attr: AttributeSet) : LinearLayout(contex
     }
 
     private fun selectTap(tap: Tap) {
-        val viewIterator = children.iterator()
         // removing the background from all taps
-        while (viewIterator.hasNext()) {
-            viewIterator.next().apply {
-                background = null
-                alpha = 0.5F
-            }
+        children.forEach {
+            it.background = null
+            it.alpha = 0.5F
         }
 
         // selecting the targeted tap
@@ -101,7 +98,7 @@ class TapsLayout(context: Context, val attr: AttributeSet) : LinearLayout(contex
         try {
             selectedTap.callOnClick()
         } catch (e: Exception) {
-            Log.d(TAG, "refreshCurrentTap: cant refresh the current tap")
+            Log.d(TAG, "cant refresh the current tap")
         }
     }
 

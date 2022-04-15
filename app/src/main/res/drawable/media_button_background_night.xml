@@ -7,5 +7,4 @@
         android:width="1dp"
         android:color="@color/dark_mode_theme_color" />
 
-
 </shape>

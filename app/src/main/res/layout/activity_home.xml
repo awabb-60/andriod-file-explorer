@@ -14,9 +14,9 @@
         android:layout_marginStart="5dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="5dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/quickAccessFilesCard"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@id/quickAccessFilesCard"
         app:layout_constraintTop_toTopOf="parent"
         app:show_preview="true"
         app:tap_height="40dp"
@@ -64,64 +64,66 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/storagesCard"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_margin="10dp"
         app:cardCornerRadius="10dp"
-        app:layout_constraintBottom_toTopOf="@+id/mediaButtonsLayout"
+        app:layout_constraintBottom_toTopOf="@+id/btnMediaImages"
         app:cardBackgroundColor="@color/transparent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHeight_default="wrap"
         app:layout_constraintTop_toBottomOf="@+id/quickAccessFilesCard">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvStorages"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            tools:listitem="@layout/storage_item"
             android:layout_width="match_parent"
             android:layout_gravity="center" />
     </androidx.cardview.widget.CardView>
 
-    <LinearLayout
-        android:id="@+id/mediaButtonsLayout"
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
+    <ImageButton
+        android:id="@+id/btnMediaImages"
+        style="@style/MediaCategoryItemStyle"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
-        android:gravity="center_horizontal"
-        android:orientation="horizontal"
-        android:weightSum="5"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btnMediaVideo"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="parent"
+        android:src="@drawable/ic_default_image_file"
+        tools:ignore="ContentDescription" />
+
+    <ImageButton
+        android:id="@+id/btnMediaVideo"
+        style="@style/MediaCategoryItemStyle"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/btnMediaImages"
+        app:layout_constraintEnd_toStartOf="@id/btnMediaAudio"
+        app:layout_constraintStart_toEndOf="@id/btnMediaImages"
+        android:src="@drawable/ic_default_video_file"
+        tools:ignore="ContentDescription" />
+
+    <ImageButton
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/btnMediaImages"
+        android:id="@+id/btnMediaAudio"
+        style="@style/MediaCategoryItemStyle"
+        app:layout_constraintEnd_toStartOf="@id/btnMediaDocs"
+        app:layout_constraintStart_toEndOf="@id/btnMediaVideo"
+        android:src="@drawable/ic_default_audio_file"
+        tools:ignore="ContentDescription" />
+
+    <ImageButton
+        android:id="@+id/btnMediaDocs"
+        style="@style/MediaCategoryItemStyle"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_default_pdf_file"
+        app:layout_constraintBottom_toBottomOf="@id/btnMediaImages"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <ImageButton
-            android:id="@+id/btnMediaImages"
-            style="@style/MediaCategoryItemStyle"
-            android:layout_height="match_parent"
-            android:src="@drawable/ic_default_image_file"
-            tools:ignore="ContentDescription" />
-
-        <ImageButton
-            android:id="@+id/btnMediaVideo"
-            style="@style/MediaCategoryItemStyle"
-            android:layout_height="match_parent"
-            android:src="@drawable/ic_default_video_file"
-            tools:ignore="ContentDescription" />
-
-        <ImageButton
-            android:id="@+id/btnMediaAudio"
-            style="@style/MediaCategoryItemStyle"
-            android:layout_height="match_parent"
-            android:src="@drawable/ic_default_audio_file"
-            tools:ignore="ContentDescription" />
-
-        <ImageButton
-            android:id="@+id/btnMediaDocs"
-            style="@style/MediaCategoryItemStyle"
-            android:layout_height="match_parent"
-            android:src="@drawable/ic_default_pdf_file"
-            tools:ignore="ContentDescription" />
-    </LinearLayout>
+        app:layout_constraintStart_toEndOf="@id/btnMediaAudio"
+        tools:ignore="ContentDescription" />
 
     <Button
         android:id="@+id/btnTesting"

@@ -76,10 +76,9 @@
     </style>
 
     <style name="MediaCategoryItemStyle">
-        <item name="android:layout_width">0dp</item>
         <item name="android:background">@drawable/media_button_background</item>
-        <item name="android:layout_weight">1</item>
-        <item name="android:layout_margin">10dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:padding">20dp</item>
     </style>
 
     <style name="Theme.FileExplorer.NoActionBar">

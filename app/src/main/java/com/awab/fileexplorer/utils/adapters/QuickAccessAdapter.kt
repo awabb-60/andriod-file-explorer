@@ -23,7 +23,7 @@ class QuickAccessAdapter(val context: Context, val presenter: HomePresenterContr
     companion object {
         var editMode = false
         const val MARGIN_SIZE = 6
-        const val PER_ROW = 4
+        const val PER_ROW = 3
         var itemDimen = 0
     }
 
@@ -35,7 +35,7 @@ class QuickAccessAdapter(val context: Context, val presenter: HomePresenterContr
         val layoutParams = binding.root.layoutParams as ViewGroup.MarginLayoutParams
 
         layoutParams.width = itemDimen
-        layoutParams.height = (itemDimen * 0.95).toInt()
+        layoutParams.height = (itemDimen * 0.75).toInt()
 
         layoutParams.setMargins(MARGIN_SIZE, MARGIN_SIZE, MARGIN_SIZE, MARGIN_SIZE)
 

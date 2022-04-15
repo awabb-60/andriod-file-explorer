@@ -44,7 +44,7 @@
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/selected_tap_background.xml" value="0.22552083333333334" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/drawable/selected_tap_background_night.xml" value="0.20046296296296295" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout-v31/item_file.xml" value="0.209375" />
-        <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/activity_home.xml" value="0.19771863117870722" />
+        <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/activity_home.xml" value="0.22" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/activity_main.xml" value="0.209375" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/activity_media.xml" value="0.25" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/activity_storage.xml" value="0.190625" />
@@ -81,6 +81,7 @@
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/recent_file_layout.xml" value="0.1763157894736842" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/snack_bar_layout.xml" value="0.33" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/storage_item.xml" value="0.33" />
+        <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/t.xml" value="0.18356164383561643" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/layout/taps_layout.xml" value="0.209375" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/menu-v26/main_meun.xml" value="0.19375" />
         <entry key="..\:/Users/HP/AndroidStudioProjects/FileExplorer/app/src/main/res/menu/action_mode_menu.xml" value="0.18611111111111112" />

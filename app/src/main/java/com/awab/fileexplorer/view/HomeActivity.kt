@@ -10,7 +10,6 @@ import android.provider.Settings
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -56,7 +55,11 @@ class HomeActivity : AppCompatActivity(), HomeView {
 
         binding.btnEditQuickAccess.setOnClickListener {
             mHomePresenter.quickAccessInEditMode = true
-            it.visibility = View.GONE
+            it.animate()
+                .rotationX(180F)
+                .translationX(binding.btnEditQuickAccess.width.toFloat())
+                .setDuration(500).start()
+
             mQuickAccessFilesAdapter.startEditMode()
         }
 
@@ -92,7 +95,10 @@ class HomeActivity : AppCompatActivity(), HomeView {
         // closing the edit mode in the quick access window
         if (mHomePresenter.quickAccessInEditMode) {
             mHomePresenter.quickAccessInEditMode = false
-            binding.btnEditQuickAccess.isVisible = true
+            binding.btnEditQuickAccess.animate()
+                .rotationX(0F)
+                .translationX(0F)
+                .setDuration(500).start()
             mQuickAccessFilesAdapter.stopEditMode()
         } else
             super.onBackPressed()
