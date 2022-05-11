@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.transition.TransitionManager
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -27,11 +28,13 @@ import com.awab.fileexplorer.view.contract.HomeView
 import com.awab.fileexplorer.view.custom_views.CustomDialog
 
 class HomeActivity : AppCompatActivity(), HomeView {
-
+    private val TAG = "AppDebug"
     private lateinit var binding: ActivityHomeBinding
     private lateinit var mHomePresenter: HomePresenterContract
     private lateinit var mStorageAdapter: StoragesAdapter
     private lateinit var mQuickAccessFilesAdapter: QuickAccessAdapter
+
+    private var mediaOpen = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         mHomePresenter = HomePresenter(this)
@@ -73,14 +76,50 @@ class HomeActivity : AppCompatActivity(), HomeView {
         binding.rvStorages.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         binding.rvStorages.setHasFixedSize(true)
 
-        // setting click listeners for the media items
+        // setting click listeners for the media buttons
         binding.apply {
             listOf(btnMediaImages, btnMediaVideo, btnMediaAudio, btnMediaDocs).forEach { mediaButton ->
                 mediaButton.setOnClickListener {
                     mHomePresenter.mediaItemClicked(mediaButton.id)
                 }
             }
+            btnMedia.setOnClickListener {
+                TransitionManager.beginDelayedTransition(binding.root)
+
+                if (!mediaOpen)
+                    openMediaButtons()
+                else
+                    closeMediaButtons()
+            }
         }
+    }
+
+    private fun openMediaButtons() {
+        binding.hiddenPh1.setContentId(-1)
+        binding.hiddenPh2.setContentId(-1)
+        binding.hiddenPh3.setContentId(-1)
+        binding.hiddenPh4.setContentId(-1)
+
+        binding.ph1.setContentId(binding.btnMediaImages.id)
+        binding.ph2.setContentId(binding.btnMediaAudio.id)
+        binding.ph3.setContentId(binding.btnMediaVideo.id)
+        binding.ph4.setContentId(binding.btnMediaDocs.id)
+
+        mediaOpen = true
+    }
+
+    private fun closeMediaButtons() {
+        binding.ph1.setContentId(-1)
+        binding.ph2.setContentId(-1)
+        binding.ph3.setContentId(-1)
+        binding.ph4.setContentId(-1)
+
+        binding.hiddenPh1.setContentId(binding.btnMediaImages.id)
+        binding.hiddenPh2.setContentId(binding.btnMediaAudio.id)
+        binding.hiddenPh3.setContentId(binding.btnMediaVideo.id)
+        binding.hiddenPh4.setContentId(binding.btnMediaDocs.id)
+
+        mediaOpen = false
     }
 
     override fun onStart() {
@@ -117,6 +156,11 @@ class HomeActivity : AppCompatActivity(), HomeView {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
                         !shouldShowRequestPermissionRationale(permissions[idx])
                     ) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            return
+                        }
+
+                        //opening the setting for the user to grant the permission
                         val settingsIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                         val packageUri = Uri.fromParts("package", packageName, null)
                         settingsIntent.data = packageUri
@@ -144,6 +188,7 @@ class HomeActivity : AppCompatActivity(), HomeView {
     override fun openActivity(intent: Intent) {
         startActivity(intent)
     }
+
 
     override fun showDetailsDialog(name: String, size: String, lastModified: String, path: String) {
         val dialogBinding = FileDetailsLayoutBinding.inflate(layoutInflater)

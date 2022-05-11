@@ -45,8 +45,8 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvQuickAccess"
             android:layout_width="match_parent"
-            tools:listitem="@layout/quick_access_file_layout"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            tools:listitem="@layout/quick_access_file_layout" />
 
         <ImageButton
             android:id="@+id/btnEditQuickAccess"
@@ -55,9 +55,9 @@
             android:layout_gravity="end|bottom"
             android:background="?attr/selectableItemBackground"
             android:clickable="true"
+            android:contentDescription="@string/edit_quick_access"
             android:focusable="true"
             android:padding="4dp"
-            android:contentDescription="@string/edit_quick_access"
             android:src="@drawable/ic_edit" />
     </androidx.cardview.widget.CardView>
 
@@ -66,53 +66,48 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_margin="10dp"
-        app:cardCornerRadius="10dp"
-        app:layout_constraintBottom_toTopOf="@+id/btnMediaImages"
         app:cardBackgroundColor="@color/transparent"
+        app:cardCornerRadius="10dp"
+        app:layout_constraintBottom_toTopOf="@+id/btnMedia"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_default="wrap"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintHeight_default="wrap"
         app:layout_constraintTop_toBottomOf="@+id/quickAccessFilesCard">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvStorages"
-            android:layout_height="match_parent"
-            tools:listitem="@layout/storage_item"
             android:layout_width="match_parent"
-            android:layout_gravity="center" />
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            tools:listitem="@layout/storage_item" />
     </androidx.cardview.widget.CardView>
 
     <ImageButton
         android:id="@+id/btnMediaImages"
         style="@style/MediaCategoryItemStyle"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/btnMediaVideo"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toStartOf="parent"
         android:src="@drawable/ic_default_image_file"
+        app:layout_constraintBottom_toBottomOf="@id/btnMedia"
+        app:layout_constraintStart_toStartOf="@id/btnMedia"
         tools:ignore="ContentDescription" />
 
     <ImageButton
         android:id="@+id/btnMediaVideo"
         style="@style/MediaCategoryItemStyle"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@id/btnMediaImages"
-        app:layout_constraintEnd_toStartOf="@id/btnMediaAudio"
-        app:layout_constraintStart_toEndOf="@id/btnMediaImages"
         android:src="@drawable/ic_default_video_file"
+        app:layout_constraintBottom_toBottomOf="@id/btnMedia"
+        app:layout_constraintStart_toStartOf="@id/btnMedia"
         tools:ignore="ContentDescription" />
 
     <ImageButton
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@id/btnMediaImages"
         android:id="@+id/btnMediaAudio"
         style="@style/MediaCategoryItemStyle"
-        app:layout_constraintEnd_toStartOf="@id/btnMediaDocs"
-        app:layout_constraintStart_toEndOf="@id/btnMediaVideo"
+        android:layout_height="wrap_content"
         android:src="@drawable/ic_default_audio_file"
+        app:layout_constraintBottom_toBottomOf="@id/btnMedia"
+        app:layout_constraintStart_toStartOf="@id/btnMedia"
         tools:ignore="ContentDescription" />
 
     <ImageButton
@@ -120,10 +115,98 @@
         style="@style/MediaCategoryItemStyle"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_default_pdf_file"
-        app:layout_constraintBottom_toBottomOf="@id/btnMediaImages"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/btnMediaAudio"
+        app:layout_constraintBottom_toBottomOf="@id/btnMedia"
+        app:layout_constraintStart_toStartOf="@id/btnMedia"
         tools:ignore="ContentDescription" />
+
+    <ImageButton
+        android:id="@+id/btnMedia"
+        style="@style/MediaCategoryItemStyle"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:background="@color/white"
+        android:src="@drawable/ic_media"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/ph1"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="ContentDescription" />
+
+    <androidx.constraintlayout.widget.Placeholder
+        android:id="@+id/hidden_ph1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/btnMedia"
+        app:layout_constraintEnd_toEndOf="@+id/btnMedia"
+        app:layout_constraintStart_toStartOf="@+id/btnMedia"
+        app:layout_constraintTop_toTopOf="@+id/btnMedia" />
+
+    <androidx.constraintlayout.widget.Placeholder
+        android:id="@+id/hidden_ph2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/btnMedia"
+        app:layout_constraintEnd_toEndOf="@+id/btnMedia"
+        app:layout_constraintStart_toStartOf="@+id/btnMedia"
+        app:layout_constraintTop_toTopOf="@+id/btnMedia" />
+
+    <androidx.constraintlayout.widget.Placeholder
+        android:id="@+id/hidden_ph3"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/btnMedia"
+        app:layout_constraintEnd_toEndOf="@+id/btnMedia"
+        app:layout_constraintStart_toStartOf="@+id/btnMedia"
+        app:layout_constraintTop_toTopOf="@+id/btnMedia" />
+
+    <androidx.constraintlayout.widget.Placeholder
+        android:id="@+id/hidden_ph4"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/btnMedia"
+        app:layout_constraintEnd_toEndOf="@+id/btnMedia"
+        app:layout_constraintStart_toStartOf="@+id/btnMedia"
+        app:layout_constraintTop_toTopOf="@+id/btnMedia" />
+
+    <androidx.constraintlayout.widget.Placeholder
+        android:id="@+id/ph1"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        app:layout_constraintBottom_toBottomOf="@+id/btnMedia"
+        app:layout_constraintEnd_toStartOf="@+id/ph2"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/btnMedia"
+        app:layout_constraintTop_toTopOf="@+id/btnMedia" />
+
+    <androidx.constraintlayout.widget.Placeholder
+        android:id="@+id/ph2"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        app:layout_constraintBottom_toBottomOf="@+id/btnMedia"
+        app:layout_constraintEnd_toStartOf="@+id/ph3"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/ph1"
+        app:layout_constraintTop_toTopOf="@+id/btnMedia" />
+
+    <androidx.constraintlayout.widget.Placeholder
+        android:id="@+id/ph3"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        app:layout_constraintBottom_toBottomOf="@+id/btnMedia"
+        app:layout_constraintEnd_toStartOf="@+id/ph4"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/ph2"
+        app:layout_constraintTop_toTopOf="@+id/btnMedia" />
+
+    <androidx.constraintlayout.widget.Placeholder
+        android:id="@+id/ph4"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        app:layout_constraintBottom_toBottomOf="@+id/btnMedia"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/ph3"
+        app:layout_constraintTop_toTopOf="@+id/btnMedia" />
 
     <Button
         android:id="@+id/btnTesting"

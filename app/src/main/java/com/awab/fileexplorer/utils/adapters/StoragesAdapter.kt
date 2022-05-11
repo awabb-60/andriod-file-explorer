@@ -7,9 +7,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.awab.fileexplorer.databinding.StorageItemBinding
 import com.awab.fileexplorer.utils.data.data_models.StorageDataModel
 
-class StoragesAdapter(val onClick:(StorageDataModel) -> Unit) : RecyclerView.Adapter<StoragesAdapter.ViewHolder>() {
-
-    lateinit var list:Array<StorageDataModel>
+class StoragesAdapter(var list: Array<StorageDataModel> = arrayOf(), val onClick: (StorageDataModel) -> Unit) :
+    RecyclerView.Adapter<StoragesAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = StorageItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -21,7 +20,6 @@ class StoragesAdapter(val onClick:(StorageDataModel) -> Unit) : RecyclerView.Ada
     }
 
     override fun getItemCount() = list.size
-
 
     @SuppressLint("NotifyDataSetChanged")
     fun submitList(list: Array<StorageDataModel>) {
@@ -55,8 +53,5 @@ class StoragesAdapter(val onClick:(StorageDataModel) -> Unit) : RecyclerView.Ada
                 tvStorageSize.text = item.size
             }
         }
-
-
     }
-
 }
