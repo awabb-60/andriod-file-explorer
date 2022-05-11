@@ -2,6 +2,7 @@ package com.awab.fileexplorer.utils.adapters
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
@@ -27,6 +28,8 @@ class QuickAccessAdapter(val context: Context, val presenter: HomePresenterContr
         var itemDimen = 0
     }
 
+    private val TAG = "AppDebug"
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = QuickAccessFileLayoutBinding.inflate(LayoutInflater.from(parent.context), parent, false)
 
@@ -39,6 +42,7 @@ class QuickAccessAdapter(val context: Context, val presenter: HomePresenterContr
 
         layoutParams.setMargins(MARGIN_SIZE, MARGIN_SIZE, MARGIN_SIZE, MARGIN_SIZE)
 
+        Log.d(TAG, "onCreateViewHolder: $itemDimen  ${parent.width} ${parent.height}")
         return ViewHolder(binding)
     }
 

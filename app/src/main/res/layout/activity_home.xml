@@ -30,12 +30,11 @@
         android:layout_margin="10dp"
         app:cardCornerRadius="10dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tapsLayout">
 
         <TextView
-            android:id="@+id/quickAccessEmptyMessage"
+            android:id="@+id/tv_quick_access_empty_message"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
@@ -43,10 +42,11 @@
             android:visibility="gone" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvQuickAccess"
+            android:id="@+id/rv_quick_Access"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:listitem="@layout/quick_access_file_layout" />
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="3" />
 
         <ImageButton
             android:id="@+id/btnEditQuickAccess"
@@ -66,7 +66,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_margin="10dp"
-        app:cardBackgroundColor="@color/transparent"
         app:cardCornerRadius="10dp"
         app:layout_constraintBottom_toTopOf="@+id/btnMedia"
         app:layout_constraintEnd_toEndOf="parent"
@@ -79,7 +78,6 @@
             android:id="@+id/rvStorages"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center"
             tools:listitem="@layout/storage_item" />
     </androidx.cardview.widget.CardView>
 
@@ -124,7 +122,6 @@
         style="@style/MediaCategoryItemStyle"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
-        android:background="@color/white"
         android:src="@drawable/ic_media"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/ph1"

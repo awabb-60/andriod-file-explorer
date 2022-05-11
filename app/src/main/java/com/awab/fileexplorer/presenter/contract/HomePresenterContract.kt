@@ -51,11 +51,6 @@ interface HomePresenterContract {
     fun updateQuickAccessCard(list: List<QuickAccessFileDataModel>)
 
     /**
-     * set the new height of the quick access card
-     */
-    fun updateQuickAccessCardHeight(fileDim: Int, listSize: Int)
-
-    /**
      * get called after an item is clicked in the quick access rv
      * @param file the targeted file
      */

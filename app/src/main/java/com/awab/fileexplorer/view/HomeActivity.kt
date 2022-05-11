@@ -24,6 +24,8 @@ import com.awab.fileexplorer.utils.adapters.StoragesAdapter
 import com.awab.fileexplorer.utils.data.data_models.QuickAccessFileDataModel
 import com.awab.fileexplorer.utils.data.data_models.StorageDataModel
 import com.awab.fileexplorer.utils.data.data_models.Tap
+import com.awab.fileexplorer.utils.isAPI30AndAbove
+import com.awab.fileexplorer.utils.isBetweenAPI23And30
 import com.awab.fileexplorer.view.contract.HomeView
 import com.awab.fileexplorer.view.custom_views.CustomDialog
 
@@ -149,32 +151,39 @@ class HomeActivity : AppCompatActivity(), HomeView {
         grantResults: IntArray
     ) {
         if (requestCode == PERMISSION_REQUEST_CODE) {
-            for (idx in grantResults.indices) {
-                if (grantResults[idx] != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, " this app need the storage permission to work", Toast.LENGTH_SHORT)
-                        .show()
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                        !shouldShowRequestPermissionRationale(permissions[idx])
-                    ) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                            return
+
+            // check permissions for API 30 and above
+            if (isAPI30AndAbove()) {
+                if (grantResults[0] != PackageManager.PERMISSION_GRANTED)
+                    Toast.makeText(this, "grant the storage permission", Toast.LENGTH_SHORT).show()
+
+            } else if (isBetweenAPI23And30()) {
+                for (idx in grantResults.indices) {
+                    if (grantResults[idx] != PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(this, " this app need the storage permission to work", Toast.LENGTH_SHORT)
+                            .show()
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                            !shouldShowRequestPermissionRationale(permissions[idx])
+                        ) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                return
+                            }
+
+                            //opening the setting for the user to grant the permission
+                            val settingsIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                            val packageUri = Uri.fromParts("package", packageName, null)
+                            settingsIntent.data = packageUri
+                            startActivity(settingsIntent)
+                            Toast.makeText(
+                                this,
+                                "go to the permission section and allow the storage permission",
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
 
-                        //opening the setting for the user to grant the permission
-                        val settingsIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                        val packageUri = Uri.fromParts("package", packageName, null)
-                        settingsIntent.data = packageUri
-                        startActivity(settingsIntent)
-                        Toast.makeText(
-                            this,
-                            "go to the permission section and allow the storage permission",
-                            Toast.LENGTH_LONG
-                        ).show()
                     }
-
                 }
             }
-
         }
 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
@@ -211,24 +220,17 @@ class HomeActivity : AppCompatActivity(), HomeView {
 
     override fun updateQuickAccessFilesList(list: List<QuickAccessFileDataModel>) {
         binding.rvQuickAccess.visibility = View.VISIBLE
-        binding.quickAccessEmptyMessage.visibility = View.GONE
+        binding.tvQuickAccessEmptyMessage.visibility = View.GONE
+
         mQuickAccessFilesAdapter.submitList(list)
     }
 
     override fun quickAccessIsEmpty() {
         binding.rvQuickAccess.visibility = View.GONE
-        binding.quickAccessEmptyMessage.visibility = View.VISIBLE
-
-        // shrinking the window height to math the taps
-        binding.quickAccessFilesCard.layoutParams.height = (binding.root.layoutParams.height * 0.2).toInt()
+        binding.tvQuickAccessEmptyMessage.visibility = View.VISIBLE
 
         // removing the edit button
         binding.btnEditQuickAccess.visibility = View.GONE
-    }
-
-    override fun updateQuickAccessCardHeight(cardHeight: Int) {
-        binding.quickAccessFilesCard.layoutParams.height = cardHeight
-        binding.btnEditQuickAccess.visibility = View.VISIBLE
     }
 
     override fun showEditQuickAccess() {

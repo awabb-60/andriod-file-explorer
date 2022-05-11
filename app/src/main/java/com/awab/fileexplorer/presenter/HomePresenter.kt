@@ -10,7 +10,6 @@ import com.awab.fileexplorer.R
 import com.awab.fileexplorer.model.MainStorageModel
 import com.awab.fileexplorer.presenter.contract.HomePresenterContract
 import com.awab.fileexplorer.utils.*
-import com.awab.fileexplorer.utils.adapters.QuickAccessAdapter
 import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
 import com.awab.fileexplorer.utils.data.data_models.FileDataModel
 import com.awab.fileexplorer.utils.data.data_models.QuickAccessFileDataModel
@@ -26,7 +25,6 @@ import kotlinx.coroutines.*
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 class HomePresenter(override val view: HomeView) : HomePresenterContract {
 
@@ -52,10 +50,12 @@ class HomePresenter(override val view: HomeView) : HomePresenterContract {
     }
 
     private fun getOenStorageIntent(storage: StorageDataModel): Intent? {
-        if (!allPermissionsGranted(view.context(), INTERNAL_STORAGE_REQUIRED_PERMISSIONS)) {
+        if (!allPermissionsGranted(view.context())) {
             storageAccess(view.context())
             return null
         }
+
+
         return Intent(view.context(), StorageActivity::class.java).apply {
             putExtra(STORAGE_PATH_EXTRA, storage.path)
             putExtra(STORAGE_DISPLAY_NAME_EXTRA, storage.name)
@@ -237,21 +237,7 @@ class HomePresenter(override val view: HomeView) : HomePresenterContract {
             view.quickAccessIsEmpty()
         else {
             view.updateQuickAccessFilesList(list)
-//            updateQuickAccessCardHeight(QuickAccessAdapter.itemDimen, list.size)
         }
-    }
-
-    override fun updateQuickAccessCardHeight(fileDim: Int, listSize: Int) {
-        when (listSize) {
-            0 -> view.quickAccessIsEmpty()
-            // height for on row of files
-            in 1..QuickAccessAdapter.PER_ROW -> {
-                view.updateQuickAccessCardHeight(fileDim)
-            }
-            // when the size can fil 2 rows or more... the height will fit 2 file only
-            else -> view.updateQuickAccessCardHeight(fileDim * 2)
-        }
-
     }
 
 

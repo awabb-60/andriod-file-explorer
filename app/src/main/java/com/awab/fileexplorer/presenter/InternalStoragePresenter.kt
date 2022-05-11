@@ -3,9 +3,12 @@ package com.awab.fileexplorer.presenter
 import com.awab.fileexplorer.model.MainStorageModel
 import com.awab.fileexplorer.presenter.contract.StoragePresenterContract
 import com.awab.fileexplorer.presenter.contract.SupPresenter
-import com.awab.fileexplorer.utils.*
+import com.awab.fileexplorer.utils.allPermissionsGranted
 import com.awab.fileexplorer.utils.callbacks.SimpleSuccessAndFailureCallback
+import com.awab.fileexplorer.utils.createFolderIO
 import com.awab.fileexplorer.utils.data.types.StorageType
+import com.awab.fileexplorer.utils.renameFileIO
+import com.awab.fileexplorer.utils.storageAccess
 import com.awab.fileexplorer.view.contract.StorageView
 import java.io.File
 
@@ -32,7 +35,7 @@ class InternalStoragePresenter(
     override val model = MainStorageModel(view.context())
 
     override fun isAuthorized(): Boolean {
-        return allPermissionsGranted(view.context(), INTERNAL_STORAGE_REQUIRED_PERMISSIONS)
+        return allPermissionsGranted(view.context())
     }
 
     override fun requestPermission() {

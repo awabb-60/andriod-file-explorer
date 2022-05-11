@@ -32,10 +32,10 @@ interface HomeView {
      */
     fun quickAccessIsEmpty()
 
-    /**
-     * update the quick access window height
-     */
-    fun updateQuickAccessCardHeight(cardHeight: Int)
+//    /**
+//     * update the quick access window height
+//     */
+//    fun updateQuickAccessCardHeight(cardHeight: Int)
 
     /**
      * show the edit button in the quick access window
